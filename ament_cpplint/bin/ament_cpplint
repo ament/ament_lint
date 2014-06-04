@@ -1,0 +1,181 @@
+#!/usr/bin/env python2
+
+from __future__ import print_function
+
+import argparse
+import codecs
+import os
+import re
+import sys
+import time
+
+from ament_cpplint import get_xunit_content
+from ament_cpplint.cpplint import _cpplint_state
+from ament_cpplint.cpplint import ParseArguments
+from ament_cpplint.cpplint import ProcessFile
+
+
+def main(argv=sys.argv[1:]):
+    parser = argparse.ArgumentParser(
+        description='Check code against the Google style conventions using '
+                    'cpplint.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        'paths',
+        nargs='*',
+        default=[os.curdir],
+        help="The files or directories to check. For directories files ending "
+             "in '.c', '.cc', '.cpp', '.cxx', '.h', '.hh', '.hpp' and '.hxx' "
+             "will be considered.")
+    # not using a file handle directly
+    # in order to prevent leaving an empty file when something fails early
+    parser.add_argument(
+        '--xunit-file',
+        help='Generate a xunit compliant XML file')
+    args = parser.parse_args(argv)
+
+    if args.xunit_file:
+        start_time = time.time()
+
+    argv = []
+    # collect category based counts
+    argv.append('--counting=detailed')
+    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
+    argv.append('--extensions=%s' % ','.join(extensions))
+
+    groups = get_file_groups(args.paths, extensions)
+    if not groups:
+        print('No files found', file=sys.stderr)
+        return 1
+
+    # change stderr to write with replacement characters so we don't die
+    # if we try to print something containing non-ASCII characters.
+    sys.stderr = codecs.StreamReaderWriter(
+        sys.stderr,
+        codecs.getreader('utf8'),
+        codecs.getwriter('utf8'),
+        'replace')
+
+    # hook into error reporting
+    import ament_cpplint.cpplint
+    DefaultError = ament_cpplint.cpplint.Error
+    report = []
+
+    # invoke cpplint for each root group of files
+    _cpplint_state.ResetErrorCounts()
+    for root in sorted(groups.keys()):
+        files = groups[root]
+
+        arguments = list(argv)
+        if root:
+            root_arg = '--root=%s' % root
+            arguments.append(root_arg)
+            print("Using '%s' argument" % root_arg)
+        else:
+            print("Not using '--root'")
+        print('')
+        arguments += files
+        filenames = ParseArguments(arguments)
+
+        for filename in filenames:
+            # hook into error reporting
+            errors = []
+
+            def custom_error(filename, linenum, category, confidence, message):
+                errors.append({
+                    'linenum': linenum,
+                    'category': category,
+                    'confidence': confidence,
+                    'message': message,
+                })
+                DefaultError(filename, linenum, category, confidence, message)
+            ament_cpplint.cpplint.Error = custom_error
+
+            ProcessFile(filename, _cpplint_state.verbose_level)
+            report.append((filename, errors))
+            print('')
+
+    # output summary
+    for category in sorted(_cpplint_state.errors_by_category.keys()):
+        count = _cpplint_state.errors_by_category[category]
+        print("Category '%s' errors found: %d" % (category, count),
+              file=sys.stderr)
+    if _cpplint_state.error_count:
+        print('Total errors found: %d' % _cpplint_state.error_count,
+              file=sys.stderr)
+    else:
+        print('No errors found')
+
+    # generate xunit file
+    if args.xunit_file:
+        testname = os.path.basename(args.xunit_file)
+        suffix = '.xml'
+        if testname.endswith(suffix):
+            testname = testname[0:-len(suffix)]
+        xml = get_xunit_content(report, testname, time.time() - start_time)
+        path = os.path.dirname(os.path.abspath(args.xunit_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.xunit_file, 'w') as f:
+            f.write(xml)
+
+    return 1 if _cpplint_state.error_count else 0
+
+
+def get_file_groups(paths, extensions):
+    # dict mapping root path to files
+    groups = {}
+    for path in paths:
+        if os.path.isdir(path):
+            for dirpath, dirnames, filenames in os.walk(path):
+                # ignore folder starting with . or _
+                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames.sort()
+
+                # select files by extension
+                for filename in sorted(filenames):
+                    _, ext = os.path.splitext(filename)
+                    if ext in ['.%s' % e for e in extensions]:
+                        append_file_to_group(groups,
+                                             os.path.join(dirpath, filename))
+        if os.path.isfile(path):
+            append_file_to_group(groups, path)
+    return groups
+
+
+def append_file_to_group(groups, path):
+    path = os.path.abspath(path)
+
+    # try to determine root from path
+    base_path = os.path.dirname(path)
+    for p in ['include', 'src', 'test']:
+        match = re.search(
+            '^(.+%s%s)%s' %
+            (re.escape(os.sep), re.escape(p), re.escape(os.sep)), path)
+        if match:
+            base_path = match.group(1)
+            break
+
+    # try to find repository root
+    repo_root = None
+    p = path
+    while p and repo_root is None:
+        p = os.path.dirname(p)
+        for marker in ['.git', '.hg', '.svn']:
+            if os.path.exists(os.path.join(p, marker)):
+                repo_root = p
+                break
+
+    # compute relative --root argument
+    root = None
+    if repo_root:
+        root = os.path.relpath(base_path, repo_root)
+
+    # add the path to the appropriate group
+    if root not in groups:
+        groups[root] = []
+    groups[root].append(path)
+
+
+if __name__ == '__main__':
+    sys.exit(main())
