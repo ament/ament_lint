@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+
+from __future__ import print_function
+
+import argparse
+import multiprocessing
+import os
+import subprocess
+import sys
+import time
+from xml.etree import ElementTree
+
+from ament_cppcheck import get_xunit_content
+
+
+def main(argv=sys.argv[1:]):
+    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
+
+    parser = argparse.ArgumentParser(
+        description='Perform static code analysis using cppcheck.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        'paths',
+        nargs='*',
+        default=[os.curdir],
+        help='The files or directories to check. For directories files ending '
+             'in %s will be considered.' %
+             ', '.join(["'.%s'" % e for e in extensions]))
+    # not using a file handle directly
+    # in order to prevent leaving an empty file when something fails early
+    parser.add_argument(
+        '--xunit-file',
+        help='Generate a xunit compliant XML file')
+    args = parser.parse_args(argv)
+
+    if args.xunit_file:
+        start_time = time.time()
+
+    files = get_files(args.paths, extensions)
+    if not files:
+        print('No files found', file=sys.stderr)
+        return 1
+
+    cppcheck_bin = find_executable('cppcheck')
+    if not cppcheck_bin:
+        print("Could not find 'cppcheck' executable", file=sys.stderr)
+        return 1
+
+    # try to determine the number of CPU cores
+    jobs = None
+    try:
+        jobs = multiprocessing.cpu_count()
+    except NotImplementedError:
+        # the number of cores cannot be determined, do not extend args
+        pass
+
+    # invoke cppcheck
+    cmd = [cppcheck_bin,
+           '-f',
+           '--inline-suppr',
+           '-q',
+           '-rp',
+           '--xml',
+           '--xml-version=1']
+    if jobs:
+        cmd.extend(['-j', '%d' % jobs])
+    cmd.extend(files)
+    try:
+        p = subprocess.Popen(cmd, stderr=subprocess.PIPE)
+        xml = p.communicate()[1]
+    except subprocess.CalledProcessError as e:
+        print("Could not invoke 'cppcheck' (error code: %d): %s" %
+              (e.returncode, e), file=sys.stderr)
+        return 1
+
+    try:
+        root = ElementTree.fromstring(xml)
+    except ElementTree.ParseError as e:
+        print('Invalid XML in cppcheck output: %s' % str(e),
+              file=sys.stderr)
+        return 1
+
+    # output errors
+    report = {}
+    for filename in files:
+        report[filename] = []
+    for error in root.findall('error'):
+        filename = error.get('file')
+        data = {
+            'line': int(error.get('line')),
+            'id': error.get('id'),
+            'severity': error.get('severity'),
+            'msg': error.get('msg'),
+        }
+        report[filename].append(data)
+
+        data = dict(data)
+        data['filename'] = filename
+        print('[%(filename)s:%(line)d]: (%(severity)s: %(id)s) %(msg)s' % data,
+              file=sys.stderr)
+
+    # output summary
+    error_count = sum([len(r) for r in report.values()])
+    if not error_count:
+        print('No errors')
+        rc = 0
+    else:
+        print('%d errors' % error_count, file=sys.stderr)
+        rc = 1
+
+    # generate xunit file
+    if args.xunit_file:
+        testname = os.path.basename(args.xunit_file)
+        suffix = '.xml'
+        if testname.endswith(suffix):
+            testname = testname[0:-len(suffix)]
+        xml = get_xunit_content(report, testname, time.time() - start_time)
+        path = os.path.dirname(os.path.abspath(args.xunit_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.xunit_file, 'w') as f:
+            f.write(xml)
+
+    return rc
+
+
+def find_executable(file_name):
+    for path in os.getenv('PATH').split(os.path.pathsep):
+        file_path = os.path.join(path, file_name)
+        if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
+            return file_path
+    return None
+
+
+def get_files(paths, extensions):
+    files = []
+    for path in paths:
+        if os.path.isdir(path):
+            for dirpath, dirnames, filenames in os.walk(path):
+                # ignore folder starting with . or _
+                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames.sort()
+
+                # select files by extension
+                for filename in sorted(filenames):
+                    _, ext = os.path.splitext(filename)
+                    if ext in ['.%s' % e for e in extensions]:
+                        files.append(os.path.join(dirpath, filename))
+        if os.path.isfile(path):
+            files.append(path)
+    return files
+
+
+if __name__ == '__main__':
+    sys.exit(main())
