@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+
+from __future__ import print_function
+
+import argparse
+import difflib
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+from ament_uncrustify import get_xunit_content
+
+
+def main(argv=sys.argv[1:]):
+    # support running the script from source
+    config_file = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        'share', 'ament_uncrustify', 'ament_code_style.cfg')
+    if not os.path.exists(config_file):
+        rel_config_file = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'ament_code_style.cfg')
+        if os.path.exists(rel_config_file):
+            config_file = rel_config_file
+
+    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
+
+    parser = argparse.ArgumentParser(
+        description='Check code style using uncrustify.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '-c',
+        metavar='CFG',
+        default=config_file,
+        help='The config file')
+    parser.add_argument(
+        'paths',
+        nargs='*',
+        default=[os.curdir],
+        help='The files or directories to check. For directories files ending '
+             'in %s will be considered.' %
+             ', '.join(["'.%s'" % e for e in extensions]))
+    # not using a file handle directly
+    # in order to prevent leaving an empty file when something fails early
+    parser.add_argument(
+        '--xunit-file',
+        help='Generate a xunit compliant XML file')
+    args = parser.parse_args(argv)
+
+    if not os.path.exists(args.c):
+        print("Could not config file '%s'" % args.c, file=sys.stderr)
+        return 1
+
+    if args.xunit_file:
+        start_time = time.time()
+
+    files = get_files(args.paths, extensions)
+    if not files:
+        print('No files found', file=sys.stderr)
+        return 1
+
+    uncrustify_bin = find_executable('uncrustify')
+    if not uncrustify_bin:
+        print("Could not find 'uncrustify' executable", file=sys.stderr)
+        return 1
+
+    abs_files = [os.path.abspath(f) for f in files]
+    suffix = '.uncrustify'
+
+    report = []
+    try:
+        temp_path = tempfile.mkdtemp(prefix='uncrustify_')
+
+        # invoke uncrustify
+        try:
+            cmd = [uncrustify_bin,
+                   '-c', args.c,
+                   '--prefix', temp_path,
+                   '--suffix', suffix,
+                   '-q']
+            cmd.extend(abs_files)
+            output = subprocess.check_output(cmd)
+        except subprocess.CalledProcessError as e:
+            print("Could not invoke 'uncrustify' (error code: %d): %s" %
+                  (e.returncode, e), file=sys.stderr)
+            print(output, file=sys.stderr)
+            return 1
+
+        # compute diff
+        for filename in files:
+            with open(filename, 'r') as original_file:
+                # remove leading slash / drive
+                rel_abspath = os.sep.join(
+                    os.path.abspath(filename).split(os.sep)[1:])
+                modified_filename = os.path.join(
+                    temp_path, rel_abspath + suffix)
+                with open(modified_filename, 'r') as modified_file:
+                    diff_lines = list(difflib.unified_diff(
+                        original_file.readlines(), modified_file.readlines(),
+                        fromfile=filename, tofile=filename + suffix,
+                        n=0))
+                    report.append((filename, diff_lines))
+    finally:
+        if os.path.exists(temp_path):
+            shutil.rmtree(temp_path)
+
+    # output diffs
+    for (filename, diff_lines) in report:
+        if diff_lines:
+            print("Code style divergence in file '%s':" % filename,
+                  file=sys.stderr)
+            print('', file=sys.stderr)
+            for line in diff_lines:
+                print(line.rstrip('\r\n'), file=sys.stderr)
+            print('', file=sys.stderr)
+        else:
+            print("No code style divergence in file '%s'" % filename)
+            print('')
+
+    # output summary
+    error_count = sum([1 if r[1] else 0 for r in report])
+    if not error_count:
+        print('No errors')
+        rc = 0
+    else:
+        print('%d files with code style divergence' % error_count,
+              file=sys.stderr)
+        rc = 1
+
+    # generate xunit file
+    if args.xunit_file:
+        testname = os.path.basename(args.xunit_file)
+        suffix = '.xml'
+        if testname.endswith(suffix):
+            testname = testname[0:-len(suffix)]
+        xml = get_xunit_content(report, testname, time.time() - start_time)
+        path = os.path.dirname(os.path.abspath(args.xunit_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.xunit_file, 'w') as f:
+            f.write(xml)
+
+    return rc
+
+
+def find_executable(file_name):
+    for path in os.getenv('PATH').split(os.path.pathsep):
+        file_path = os.path.join(path, file_name)
+        if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
+            return file_path
+    return None
+
+
+def get_files(paths, extensions):
+    files = []
+    for path in paths:
+        if os.path.isdir(path):
+            for dirpath, dirnames, filenames in os.walk(path):
+                # ignore folder starting with . or _
+                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames.sort()
+
+                # select files by extension
+                for filename in sorted(filenames):
+                    _, ext = os.path.splitext(filename)
+                    if ext in ['.%s' % e for e in extensions]:
+                        files.append(os.path.join(dirpath, filename))
+        if os.path.isfile(path):
+            files.append(path)
+    return files
+
+
+if __name__ == '__main__':
+    sys.exit(main())
