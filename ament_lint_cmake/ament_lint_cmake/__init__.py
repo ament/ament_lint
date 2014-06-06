@@ -27,14 +27,13 @@ def get_xunit_content(report, testname, elapsed):
             for error in errors:
                 data = {
                     'quoted_location': quoteattr(
-                        '%s:%d' % (filename, error['linenum'])),
+                        '%s:%d' % (filename, error['linenumber'])),
                     'category': error['category'],
-                    'confidence': error['confidence'],
                     'quoted_message': quoteattr(error['message']),
                 }
                 xml += '''  <testcase
     name=%(quoted_location)s
-    classname="%(category)s [%(confidence)d]"
+    classname="%(category)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
