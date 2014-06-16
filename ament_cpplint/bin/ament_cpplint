@@ -16,6 +16,8 @@ from ament_cpplint.cpplint import ProcessFile
 
 
 def main(argv=sys.argv[1:]):
+    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
+
     parser = argparse.ArgumentParser(
         description='Check code against the Google style conventions using '
                     'cpplint.',
@@ -25,8 +27,8 @@ def main(argv=sys.argv[1:]):
         nargs='*',
         default=[os.curdir],
         help="The files or directories to check. For directories files ending "
-             "in '.c', '.cc', '.cpp', '.cxx', '.h', '.hh', '.hpp' and '.hxx' "
-             "will be considered.")
+             'in %s will be considered.' %
+             ', '.join(["'.%s'" % e for e in extensions]))
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -40,7 +42,6 @@ def main(argv=sys.argv[1:]):
     argv = []
     # collect category based counts
     argv.append('--counting=detailed')
-    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
     argv.append('--extensions=%s' % ','.join(extensions))
 
     groups = get_file_groups(args.paths, extensions)
