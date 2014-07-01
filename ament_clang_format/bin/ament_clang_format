@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+
+from __future__ import print_function
+
+import argparse
+import os
+import subprocess
+import sys
+import time
+from xml.etree import ElementTree
+
+from ament_clang_format import get_xunit_content
+
+
+def main(argv=sys.argv[1:]):
+    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
+
+    parser = argparse.ArgumentParser(
+        description='Check code style using clang_format.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        'paths',
+        nargs='*',
+        default=[os.curdir],
+        help='The files or directories to check. For directories files ending '
+             'in %s will be considered.' %
+             ', '.join(["'.%s'" % e for e in extensions]))
+    parser.add_argument(
+        '--reformat',
+        action='store_true',
+        help='Reformat the files in place')
+    # not using a file handle directly
+    # in order to prevent leaving an empty file when something fails early
+    parser.add_argument(
+        '--xunit-file',
+        help='Generate a xunit compliant XML file')
+    args = parser.parse_args(argv)
+
+    if args.xunit_file:
+        start_time = time.time()
+
+    files = get_files(args.paths, extensions)
+    if not files:
+        print('No files found', file=sys.stderr)
+        return 1
+
+    bin_names = ['clang-format-3.5', 'clang-format-3.4', 'clang-format-3.3']
+    clang_format_bin = find_executable(bin_names)
+    if not clang_format_bin:
+        print("Could not find %s executable" %
+              ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
+        return 1
+
+    report = []
+
+    # invoke clang_format
+    style = '{BasedOnStyle: Google}'
+    cmd = [clang_format_bin,
+           '-output-replacements-xml',
+           '-style=%s' % style]
+    cmd.extend(files)
+    try:
+        output = subprocess.check_output(cmd)
+    except subprocess.CalledProcessError as e:
+        print("Could not invoke '%s' (error code: %d): %s" %
+              (os.path.basename(clang_format_bin), e.returncode, e),
+              file=sys.stderr)
+        return 1
+
+    # output errors
+    report = {}
+    for filename in files:
+        report[filename] = []
+
+    xmls = output.split(b"<?xml version='1.0'?>")[1:]
+    changed_files = []
+    for filename, xml in zip(files, xmls):
+        try:
+            root = ElementTree.fromstring(xml)
+        except ElementTree.ParseError as e:
+            print('Invalid XML in clang format output: %s' % str(e),
+                  file=sys.stderr)
+            return 1
+
+        replacements = root.findall('replacement')
+        if replacements:
+            changed_files.append(filename)
+            if not args.reformat:
+                print("Code style divergence in file '%s':" % filename,
+                      file=sys.stderr)
+                print('', file=sys.stderr)
+            else:
+                print("%d code style divergences in file '%s': reformatted "
+                      "file" % (len(replacements), filename))
+            for replacement in replacements:
+                data = {
+                    'offset': int(replacement.get('offset')),
+                    'length': int(replacement.get('length')),
+                    'replacement': replacement.text or '',
+                }
+                # make common control characters visible
+                mapping = {'\n': '\\n', '\r': '\\r', '\t': '\\t'}
+                for old, new in mapping.items():
+                    data['replacement'] = data['replacement'].replace(old, new)
+                report[filename].append(data)
+
+                if not args.reformat:
+                    data = dict(data)
+                    data['filename'] = filename
+                    print('[%(filename)s:%(offset)d]: Replace %(length)s '
+                          'characters with [%(replacement)s]' % data,
+                          file=sys.stderr)
+            if not args.reformat:
+                print('', file=sys.stderr)
+        else:
+            print("No code style divergence in file '%s'" % filename)
+            if not args.reformat:
+                print('')
+
+    # overwrite original with reformatted files
+    if args.reformat and changed_files:
+        cmd = [clang_format_bin,
+               '-i',
+               '-style=%s' % style]
+        cmd.extend(files)
+        try:
+            subprocess.check_call(cmd)
+        except subprocess.CalledProcessError as e:
+            print("Could not invoke '%s' (error code: %d): %s" %
+                  (os.path.basename(clang_format_bin), e.returncode, e),
+                  file=sys.stderr)
+            return 1
+
+    # output summary
+    file_count = sum([1 if report[k] else 0 for k in report.keys()])
+    replacement_count = sum([len(r) for r in report.values()])
+    if not file_count:
+        print('No errors')
+        rc = 0
+    else:
+        print('%d files with %d code style divergences' %
+              (file_count, replacement_count), file=sys.stderr)
+        rc = 1
+
+    # generate xunit file
+    if args.xunit_file:
+        testname = os.path.basename(args.xunit_file)
+        suffix = '.xml'
+        if testname.endswith(suffix):
+            testname = testname[0:-len(suffix)]
+        xml = get_xunit_content(report, testname, time.time() - start_time)
+        path = os.path.dirname(os.path.abspath(args.xunit_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.xunit_file, 'w') as f:
+            f.write(xml)
+
+    return rc
+
+
+def find_executable(file_names):
+    paths = os.getenv('PATH').split(os.path.pathsep)
+    for file_name in file_names:
+        for path in paths:
+            file_path = os.path.join(path, file_name)
+            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
+                return file_path
+    return None
+
+
+def get_files(paths, extensions):
+    files = []
+    for path in paths:
+        if os.path.isdir(path):
+            for dirpath, dirnames, filenames in os.walk(path):
+                # ignore folder starting with . or _
+                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames.sort()
+
+                # select files by extension
+                for filename in sorted(filenames):
+                    _, ext = os.path.splitext(filename)
+                    if ext in ['.%s' % e for e in extensions]:
+                        files.append(os.path.join(dirpath, filename))
+        if os.path.isfile(path):
+            files.append(path)
+    return files
+
+
+if __name__ == '__main__':
+    sys.exit(main())

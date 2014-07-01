@@ -47,7 +47,7 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--reformat',
         action='store_true',
-        help='Reformat the files inplace')
+        help='Reformat the files in place')
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -87,7 +87,7 @@ def main(argv=sys.argv[1:]):
                    '--suffix', suffix,
                    '-q']
             cmd.extend(input_files)
-            subprocess.check_output(cmd)
+            subprocess.check_call(cmd)
         except subprocess.CalledProcessError as e:
             print("Could not invoke 'uncrustify' (error code: %d): %s" %
                   (e.returncode, e), file=sys.stderr)
@@ -127,7 +127,7 @@ def main(argv=sys.argv[1:]):
                        '--suffix', suffix,
                        '-q']
                 cmd.extend(input_files)
-                subprocess.check_output(cmd)
+                subprocess.check_call(cmd)
             except subprocess.CalledProcessError as e:
                 print("Could not invoke 'uncrustify' (error code: %d): %s" %
                       (e.returncode, e), file=sys.stderr)
