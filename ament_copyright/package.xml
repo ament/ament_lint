@@ -8,8 +8,6 @@
   <license>BSD</license>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
-  <buildtool_depend>ament_cmake_environment</buildtool_depend>
-  <buildtool_depend>ament_cmake_index</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>
 
