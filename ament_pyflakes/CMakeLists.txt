@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-project(ament_pyflakes)
+project(ament_pyflakes NONE)
 
 find_package(ament_cmake_core REQUIRED)
 find_package(ament_cmake_python REQUIRED)
