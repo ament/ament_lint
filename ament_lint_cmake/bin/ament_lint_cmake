@@ -67,7 +67,8 @@ def main(argv=sys.argv[1:]):
 
         cmakelint.ProcessFile(filename)
         report.append((filename, errors))
-        print('')
+        if errors:
+            print('')
 
     # print summary
     print('')
