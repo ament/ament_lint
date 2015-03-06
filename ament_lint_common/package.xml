@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ament_lint_common</name>
+  <version>0.0.0</version>
+  <description>The list of commonly used linters in the ament buildsytem in CMake.</description>
+  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake_core</buildtool_depend>
+  <buildtool_depend>ament_cmake_export_dependencies</buildtool_depend>
+
+  <buildtool_export_depend>ament_cmake_core</buildtool_export_depend>
+
+  <exec_depend>ament_clang_format</exec_depend>
+  <exec_depend>ament_copyright</exec_depend>
+  <exec_depend>ament_cppcheck</exec_depend>
+  <exec_depend>ament_cpplint</exec_depend>
+  <exec_depend>ament_lint_cmake</exec_depend>
+  <exec_depend>ament_pep8</exec_depend>
+  <exec_depend>ament_pyflakes</exec_depend>
+  <exec_depend>ament_uncrustify</exec_depend>
+</package>
