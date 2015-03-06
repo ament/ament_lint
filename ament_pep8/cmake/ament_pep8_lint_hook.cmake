@@ -1,0 +1,5 @@
+file(GLOB_RECURSE _python_files FOLLOW_SYMLINKS "*.py")
+if(_python_files)
+  message(" - Added test 'pep8' to check Python code against some of the style conventions in PEP 8")
+  ament_pep8(pep8)
+endif()
