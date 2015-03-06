@@ -18,8 +18,7 @@ function(ament_copyright testname)
     set(subcmd "${subcmd} \"${arg}\"")
   endforeach()
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_copyright")
-  # copyright only works with Python 2
-  set(cmd "python2 ${subcmd} > \"${CMAKE_BINARY_DIR}/ament_copyright/${testname}.txt\"")
+  set(cmd "${subcmd} > \"${CMAKE_BINARY_DIR}/ament_copyright/${testname}.txt\"")
   ament_add_test(
     "${testname}"
     COMMAND ${cmd}
