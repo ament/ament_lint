@@ -14,4 +14,8 @@
   <buildtool_export_depend>ament_cmake_core</buildtool_export_depend>
   <buildtool_export_depend>ament_cmake_test</buildtool_export_depend>
   <buildtool_export_depend>clang-format</buildtool_export_depend>
+
+  <test_depend>ament_lint_cmake</test_depend>
+  <test_depend>ament_pep8</test_depend>
+  <test_depend>ament_pyflakes</test_depend>
 </package>
