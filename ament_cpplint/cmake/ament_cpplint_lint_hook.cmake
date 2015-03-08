@@ -10,5 +10,5 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
 )
 if(_source_files)
   message(" - Added test 'cpplint' to check C / C++ code against the Google style")
-  ament_cpplint(cpplint)
+  ament_cpplint()
 endif()

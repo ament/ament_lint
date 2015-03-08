@@ -27,5 +27,5 @@ install(
 )
 
 if(AMENT_ENABLE_TESTING)
-  ament_pep8(pep8 "ament_pep8" "bin/ament_pep8")
+  ament_pep8("ament_pep8" "bin/ament_pep8")
 endif()

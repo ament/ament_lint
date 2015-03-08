@@ -29,11 +29,11 @@ if(AMENT_ENABLE_TESTING)
   set(python_files "ament_uncrustify" "bin/ament_uncrustify")
 
   find_package(ament_pep8 REQUIRED)
-  ament_pep8(pep8 ${python_files})
+  ament_pep8(${python_files})
 
   find_package(ament_pyflakes REQUIRED)
-  ament_pyflakes(pyflakes ${python_files})
+  ament_pyflakes(${python_files})
 
   find_package(ament_lint_cmake REQUIRED)
-  ament_lint_cmake(lint_cmake)
+  ament_lint_cmake()
 endif()
