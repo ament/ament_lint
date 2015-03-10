@@ -5,7 +5,6 @@
   <description>The ability to check code using pyflakes in the ament buildsystem.</description>
   <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
   <license>Apache License 2.0</license>
-  <license>BSD</license>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>

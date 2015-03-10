@@ -5,7 +5,6 @@
   <description>The ability to perform static code analysis on C/C++ code using cppcheck in the ament buildsystem.</description>
   <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
   <license>Apache License 2.0</license>
-  <license>BSD</license>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
