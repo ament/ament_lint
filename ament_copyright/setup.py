@@ -19,10 +19,10 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    description='Ament is a build system for federated packages.',
+    description='Check source files for copyright reference.',
     long_description='''\
-Ament defines metainformation for packages, their dependencies,
-and provides tooling to build these federated packages together.''',
+The ability to check every source file contains copyright reference
+in the ament buildsystem.''',
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={
