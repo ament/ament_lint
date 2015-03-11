@@ -10,7 +10,7 @@ setup(
     author_email='dthomas@osrfoundation.org',
     maintainer='Dirk Thomas',
     maintainer_email='dthomas@osrfoundation.org',
-    url='https://github.com/ament/ament_lint/wiki',
+    url='https://github.com/ament/ament_lint',
     download_url='https://github.com/ament/ament_lint/releases',
     keywords=['ROS'],
     classifiers=[
