@@ -26,11 +26,12 @@ def get_xunit_content(report, testname, elapsed):
             # report any diff as a failing testcase
             data = {
                 'quoted_location': quoteattr(filename),
+                'testname': testname,
                 'quoted_diff': escape(''.join(diff_lines)),
             }
             xml += '''  <testcase
     name=%(quoted_location)s
-    classname="uncrustify"
+    classname="%(testname)s"
   >
       <system-err>%(quoted_diff)s</system-err>
   </testcase>
@@ -38,9 +39,13 @@ def get_xunit_content(report, testname, elapsed):
 
         else:
             # if there is no diff report a single successful test
-            data = {'quoted_location': quoteattr(filename)}
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+            }
             xml += '''  <testcase
     name=%(quoted_location)s
+    classname="%(testname)s"
     status="No errors"/>
 ''' % data
 

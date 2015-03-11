@@ -26,15 +26,16 @@ def get_xunit_content(report, testname, elapsed):
             # report each cpplint error as a failing testcase
             for error in errors:
                 data = {
-                    'quoted_location': quoteattr(
-                        '%s:%d' % (filename, error['linenum'])),
-                    'category': error['category'],
-                    'confidence': error['confidence'],
+                    'quoted_name': quoteattr(
+                        '%s [%s] (%s:%d)' % (
+                            error['category'], error['confidence'],
+                            filename, error['linenum'])),
+                    'testname': testname,
                     'quoted_message': quoteattr(error['message']),
                 }
                 xml += '''  <testcase
-    name=%(quoted_location)s
-    classname="%(category)s [%(confidence)d]"
+    name=%(quoted_name)s
+    classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
@@ -42,9 +43,13 @@ def get_xunit_content(report, testname, elapsed):
 
         else:
             # if there are no cpplint errors report a single successful test
-            data = {'quoted_location': quoteattr(filename)}
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+            }
             xml += '''  <testcase
     name=%(quoted_location)s
+    classname="%(testname)s"
     status="No errors"/>
 ''' % data
 

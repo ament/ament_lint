@@ -30,15 +30,16 @@ def get_xunit_content(report, testname, elapsed):
             # report each pyflakes error as a failing testcase
             for error in errors:
                 data = {
-                    'quoted_location': quoteattr(
-                        '%s:%d' % (filename, error.lineno)),
-                    'category': type(error).__name__,
+                    'quoted_name': quoteattr(
+                        '%s (%s:%d)' % (
+                            type(error).__name__, filename, error.lineno)),
+                    'testname': testname,
                     'quoted_message': quoteattr(
                         error.message % error.message_args),
                 }
                 xml += '''  <testcase
-    name=%(quoted_location)s
-    classname="%(category)s"
+    name=%(quoted_name)s
+    classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
@@ -46,9 +47,13 @@ def get_xunit_content(report, testname, elapsed):
 
         else:
             # if there are no pyflakes errors report a single successful test
-            data = {'quoted_location': quoteattr(filename)}
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+            }
             xml += '''  <testcase
     name=%(quoted_location)s
+    classname="%(testname)s"
     status="No errors"/>
 ''' % data
 

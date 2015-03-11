@@ -109,10 +109,13 @@ def main(argv=sys.argv[1:]):
 
     # generate xunit file
     if args.xunit_file:
-        testname = os.path.basename(args.xunit_file)
+        folder_name = os.path.basename(os.path.dirname(args.xunit_file))
+        file_name = os.path.basename(args.xunit_file)
         suffix = '.xml'
-        if testname.endswith(suffix):
-            testname = testname[0:-len(suffix)]
+        if file_name.endswith(suffix):
+            file_name = file_name[0:-len(suffix)]
+        testname = '%s.%s' % (folder_name, file_name)
+
         xml = get_xunit_content(report, testname, time.time() - start_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):

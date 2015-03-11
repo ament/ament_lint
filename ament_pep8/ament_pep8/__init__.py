@@ -34,15 +34,16 @@ def get_xunit_content(report, testname):
         # report each pep8 error/warning as a failing testcase
         for error in report.errors:
             data = {
-                'quoted_location': quoteattr(
-                    '%(path)s:%(row)d:%(column)d' % error),
-                'error_code': error['error_code'],
+                'quoted_name': quoteattr(
+                    error['error_code'] +
+                    ' (%(path)s:%(row)d:%(column)d)' % error),
+                'testname': testname,
                 'quoted_message': quoteattr(
                     '%(error_message)s:\n%(source_line)s' % error),
             }
             xml += '''  <testcase
-    name=%(quoted_location)s
-    classname="%(error_code)s"
+    name=%(quoted_name)s
+    classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
@@ -50,10 +51,14 @@ def get_xunit_content(report, testname):
 
     else:
         # if there are no pep8 errors/warnings report a single successful test
+        data = {
+            'testname': testname,
+        }
         xml += '''  <testcase
-    name="ament_pep8"
+    name="pep8"
+    classname="%(testname)s"
     status="No errors or warnings"/>
-'''
+''' % data
 
     # output list of checked files
     data = {

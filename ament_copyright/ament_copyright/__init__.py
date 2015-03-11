@@ -59,12 +59,15 @@ def get_xunit_content(report, testname, elapsed):
 
     for (filename, has_copyright) in report:
 
+        data = {
+            'quoted_filename': quoteattr(filename),
+            'testname': testname,
+        }
         if not has_copyright:
             # report missing copyright as a failing testcase
-            data = {'quoted_filename': quoteattr(filename)}
             xml += '''  <testcase
     name=%(quoted_filename)s
-    classname="missing copyright"
+    classname="%(testname)s"
   >
       <failure message="could not find copyright reference"/>
   </testcase>
@@ -72,9 +75,9 @@ def get_xunit_content(report, testname, elapsed):
 
         else:
             # if there is a copyright report a single successful test
-            data = {'quoted_filename': quoteattr(filename)}
             xml += '''  <testcase
     name=%(quoted_filename)s
+    classname="%(testname)s"
     status="No errors"/>
 ''' % data
 

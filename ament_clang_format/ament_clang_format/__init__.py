@@ -31,6 +31,7 @@ def get_xunit_content(report, testname, elapsed):
                         '%s:%d:%d' % (
                             filename, replacement['line_no'],
                             replacement['offset_in_line'])),
+                    'testname': testname,
                     'quoted_message': quoteattr(
                         'Replace [%s] with [%s]' %
                         (replacement['original'], replacement['replacement'])
@@ -45,7 +46,7 @@ def get_xunit_content(report, testname, elapsed):
                 }
                 xml += '''  <testcase
     name=%(quoted_location)s
-    classname="replacement"
+    classname="%(testname)s"
   >
       <failure message=%(quoted_message)s><![CDATA[%(cdata)s]]></failure>
   </testcase>
@@ -53,9 +54,13 @@ def get_xunit_content(report, testname, elapsed):
 
         else:
             # if there are no replacements report a single successful test
-            data = {'quoted_location': quoteattr(filename)}
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+            }
             xml += '''  <testcase
     name=%(quoted_location)s
+    classname="%(testname)s"
     status="No errors"/>
 ''' % data
 

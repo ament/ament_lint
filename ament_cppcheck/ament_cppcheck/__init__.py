@@ -27,15 +27,16 @@ def get_xunit_content(report, testname, elapsed):
             # report each cppcheck error as a failing testcase
             for error in errors:
                 data = {
-                    'quoted_location': quoteattr(
-                        '%s:%d' % (filename, error['line'])),
-                    'severity': error['severity'],
-                    'id': error['id'],
+                    'quoted_name': quoteattr(
+                        '%s: %s (%s:%d)' % (
+                            error['severity'], error['id'],
+                            filename, error['line'])),
+                    'testname': testname,
                     'quoted_message': quoteattr(error['msg']),
                 }
                 xml += '''  <testcase
-    name=%(quoted_location)s
-    classname="%(severity)s: %(id)s"
+    name=%(quoted_name)s
+    classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
@@ -43,9 +44,13 @@ def get_xunit_content(report, testname, elapsed):
 
         else:
             # if there are no cpplint errors report a single successful test
-            data = {'quoted_location': quoteattr(filename)}
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+            }
             xml += '''  <testcase
     name=%(quoted_location)s
+    classname="%(testname)s"
     status="No errors"/>
 ''' % data
 
