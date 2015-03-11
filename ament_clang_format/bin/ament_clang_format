@@ -89,46 +89,63 @@ def main(argv=sys.argv[1:]):
                 print("Code style divergence in file '%s':" % filename,
                       file=sys.stderr)
                 print('', file=sys.stderr)
-                with open(filename, 'r') as h:
-                    content = h.read()
             else:
                 print("%d code style divergences in file '%s': reformatted "
                       "file" % (len(replacements), filename))
+            with open(filename, 'r') as h:
+                content = h.read()
             for replacement in replacements:
                 data = {
                     'offset': int(replacement.get('offset')),
                     'length': int(replacement.get('length')),
                     'replacement': replacement.text or '',
                 }
+                # to-be-replaced snippet
+                data['original'] = content[
+                    data['offset']:data['offset'] + data['length']]
+                # map global offset to line number and offset in line
+                index_of_line_start = find_index_of_line_start(
+                    content, data['offset'])
+                index_of_line_end = find_index_of_line_end(
+                    content, data['offset'] + data['length'])
+                data['line_no'] = get_line_number(content, index_of_line_start)
+                data['offset_in_line'] = data['offset'] - index_of_line_start
+
+                # generate diff like changes
+                subcontent = content[
+                    index_of_line_start:index_of_line_end]
+                data['deletion'] = subcontent
+                data['addition'] = subcontent[0:data['offset_in_line']] + \
+                    data['replacement'] + \
+                    subcontent[data['offset_in_line'] + data['length']:]
+
                 # make common control characters visible
                 mapping = {'\n': '\\n', '\r': '\\r', '\t': '\\t'}
                 for old, new in mapping.items():
                     data['replacement'] = data['replacement'].replace(old, new)
+                    data['original'] = data['original'].replace(old, new)
+
+                mapping = {'\r': '\n'}
+                for old, new in mapping.items():
+                    data['deletion'] = data['deletion'].replace(old, new)
+                    data['addition'] = data['addition'].replace(old, new)
+
+                # format deletion / addition as unified diff
+                data['deletion'] = '\n'.join(
+                    ['- ' + l for l in data['deletion'].split('\n')])
+                data['addition'] = '\n'.join(
+                    ['+ ' + l for l in data['addition'].split('\n')])
+
                 report[filename].append(data)
 
                 if not args.reformat:
                     data = dict(data)
                     data['filename'] = filename
-                    # map offset to line number and offset in line
-                    index_of_line_start = find_index_of_line_start(
-                        content, data['offset'])
-                    index_of_line_end = find_index_of_line_end(
-                        content, data['offset'])
-                    data['line_no'] = get_line_number(
-                        content, index_of_line_start)
-                    data['offset_in_line'] = data['offset'] - \
-                        index_of_line_start
                     print('[%(filename)s:%(line_no)d:%(offset_in_line)d]: '
-                          'Replace %(length)s characters with '
-                          '[%(replacement)s]' % data, file=sys.stderr)
-                    # show diff-like changes
-                    line = content[
-                        index_of_line_start:index_of_line_end]
-                    print('-', line, file=sys.stderr)
-                    print('+', line[0:data['offset_in_line']] +
-                          data['replacement'] +
-                          line[data['offset_in_line'] + data['length']:],
-                          file=sys.stderr)
+                          'Replace [%(original)s] with [%(replacement)s]' %
+                          data, file=sys.stderr)
+                    print(data['deletion'], file=sys.stderr)
+                    print(data['addition'], file=sys.stderr)
             if not args.reformat:
                 print('', file=sys.stderr)
         else:

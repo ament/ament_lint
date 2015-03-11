@@ -28,17 +28,26 @@ def get_xunit_content(report, testname, elapsed):
             for replacement in replacements:
                 data = {
                     'quoted_location': quoteattr(
-                        '%s:%d' % (filename, replacement['offset'])),
+                        '%s:%d:%d' % (
+                            filename, replacement['line_no'],
+                            replacement['offset_in_line'])),
                     'quoted_message': quoteattr(
-                        'Replace %d characters with [%s]' %
-                        (replacement['length'], replacement['replacement'])
+                        'Replace [%s] with [%s]' %
+                        (replacement['original'], replacement['replacement'])
                     ),
+                    'cdata': '\n'.join([
+                        '%s:%d:%d' % (
+                            filename, replacement['line_no'],
+                            replacement['offset_in_line']),
+                        replacement['deletion'],
+                        replacement['addition'],
+                    ]),
                 }
                 xml += '''  <testcase
     name=%(quoted_location)s
     classname="replacement"
   >
-      <failure message=%(quoted_message)s/>
+      <failure message=%(quoted_message)s><![CDATA[%(cdata)s]]></failure>
   </testcase>
 ''' % data
 
