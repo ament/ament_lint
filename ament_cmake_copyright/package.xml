@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ament_cmake_copyright</name>
+  <version>0.0.0</version>
+  <description>The CMake API for ament_copyright to check every source file contains copyright reference.</description>
+  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake_core</buildtool_depend>
+  <buildtool_depend>ament_cmake_test</buildtool_depend>
+  <buildtool_depend>ament_copyright</buildtool_depend>
+
+  <buildtool_export_depend>ament_cmake_test</buildtool_export_depend>
+  <buildtool_export_depend>ament_copyright</buildtool_export_depend>
+
+  <test_depend>ament_lint_cmake</test_depend>
+</package>

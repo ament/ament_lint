@@ -14,8 +14,9 @@ function(ament_copyright)
     set(ARG_TESTNAME "copyright")
   endif()
 
+  find_program(ament_copyright_BIN NAMES "ament_copyright")
   if(NOT ament_copyright_BIN)
-    message(FATAL_ERROR "ament_copyright() variable 'ament_copyright_BIN' must not be empty")
+    message(FATAL_ERROR "ament_copyright() could not find program 'ament_copyright'")
   endif()
 
   set(subcmd "${ament_copyright_BIN} --xunit-file \"${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml\"")
