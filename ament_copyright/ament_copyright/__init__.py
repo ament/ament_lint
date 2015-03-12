@@ -294,13 +294,20 @@ def scan_past_empty_lines(content, index):
 def get_index_of_next_line(content, index):
     index_n = content.find('\n', index)
     index_r = content.find('\r', index)
-    if index_n == -1 and index_r == -1:
+    index_rn = content.find('\r\n', index)
+    indices = set([])
+    if index_n != -1:
+        indices.add(index_n)
+    if index_r != -1:
+        indices.add(index_r)
+    if index_rn != -1:
+        indices.add(index_rn)
+    if not indices:
         return len(content)
-    if index_n == -1:
-        return index_r + 1
-    if index_r == -1:
-        return index_n + 1
-    return min(index_n + 1, index_r + 1)
+    index = min(indices)
+    if index == index_rn:
+        return index + 2
+    return index + 1
 
 
 def is_comment_line(content, index):
