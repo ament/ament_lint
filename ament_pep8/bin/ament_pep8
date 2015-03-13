@@ -20,9 +20,26 @@ from ament_pep8 import get_xunit_content
 
 
 def main(argv=sys.argv[1:]):
+    # support running the script from source
+    config_file = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        'share', 'ament_pep8', 'ament_pep8.ini')
+    if not os.path.exists(config_file):
+        rel_config_file = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'ament_pep8.ini')
+        if os.path.exists(rel_config_file):
+            config_file = rel_config_file
+
     parser = argparse.ArgumentParser(
         description='Check code against the style conventions in PEP 8.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--config',
+        metavar='path',
+        default=config_file,
+        dest='config_file',
+        help='The config file')
     parser.add_argument(
         'paths',
         nargs='*',
@@ -36,7 +53,11 @@ def main(argv=sys.argv[1:]):
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
-    report = generate_pep8_report(args.paths)
+    if not os.path.exists(args.config_file):
+        print("Could not config file '%s'" % args.config_file, file=sys.stderr)
+        return 1
+
+    report = generate_pep8_report(args.config_file, args.paths)
 
     # print statistics about errors
     if report.total_errors:

@@ -25,6 +25,10 @@ install(
   DIRECTORY cmake
   DESTINATION share/${PROJECT_NAME}
 )
+install(
+  FILES ament_pep8.ini
+  DESTINATION share/${PROJECT_NAME}
+)
 
 if(AMENT_ENABLE_TESTING)
   ament_pep8("ament_pep8" "bin/ament_pep8")

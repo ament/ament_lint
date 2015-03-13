@@ -36,6 +36,7 @@ def main(argv=sys.argv[1:]):
         '-c',
         metavar='CFG',
         default=config_file,
+        dest='config_file',
         help='The config file')
     parser.add_argument(
         'paths',
@@ -55,8 +56,8 @@ def main(argv=sys.argv[1:]):
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
-    if not os.path.exists(args.c):
-        print("Could not config file '%s'" % args.c, file=sys.stderr)
+    if not os.path.exists(args.config_file):
+        print("Could not config file '%s'" % args.config_file, file=sys.stderr)
         return 1
 
     if args.xunit_file:
@@ -82,7 +83,7 @@ def main(argv=sys.argv[1:]):
         input_files = [os.path.abspath(f) for f in files]
         try:
             cmd = [uncrustify_bin,
-                   '-c', args.c,
+                   '-c', args.config_file,
                    '--prefix', temp_path,
                    '--suffix', suffix,
                    '-q']
@@ -127,7 +128,7 @@ def main(argv=sys.argv[1:]):
             input_files = changed_files
             try:
                 cmd = [uncrustify_bin,
-                       '-c', args.c,
+                       '-c', args.config_file,
                        '--suffix', suffix,
                        '-q']
                 cmd.extend(input_files)

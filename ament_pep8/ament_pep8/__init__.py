@@ -4,12 +4,13 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 
-def generate_pep8_report(paths):
+def generate_pep8_report(config_file, paths):
     pep8style = CustomStyleGuide(
         repeat=True,
         show_source=True,
         verbose=True,
         reporter=CustomReport,
+        config_file=config_file,
     )
     return pep8style.check_files(paths)
 
