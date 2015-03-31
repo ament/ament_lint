@@ -21,15 +21,14 @@ function(ament_pep8)
     message(FATAL_ERROR "ament_pep8() variable 'ament_pep8_BIN' must not be empty")
   endif()
 
-  set(subcmd "${ament_pep8_BIN} --xunit-file \"${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml\"")
-  foreach(arg ${ARG_UNPARSED_ARGUMENTS})
-    set(subcmd "${subcmd} \"${arg}\"")
-  endforeach()
+  set(cmd "${PYTHON_EXECUTABLE}" "${ament_pep8_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pep8")
-  set(cmd "${PYTHON_EXECUTABLE} ${subcmd} > \"${CMAKE_BINARY_DIR}/ament_pep8/${ARG_TESTNAME}.txt\"")
   ament_add_test(
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
+    OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_pep8/${ARG_TESTNAME}.txt"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 endfunction()
