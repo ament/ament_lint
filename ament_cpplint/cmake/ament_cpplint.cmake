@@ -18,16 +18,15 @@ function(ament_cpplint)
     message(FATAL_ERROR "ament_cpplint() variable 'ament_cpplint_BIN' must not be empty")
   endif()
 
-  set(subcmd "${ament_cpplint_BIN} --xunit-file \"${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml\"")
-  foreach(arg ${ARG_UNPARSED_ARGUMENTS})
-    set(subcmd "${subcmd} \"${arg}\"")
-  endforeach()
-  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")
   # cpplint only works with Python 2
-  set(cmd "python2 ${subcmd} > \"${CMAKE_BINARY_DIR}/ament_cpplint/${ARG_TESTNAME}.txt\"")
+  set(cmd "python2" "${ament_cpplint_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")
   ament_add_test(
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
+    OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_cpplint/${ARG_TESTNAME}.txt"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 endfunction()

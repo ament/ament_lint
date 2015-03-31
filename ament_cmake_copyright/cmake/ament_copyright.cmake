@@ -19,15 +19,14 @@ function(ament_copyright)
     message(FATAL_ERROR "ament_copyright() could not find program 'ament_copyright'")
   endif()
 
-  set(subcmd "${ament_copyright_BIN} --xunit-file \"${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml\"")
-  foreach(arg ${ARG_UNPARSED_ARGUMENTS})
-    set(subcmd "${subcmd} \"${arg}\"")
-  endforeach()
+  set(cmd "${ament_copyright_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_copyright")
-  set(cmd "${subcmd} > \"${CMAKE_BINARY_DIR}/ament_copyright/${ARG_TESTNAME}.txt\"")
   ament_add_test(
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
+    OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_copyright/${ARG_TESTNAME}.txt"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 endfunction()

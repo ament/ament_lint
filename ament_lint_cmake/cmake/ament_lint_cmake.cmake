@@ -21,15 +21,14 @@ function(ament_lint_cmake)
     message(FATAL_ERROR "ament_lint_cmake() variable 'ament_lint_cmake_BIN' must not be empty")
   endif()
 
-  set(subcmd "${ament_lint_cmake_BIN} --xunit-file \"${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml\"")
-  foreach(arg ${ARG_UNPARSED_ARGUMENTS})
-    set(subcmd "${subcmd} \"${arg}\"")
-  endforeach()
+  set(cmd "${PYTHON_EXECUTABLE}" "${ament_lint_cmake_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_lint_cmake")
-  set(cmd "${PYTHON_EXECUTABLE} ${subcmd} > \"${CMAKE_BINARY_DIR}/ament_lint_cmake/${ARG_TESTNAME}.txt\"")
   ament_add_test(
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
+    OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_lint_cmake/${ARG_TESTNAME}.txt"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 endfunction()
