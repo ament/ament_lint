@@ -2,10 +2,17 @@ ament_copyright
 ===============
 
 Checks C / C++ / CMake / Python source files for the existance of a copyright
-notice.
+and licence notice.
 Files with the following extensions are being considered:
 ``.c``, ``.cc``, ``.cpp``, ``.cxx``, ``.h``, ``.hh``, ``.hpp``, ``.hxx``,
 ``.cmake``, ``.py``.
+
+When being searched for recursively the following files are being excluded:
+
+- ``setup.py`` when being a sibling of ``package.xml``
+
+Additionally it checks if the root of a repository contains a ``LICENSE`` and
+``CONTRIBUTING.md`` file.
 
 
 How to run the check from the command line?
@@ -15,14 +22,16 @@ How to run the check from the command line?
 
     ament_copyright [<path> ...]
 
-When using the option ``--list-names`` a list of known copyright holders is
-shown.
+When using the option ``--list-copyright-names`` a list of known copyright
+holders is shown. The option ``--list-licenses`` outputs a list of known
+licenses.
 
 When using the option
-``--add-missing <NAME | "Copyright holder string">`` a copyright notice is
-added to all files which lack one.
-The argument can either be a name from the list returned by ``--list-names`` or
-a custom string.
+``--add-missing <KNOWN_COPYRIGHT_NAME | "Copyright holder string"> <KNOWN_LICENSE>``
+a copyright notice and license is added to all files which lack one.
+The first argument can either be a name from the list returned by
+``--list-copyright-names`` or a custom string. The second argument must be a
+name from the list returned by ``--list-licenses``.
 
 When using the option ``--add-copyright-year`` existing copyright notices are
 being updated to include the current year.
@@ -33,3 +42,11 @@ How to run the check from within a CMake ament package as part of the tests?
 
 The CMake integration is provided by the package `ament_cmake_copyright
 <https://github.com/ament/ament_lint>`_.
+
+
+Why are my existing copyright / license notices not detected?
+-------------------------------------------------------------
+
+This script currently only checks line comments (lines starting with ``#`` /
+``//`` depending on the language). Block comments / C-style comment (starting
+with ``/*``) are not being detected to keep the complexity minimal.
