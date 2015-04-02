@@ -115,8 +115,8 @@ def get_files(paths):
 
                 # select files by name  / extension
                 for filename in sorted(filenames):
-                    if filename.lower() == 'CMakeLists.txt'.lower() or \
-                            filename.endswith('.cmake'):
+                    fname_low = filename.lower()
+                    if fname_low == 'CMakeLists.txt'.lower() or fname_low.endswith('.cmake'):
                         files.append(os.path.join(dirpath, filename))
         if os.path.isfile(path):
             files.append(path)
