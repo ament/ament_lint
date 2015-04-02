@@ -15,6 +15,7 @@ https://github.com/richq/cmake-lint/blob/7b85fe46b9bd66fe11ecfef20060f976a49d966
 - removed __version__ import
 - allow closing parenthesis to be on the same level as the opening one (lines 281-282)
 - ignore lines with exceeding length if they only contain a single string (lines 35, 196-207)
+- improve SetFilters ability to parse new filters (lines 89-92)
 """
 from __future__ import print_function
 import sys
@@ -86,10 +87,13 @@ class _CMakeLintState(object):
     def SetFilters(self, filters):
         if not filters:
             return
-        if self.filters:
-            self.filters.extend(filters.split(','))
+        assert isinstance(self.filters, list)
+        if isinstance(filters, list):
+            self.filters.extend(filters)
+        elif isinstance(filters, str):
+            self.filters.extend([f.strip() for f in filters.split(',') if f])
         else:
-            self.filters = filters.split(',')
+            raise ValueError('Filters should be a list or a comma separated string')
         for f in self.filters:
             if f.startswith('-') or f.startswith('+'):
                 allowed = False
