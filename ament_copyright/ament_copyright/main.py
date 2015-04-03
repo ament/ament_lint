@@ -53,7 +53,8 @@ def main(argv=sys.argv[1:]):
         nargs='*',
         default=[os.curdir],
         help='The files or directories to check. For directories files ending '
-             'in %s will be considered (except setup.py files beside package.xml files).' %
+             "in %s will be considered (except directories starting with '.' "
+             "or '_' and 'setup.py' files beside 'package.xml' files)." %
              ', '.join(["'.%s'" % e for e in extensions]))
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
