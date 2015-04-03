@@ -16,6 +16,7 @@ https://github.com/richq/cmake-lint/blob/7b85fe46b9bd66fe11ecfef20060f976a49d966
 - allow closing parenthesis to be on the same level as the opening one (lines 281-282)
 - ignore lines with exceeding length if they only contain a single string (lines 35, 196-207)
 - improve SetFilters ability to parse new filters (lines 89-92)
+- implement in file pragmas to control filters on a per file basis (lines 389 - 430)
 """
 from __future__ import print_function
 import sys
