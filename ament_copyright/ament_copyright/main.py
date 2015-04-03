@@ -35,7 +35,7 @@ from ament_copyright.parser import get_comment_block
 from ament_copyright.parser import parse_file
 from ament_copyright.parser import scan_past_coding_and_shebang_lines
 from ament_copyright.parser import scan_past_empty_lines
-from ament_copyright.parser import _search_copyright_information
+from ament_copyright.parser import search_copyright_information
 
 
 def main(argv=sys.argv[1:]):
@@ -156,7 +156,7 @@ def main(argv=sys.argv[1:]):
                      file_descriptor.license_identifier)
                 has_error = file_descriptor.license_identifier == UNKNOWN_IDENTIFIER
 
-        elif file_descriptor.filetype == CONTRIBUTING_FILETYPE:
+        elif file_descriptor.filetype in [CONTRIBUTING_FILETYPE, LICENSE_FILETYPE]:
             if not file_descriptor.exists:
                 message = 'file not found'
                 has_error = True
@@ -168,35 +168,6 @@ def main(argv=sys.argv[1:]):
             elif file_descriptor.license_identifier:
                 message = file_descriptor.license_identifier
                 has_error = file_descriptor.license_identifier == UNKNOWN_IDENTIFIER
-
-            else:
-                assert False, file_descriptor
-
-        elif file_descriptor.filetype == LICENSE_FILETYPE:
-            if not file_descriptor.exists:
-                message = 'file not found'
-                has_error = True
-
-            elif not file_descriptor.content:
-                message = 'could not find copyright notice'
-                print('%s: could not find copyright notice' % file_descriptor.path,
-                      file=sys.stderr)
-                has_error = True
-
-            elif file_descriptor.license_identifier == UNKNOWN_IDENTIFIER:
-                message = '%s%s%s' % \
-                    (file_descriptor.license_identifier,
-                     ' (%s)' % file_descriptor.copyright_years
-                     if file_descriptor.copyright_years else '',
-                     ' (%s)' % file_descriptor.copyright_name
-                     if file_descriptor.copyright_name else '')
-                has_error = True
-
-            elif file_descriptor.license_identifier:
-                message = '%s%s' % \
-                    (file_descriptor.license_identifier,
-                     ' (%s)' % file_descriptor.copyright_years
-                     if file_descriptor.copyright_years else '')
 
             else:
                 assert False, file_descriptor
@@ -238,7 +209,7 @@ def main(argv=sys.argv[1:]):
 
 
 def add_missing_header(file_descriptors, name, license, verbose):
-    copyright = 'Copyright %s %s' % (time.strftime('%Y'), name)
+    copyright = 'Copyright %d %s' % (int(time.strftime('%Y')) - 1 + 1, name)
     header = license.file_header.format(**{'copyright': copyright})
     lines = header.splitlines()
 
@@ -279,9 +250,8 @@ def add_missing_header(file_descriptors, name, license, verbose):
 
         elif file_descriptor.filetype == LICENSE_FILETYPE:
             print('+', file_descriptor.path)
-            content = license.license_file.format(**{'copyright': copyright})
             with open(file_descriptor.path, 'w') as h:
-                h.write(content)
+                h.write(license.license_file)
 
         else:
             assert False, 'Unknown filetype: ' + file_descriptor.filetype
@@ -309,7 +279,7 @@ def add_copyright_year(file_descriptors, new_years, verbose):
         else:
             block = file_descriptor.content[index:]
             block_offset = 0
-        copyright_span, years_span, name_span = _search_copyright_information(block)
+        copyright_span, years_span, name_span = search_copyright_information(block)
         if copyright_span is None:
             assert False, "Could not find copyright information in file '%s'" % \
                 file_descriptor.path

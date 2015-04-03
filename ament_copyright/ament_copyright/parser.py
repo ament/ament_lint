@@ -82,7 +82,7 @@ class SourceDescriptor(FileDescriptor):
         block, _ = get_comment_block(self.content, index)
         if not block:
             return
-        copyright_span, years_span, name_span = _search_copyright_information(block)
+        copyright_span, years_span, name_span = search_copyright_information(block)
         if copyright_span is None:
             return None
 
@@ -115,10 +115,6 @@ class LicenseDescriptor(FileDescriptor):
     def __init__(self, path):
         super(LicenseDescriptor, self).__init__(LICENSE_FILETYPE, path)
 
-        self.copyright_years = None
-        self.copyright_name = None
-
-        self.copyright_identifier = None
         self.license_identifier = None
 
     def parse(self):
@@ -126,10 +122,7 @@ class LicenseDescriptor(FileDescriptor):
         if not self.content:
             return
 
-        self.identify_copyright()
-
-        content = _replace_copyright_with_placeholder(self.content, self)
-        self.identify_license(content, 'license_file')
+        self.identify_license(self.content, 'license_file')
 
 
 def parse_file(path):
@@ -154,18 +147,7 @@ def determine_filetype(path):
     return SOURCE_FILETYPE
 
 
-def _replace_copyright_with_placeholder(content, file_descriptor):
-    copyright_span, years_span, name_span = _search_copyright_information(content)
-    if copyright_span is None:
-        return None
-
-    file_descriptor.copyright_years = content[years_span[0]:years_span[1]]
-    file_descriptor.copyright_name = content[name_span[0]:name_span[1]]
-
-    return content[:copyright_span[0]] + '{copyright}' + content[name_span[1]:]
-
-
-def _search_copyright_information(content):
+def search_copyright_information(content):
     # regex for matching years or year ranges (yyyy-yyyy) separated by colons
     year = '\d{4}'
     year_range = '%s-%s' % (year, year)
