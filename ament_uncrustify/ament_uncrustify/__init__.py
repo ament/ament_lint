@@ -41,13 +41,16 @@ def get_xunit_content(report, testname, elapsed):
             data = {
                 'quoted_location': quoteattr(filename),
                 'testname': testname,
-                'quoted_diff': escape(''.join(diff_lines)),
+                'quoted_message': quoteattr(
+                    'Diff with %d lines' % len(diff_lines)
+                ),
+                'cdata': ''.join(diff_lines),
             }
             xml += '''  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
   >
-      <system-err>%(quoted_diff)s</system-err>
+      <failure message=%(quoted_message)s><![CDATA[%(cdata)s]]></failure>
   </testcase>
 ''' % data
 
