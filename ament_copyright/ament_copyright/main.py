@@ -420,14 +420,14 @@ def get_xunit_content(report, testname, elapsed):
 >
 ''' % data
 
-    for (filename, has_error, message) in report:
+    for (filename, no_error, message) in report:
 
         data = {
             'quoted_filename': quoteattr(filename),
             'testname': testname,
             'escaped_message': escape(message),
         }
-        if not has_error:
+        if not no_error:
             # report missing / unknown copyright / license as a failing testcase
             xml += '''  <testcase
     name=%(quoted_filename)s
@@ -438,7 +438,7 @@ def get_xunit_content(report, testname, elapsed):
 ''' % data
 
         else:
-            # if there is a knwon copyright / license report a single successful test
+            # if there is a known copyright / license report a single successful test
             xml += '''  <testcase
     name=%(quoted_filename)s
     classname="%(testname)s"
