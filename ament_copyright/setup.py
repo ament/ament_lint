@@ -6,6 +6,9 @@ setup(
     version='0.0.0',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
+    package_data={'': [
+        'template/*',
+    ]},
     author='Dirk Thomas',
     author_email='dthomas@osrfoundation.org',
     maintainer='Dirk Thomas',
@@ -21,16 +24,18 @@ setup(
     ],
     description='Check source files for copyright reference.',
     long_description='''\
-The ability to check every source file contains copyright reference
-in the ament buildsystem.''',
+The ability to check sources file for copyright and license information.''',
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={
-        'console_scripts': [
-            'ament_copyright = ament_copyright:main',
+        'ament_copyright.copyright_name': [
+            'osrf = ament_copyright.copyright_names:osrf',
         ],
-        'ament_copyright.names': [
-            'osrf = ament_copyright.names:osrf',
+        'ament_copyright.license': [
+            'apache2 = ament_copyright.licenses:apache2',
+        ],
+        'console_scripts': [
+            'ament_copyright = ament_copyright.main:main',
         ],
     },
 )
