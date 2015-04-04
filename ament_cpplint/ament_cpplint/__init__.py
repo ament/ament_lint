@@ -74,5 +74,5 @@ def get_xunit_content(report, testname, elapsed):
     xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
 ''' % data
 
-    xml += '</testsuite>'
+    xml += '</testsuite>\n'
     return xml
