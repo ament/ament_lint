@@ -37,7 +37,7 @@ def get_xunit_content(report, testname, elapsed):
     for (filename, errors) in report:
 
         if errors:
-            # report each cpplint error as a failing testcase
+            # report each lint_cmake error as a failing testcase
             for error in errors:
                 data = {
                     'quoted_location': quoteattr(
@@ -55,7 +55,7 @@ def get_xunit_content(report, testname, elapsed):
 ''' % data
 
         else:
-            # if there are no cpplint errors report a single successful test
+            # if there are no lint_cmake errors report a single successful test
             data = {
                 'quoted_location': quoteattr(filename),
                 'testname': testname,

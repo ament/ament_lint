@@ -15,6 +15,8 @@ https://github.com/richq/cmake-lint/blob/7b85fe46b9bd66fe11ecfef20060f976a49d966
 - removed __version__ import
 - allow closing parenthesis to be on the same level as the opening one (lines 281-282)
 - ignore lines with exceeding length if they only contain a single string (lines 35, 196-207)
+- improve SetFilters ability to parse new filters (lines 89-92)
+- implement in file pragmas to control filters on a per file basis (lines 389 - 430)
 """
 from __future__ import print_function
 import sys
@@ -86,10 +88,13 @@ class _CMakeLintState(object):
     def SetFilters(self, filters):
         if not filters:
             return
-        if self.filters:
-            self.filters.extend(filters.split(','))
+        assert isinstance(self.filters, list)
+        if isinstance(filters, list):
+            self.filters.extend(filters)
+        elif isinstance(filters, str):
+            self.filters.extend([f.strip() for f in filters.split(',') if f])
         else:
-            self.filters = filters.split(',')
+            raise ValueError('Filters should be a list or a comma separated string')
         for f in self.filters:
             if f.startswith('-') or f.startswith('+'):
                 allowed = False
@@ -382,6 +387,16 @@ def IsValidFile(filename):
     return filename.endswith('.cmake') or os.path.basename(filename).lower() == 'cmakelists.txt'
 
 def ProcessFile(filename):
+    # Store and then restore the filters to prevent pragmas in the file from persisting.
+    original_filters = list(_lint_state.filters)
+    try:
+        return _ProcessFile(filename)
+    finally:
+        _lint_state.filters = original_filters
+
+
+def _ProcessFile(filename):
+    linter_pragma_start = '# lint_cmake: '
     lines = ['# Lines start at 1']
     have_cr = False
     if not IsValidFile(filename):
@@ -389,14 +404,23 @@ def ProcessFile(filename):
         return
     global _package_state
     _package_state = _CMakePackageState()
-    CheckFileName(filename, Error)
     for l in open(filename).readlines():
         l = l.rstrip('\n')
         if l.endswith('\r'):
             have_cr = True
             l = l.rstrip('\r')
         lines.append(l)
+        # Check this line to see if it is a lint_cmake pragma
+        if l.startswith(linter_pragma_start):
+            try:
+                _lint_state.SetFilters(l[len(linter_pragma_start):])
+            except:
+                print("Exception occurred while processing '{0}:{1}':"
+                      .format(filename, len(lines)))
+                raise
     lines.append('# Lines end here')
+    # Check file name after reading lines incase of a # lint_cmake: pragma
+    CheckFileName(filename, Error)
     if have_cr and os.linesep != '\r\n':
         Error(filename, 0, 'whitespace/newline', 'Unexpected carriage return found; '
                 'better to use only \\n')
