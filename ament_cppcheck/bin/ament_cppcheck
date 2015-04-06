@@ -5,6 +5,7 @@ from __future__ import print_function
 import argparse
 import multiprocessing
 import os
+from shutil import which
 import subprocess
 import sys
 import time
@@ -41,7 +42,12 @@ def main(argv=sys.argv[1:]):
         print('No files found', file=sys.stderr)
         return 1
 
-    cppcheck_bin = find_executable('cppcheck')
+    additional_paths = None
+    if os.name == 'nt':
+        # search in location where cppcheck is installed via chocolatey
+        program_files_32 = os.environ.get('ProgramFiles(x86)', 'C:\\Program Files (x86)')
+        additional_paths = [os.path.join(program_files_32, 'Cppcheck')]
+    cppcheck_bin = find_executable('cppcheck', additional_paths=additional_paths)
     if not cppcheck_bin:
         print("Could not find 'cppcheck' executable", file=sys.stderr)
         return 1
@@ -127,12 +133,12 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def find_executable(file_name):
-    for path in os.getenv('PATH').split(os.path.pathsep):
-        file_path = os.path.join(path, file_name)
-        if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-            return file_path
-    return None
+def find_executable(file_name, additional_paths=None):
+    path = None
+    if additional_paths:
+        path = os.getenv('PATH', os.defpath)
+        path += os.path.pathsep + os.path.pathsep.join(additional_paths)
+    return which(file_name, path=path)
 
 
 def get_files(paths, extensions):
