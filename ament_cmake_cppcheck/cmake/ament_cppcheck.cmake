@@ -28,14 +28,12 @@ function(ament_cppcheck)
     set(ARG_TESTNAME "cppcheck")
   endif()
 
-  if(NOT PYTHON_EXECUTABLE)
-    message(FATAL_ERROR "ament_cppcheck() variable 'PYTHON_EXECUTABLE' must not be empty")
-  endif()
+  find_program(ament_cppcheck_BIN NAMES "ament_cppcheck")
   if(NOT ament_cppcheck_BIN)
-    message(FATAL_ERROR "ament_cppcheck() variable 'ament_cppcheck_BIN' must not be empty")
+    message(FATAL_ERROR "ament_cppcheck() could not find program 'ament_cppcheck'")
   endif()
 
-  set(cmd "${PYTHON_EXECUTABLE}" "${ament_cppcheck_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  set(cmd "${ament_cppcheck_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")

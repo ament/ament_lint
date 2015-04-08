@@ -13,7 +13,7 @@
 
   <!--<exec_depend>ament_clang_format</exec_depend>-->
   <exec_depend>ament_cmake_copyright</exec_depend>
-  <exec_depend>ament_cppcheck</exec_depend>
+  <exec_depend>ament_cmake_cppcheck</exec_depend>
   <!--<exec_depend>ament_cpplint</exec_depend>-->
   <exec_depend>ament_lint_cmake</exec_depend>
   <exec_depend>ament_pep8</exec_depend>
