@@ -14,8 +14,8 @@
 
 # copied from ament_lint_auto/ament_lint_auto-extras.cmake
 
-find_package(ament_cmake_core REQUIRED)
-find_package(ament_cmake_test REQUIRED)
+find_package(ament_cmake_core QUIET REQUIRED)
+find_package(ament_cmake_test QUIET REQUIRED)
 
 include(
   "${ament_lint_auto_DIR}/ament_lint_auto_find_test_dependencies.cmake")

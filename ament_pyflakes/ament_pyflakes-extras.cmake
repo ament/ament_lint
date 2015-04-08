@@ -14,7 +14,7 @@
 
 # copied from ament_pyflakes/ament_pyflakes-extras.cmake
 
-find_package(ament_cmake_test REQUIRED)
+find_package(ament_cmake_test QUIET REQUIRED)
 
 set(ament_pyflakes_BIN "${ament_pyflakes_DIR}/../../../bin/ament_pyflakes")
 

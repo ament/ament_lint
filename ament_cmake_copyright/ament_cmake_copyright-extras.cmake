@@ -14,7 +14,7 @@
 
 # copied from ament_cmake_copyright/ament_cmake_copyright-extras.cmake
 
-find_package(ament_cmake_test REQUIRED)
+find_package(ament_cmake_test QUIET REQUIRED)
 
 include("${ament_cmake_copyright_DIR}/ament_copyright.cmake")
 
