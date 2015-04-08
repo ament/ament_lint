@@ -50,7 +50,7 @@ def main(argv=sys.argv[1:]):
         report.append((filename, reporter.errors))
         print('')
 
-   # output summary
+    # output summary
     error_count = sum([len(r[1]) for r in report])
     if not error_count:
         print('No errors')
