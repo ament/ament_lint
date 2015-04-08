@@ -214,12 +214,12 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def find_executable(file_name):
-    for path in os.getenv('PATH').split(os.path.pathsep):
-        file_path = os.path.join(path, file_name)
-        if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-            return file_path
-    return None
+def find_executable(file_name, additional_paths=None):
+    path = None
+    if additional_paths:
+        path = os.getenv('PATH', os.defpath)
+        path += os.path.pathsep + os.path.pathsep.join(additional_paths)
+    return shutil.which(file_name, path=path)
 
 
 def get_files(paths, extensions):
