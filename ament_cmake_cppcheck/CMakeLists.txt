@@ -18,6 +18,6 @@ if(AMENT_ENABLE_TESTING)
   find_package(ament_cmake_copyright REQUIRED)
   ament_copyright()
 
-  find_package(ament_lint_cmake REQUIRED)
+  find_package(ament_cmake_lint_cmake REQUIRED)
   ament_lint_cmake()
 endif()

@@ -22,6 +22,9 @@ install(
 )
 
 if(AMENT_ENABLE_TESTING)
+  find_package(ament_cmake_lint_cmake REQUIRED)
+  ament_lint_cmake()
+
   set(python_files "ament_clang_format" "bin/ament_clang_format")
 
   find_package(ament_pep8 REQUIRED)
@@ -29,7 +32,4 @@ if(AMENT_ENABLE_TESTING)
 
   find_package(ament_pyflakes REQUIRED)
   ament_pyflakes(${python_files})
-
-  find_package(ament_lint_cmake REQUIRED)
-  ament_lint_cmake()
 endif()

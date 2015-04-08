@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# copied from ament_lint_cmake/ament_lint_cmake-extras.cmake
+# copied from ament_cmake_lint_cmake/ament_cmake_lint_cmake-extras.cmake
 
-find_package(ament_cmake_core QUIET REQUIRED)
 find_package(ament_cmake_test QUIET REQUIRED)
 
-set(ament_lint_cmake_BIN "${ament_lint_cmake_DIR}/../../../bin/ament_lint_cmake")
+include("${ament_cmake_lint_cmake_DIR}/ament_lint_cmake.cmake")
 
-include("${ament_lint_cmake_DIR}/ament_lint_cmake.cmake")
-
-ament_register_extension("ament_lint_auto" "ament_lint_cmake"
-  "ament_lint_cmake_lint_hook.cmake")
+ament_register_extension("ament_lint_auto" "ament_cmake_lint_cmake"
+  "ament_cmake_lint_cmake_lint_hook.cmake")

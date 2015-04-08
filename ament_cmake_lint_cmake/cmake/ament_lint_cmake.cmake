@@ -28,14 +28,12 @@ function(ament_lint_cmake)
     set(ARG_TESTNAME "lint_cmake")
   endif()
 
-  if(NOT PYTHON_EXECUTABLE)
-    message(FATAL_ERROR "ament_lint_cmake() variable 'PYTHON_EXECUTABLE' must not be empty")
-  endif()
+  find_program(ament_lint_cmake_BIN NAMES "ament_lint_cmake")
   if(NOT ament_lint_cmake_BIN)
-    message(FATAL_ERROR "ament_lint_cmake() variable 'ament_lint_cmake_BIN' must not be empty")
+    message(FATAL_ERROR "ament_lint_cmake() could not find program 'ament_lint_cmake'")
   endif()
 
-  set(cmd "${PYTHON_EXECUTABLE}" "${ament_lint_cmake_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  set(cmd "${ament_lint_cmake_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_lint_cmake")
