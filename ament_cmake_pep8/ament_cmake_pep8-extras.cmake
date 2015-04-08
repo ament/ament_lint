@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# copied from ament_pep8/ament_pep8-extras.cmake
+# copied from ament_cmake_pep8/ament_cmake_pep8-extras.cmake
 
-find_package(ament_cmake_core QUIET REQUIRED)
 find_package(ament_cmake_test QUIET REQUIRED)
 
-set(ament_pep8_BIN "${ament_pep8_DIR}/../../../bin/ament_pep8")
+include("${ament_cmake_pep8_DIR}/ament_pep8.cmake")
 
-include("${ament_pep8_DIR}/ament_pep8.cmake")
-
-ament_register_extension("ament_lint_auto" "ament_pep8"
-  "ament_pep8_lint_hook.cmake")
+ament_register_extension("ament_lint_auto" "ament_cmake_pep8"
+  "ament_cmake_pep8_lint_hook.cmake")

@@ -28,14 +28,12 @@ function(ament_pep8)
     set(ARG_TESTNAME "pep8")
   endif()
 
-  if(NOT PYTHON_EXECUTABLE)
-    message(FATAL_ERROR "ament_pep8() variable 'PYTHON_EXECUTABLE' must not be empty")
-  endif()
+  find_program(ament_pep8_BIN NAMES "ament_pep8")
   if(NOT ament_pep8_BIN)
-    message(FATAL_ERROR "ament_pep8() variable 'ament_pep8_BIN' must not be empty")
+    message(FATAL_ERROR "ament_pep8() could not find program 'ament_pep8'")
   endif()
 
-  set(cmd "${PYTHON_EXECUTABLE}" "${ament_pep8_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  set(cmd "${ament_pep8_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pep8")

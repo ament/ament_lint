@@ -27,7 +27,7 @@ if(AMENT_ENABLE_TESTING)
 
   set(python_files "ament_clang_format" "bin/ament_clang_format")
 
-  find_package(ament_pep8 REQUIRED)
+  find_package(ament_cmake_pep8 REQUIRED)
   ament_pep8(${python_files})
 
   find_package(ament_pyflakes REQUIRED)
