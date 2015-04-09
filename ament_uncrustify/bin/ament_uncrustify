@@ -81,6 +81,19 @@ def main(argv=sys.argv[1:]):
 
         # invoke uncrustify on all files
         input_files = [os.path.abspath(f) for f in files]
+
+        # on Windows uncrustify fails to concatenate
+        # the absolute prefix path with the absolute input files
+        # https://github.com/bengardner/uncrustify/issues/364
+        cwd = None
+        if os.name == 'nt':
+            cwd = os.path.commonprefix(input_files)
+            if not os.path.isdir(cwd):
+                cwd = os.path.dirname(cwd)
+                assert os.path.isdir(cwd), \
+                    'Could not determine common prefix of input files'
+            input_files = [os.path.relpath(f, start=cwd) for f in input_files]
+
         try:
             cmd = [uncrustify_bin,
                    '-c', args.config_file,
@@ -88,7 +101,7 @@ def main(argv=sys.argv[1:]):
                    '--suffix', suffix,
                    '-q']
             cmd.extend(input_files)
-            subprocess.check_call(cmd)
+            subprocess.check_call(cmd, cwd=cwd)
         except subprocess.CalledProcessError as e:
             print("Could not invoke 'uncrustify' (error code: %d): %s" %
                   (e.returncode, e), file=sys.stderr)
