@@ -12,15 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# copied from ament_uncrustify/ament_uncrustify-extras.cmake
+# copied from ament_cmake_uncrustify/ament_cmake_uncrustify-extras.cmake
 
-find_package(ament_cmake_core QUIET REQUIRED)
 find_package(ament_cmake_test QUIET REQUIRED)
 
-set(ament_uncrustify_BIN "${ament_uncrustify_DIR}/../../../bin/ament_uncrustify")
-set(ament_uncrustify_CFG "${ament_uncrustify_DIR}/../ament_code_style.cfg")
+include("${ament_cmake_uncrustify_DIR}/ament_uncrustify.cmake")
 
-include("${ament_uncrustify_DIR}/ament_uncrustify.cmake")
-
-ament_register_extension("ament_lint_auto" "ament_uncrustify"
-  "ament_uncrustify_lint_hook.cmake")
+ament_register_extension("ament_lint_auto" "ament_cmake_uncrustify"
+  "ament_cmake_uncrustify_lint_hook.cmake")

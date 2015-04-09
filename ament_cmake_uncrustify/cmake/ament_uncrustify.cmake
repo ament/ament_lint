@@ -28,14 +28,12 @@ function(ament_uncrustify)
     set(ARG_TESTNAME "uncrustify")
   endif()
 
-  if(NOT PYTHON_EXECUTABLE)
-    message(FATAL_ERROR "ament_uncrustify() variable 'PYTHON_EXECUTABLE' must not be empty")
-  endif()
+  find_program(ament_uncrustify_BIN NAMES "ament_uncrustify")
   if(NOT ament_uncrustify_BIN)
-    message(FATAL_ERROR "ament_uncrustify() variable 'ament_uncrustify_BIN' must not be empty")
+    message(FATAL_ERROR "ament_uncrustify() could not find program 'ament_uncrustify'")
   endif()
 
-  set(cmd "${PYTHON_EXECUTABLE}" "${ament_uncrustify_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  set(cmd "${ament_uncrustify_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_uncrustify")

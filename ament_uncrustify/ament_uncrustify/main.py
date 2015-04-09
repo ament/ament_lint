@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
 
+# Copyright 2014-2015 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from __future__ import print_function
 
 import argparse
@@ -11,21 +25,14 @@ import subprocess
 import sys
 import tempfile
 import time
-
-from ament_uncrustify import get_xunit_content
+from xml.sax.saxutils import escape
+from xml.sax.saxutils import quoteattr
 
 
 def main(argv=sys.argv[1:]):
-    # support running the script from source
     config_file = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        'share', 'ament_uncrustify', 'ament_code_style.cfg')
-    if not os.path.exists(config_file):
-        rel_config_file = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'ament_code_style.cfg')
-        if os.path.exists(rel_config_file):
-            config_file = rel_config_file
+        os.path.dirname(__file__),
+        'configuration', 'ament_code_style.cfg')
 
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
@@ -252,6 +259,67 @@ def get_files(paths, extensions):
         if os.path.isfile(path):
             files.append(path)
     return files
+
+
+def get_xunit_content(report, testname, elapsed):
+    test_count = len(report)
+    error_count = sum([1 if r[1] else 0 for r in report])
+    data = {
+        'testname': testname,
+        'test_count': test_count,
+        'error_count': error_count,
+        'time': '%.3f' % round(elapsed, 3),
+    }
+    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<testsuite
+  name="%(testname)s"
+  tests="%(test_count)d"
+  failures="%(error_count)d"
+  time="%(time)s"
+>
+''' % data
+
+    for (filename, diff_lines) in report:
+
+        if diff_lines:
+            # report any diff as a failing testcase
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+                'quoted_message': quoteattr(
+                    'Diff with %d lines' % len(diff_lines)
+                ),
+                'cdata': ''.join(diff_lines),
+            }
+            xml += '''  <testcase
+    name=%(quoted_location)s
+    classname="%(testname)s"
+  >
+      <failure message=%(quoted_message)s><![CDATA[%(cdata)s]]></failure>
+  </testcase>
+''' % data
+
+        else:
+            # if there is no diff report a single successful test
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+            }
+            xml += '''  <testcase
+    name=%(quoted_location)s
+    classname="%(testname)s"
+    status="No errors"/>
+''' % data
+
+    # output list of checked files
+    data = {
+        'escaped_files': escape(''.join(['\n* %s' % r[0] for r in report])),
+    }
+    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
+''' % data
+
+    xml += '</testsuite>\n'
+    return xml
 
 
 if __name__ == '__main__':
