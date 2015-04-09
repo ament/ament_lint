@@ -16,5 +16,5 @@
 
   <test_depend>ament_cmake_lint_cmake</test_depend>
   <test_depend>ament_cmake_pep8</test_depend>
-  <test_depend>ament_pyflakes</test_depend>
+  <test_depend>ament_cmake_pyflakes</test_depend>
 </package>

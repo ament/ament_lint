@@ -30,6 +30,6 @@ if(AMENT_ENABLE_TESTING)
   find_package(ament_cmake_pep8 REQUIRED)
   ament_pep8(${python_files})
 
-  find_package(ament_pyflakes REQUIRED)
+  find_package(ament_cmake_pyflakes REQUIRED)
   ament_pyflakes(${python_files})
 endif()

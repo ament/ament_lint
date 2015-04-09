@@ -28,14 +28,12 @@ function(ament_pyflakes)
     set(ARG_TESTNAME "pyflakes")
   endif()
 
-  if(NOT PYTHON_EXECUTABLE)
-    message(FATAL_ERROR "ament_pyflakes() variable 'PYTHON_EXECUTABLE' must not be empty")
-  endif()
+  find_program(ament_pyflakes_BIN NAMES "ament_pyflakes")
   if(NOT ament_pyflakes_BIN)
-    message(FATAL_ERROR "ament_pyflakes() variable 'ament_pyflakes_BIN' must not be empty")
+    message(FATAL_ERROR "ament_pyflakes() could not find program 'ament_pyflakes'")
   endif()
 
-  set(cmd "${PYTHON_EXECUTABLE}" "${ament_pyflakes_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  set(cmd "${ament_pyflakes_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pyflakes")

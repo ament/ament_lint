@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# copied from ament_pyflakes/ament_pyflakes-extras.cmake
+# copied from ament_cmake_pyflakes/ament_cmake_pyflakes-extras.cmake
 
 find_package(ament_cmake_test QUIET REQUIRED)
 
-set(ament_pyflakes_BIN "${ament_pyflakes_DIR}/../../../bin/ament_pyflakes")
+include("${ament_cmake_pyflakes_DIR}/ament_pyflakes.cmake")
 
-include("${ament_pyflakes_DIR}/ament_pyflakes.cmake")
-
-ament_register_extension("ament_lint_auto" "ament_pyflakes"
-  "ament_pyflakes_lint_hook.cmake")
+ament_register_extension("ament_lint_auto" "ament_cmake_pyflakes"
+  "ament_cmake_pyflakes_lint_hook.cmake")
