@@ -43,6 +43,12 @@ def main(argv=sys.argv[1:]):
         default=[os.curdir],
         help="The files or directories to check. For directories files ending "
              "in '.py' will be considered.")
+    parser.add_argument(
+        '--exclude',
+        metavar='filename',
+        nargs='*',
+        dest='excludes',
+        help='The filenames to exclude.')
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -54,7 +60,7 @@ def main(argv=sys.argv[1:]):
         print("Could not config file '%s'" % args.config_file, file=sys.stderr)
         return 1
 
-    report = generate_pep8_report(args.config_file, args.paths)
+    report = generate_pep8_report(args.config_file, args.paths, args.excludes)
 
     # print statistics about errors
     if report.total_errors:
@@ -91,7 +97,7 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def generate_pep8_report(config_file, paths):
+def generate_pep8_report(config_file, paths, excludes):
     pep8style = CustomStyleGuide(
         repeat=True,
         show_source=True,
@@ -99,6 +105,8 @@ def generate_pep8_report(config_file, paths):
         reporter=CustomReport,
         config_file=config_file,
     )
+    if excludes:
+        pep8style.options.exclude += excludes
     return pep8style.check_files(paths)
 
 

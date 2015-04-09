@@ -38,6 +38,12 @@ def main(argv=sys.argv[1:]):
         default=[os.curdir],
         help="The files or directories to check. For directories files ending "
              "in '.py' will be considered.")
+    parser.add_argument(
+        '--exclude',
+        metavar='filename',
+        nargs='*',
+        dest='excludes',
+        help='The filenames to exclude.')
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -49,6 +55,8 @@ def main(argv=sys.argv[1:]):
         start_time = time.time()
 
     filenames = get_files(args.paths)
+    if args.excludes:
+        filenames = [f for f in filenames if os.path.basename(f) not in args.excludes]
     if not filenames:
         print('No files found', file=sys.stderr)
         return 1
