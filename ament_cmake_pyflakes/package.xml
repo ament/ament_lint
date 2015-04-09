@@ -10,10 +10,9 @@
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>
-  <buildtool_depend>ament_pyflakes</buildtool_depend>
 
   <buildtool_export_depend>ament_cmake_test</buildtool_export_depend>
-  <buildtool_export_depend>pyflakes</buildtool_export_depend>
+  <buildtool_export_depend>ament_pyflakes</buildtool_export_depend>
 
   <test_depend>ament_cmake_copyright</test_depend>
   <test_depend>ament_cmake_lint_cmake</test_depend>

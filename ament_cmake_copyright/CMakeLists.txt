@@ -22,5 +22,5 @@ if(AMENT_ENABLE_TESTING)
   find_package(ament_cmake_lint_cmake REQUIRED)
   ament_lint_cmake()
 
-  ament_copyright("cmake")
+  ament_copyright()
 endif()
