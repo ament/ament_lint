@@ -22,14 +22,14 @@ install(
 )
 
 if(AMENT_ENABLE_TESTING)
+  find_package(ament_cmake_lint_cmake REQUIRED)
+  ament_lint_cmake()
+
   set(python_files "ament_cpplint/__init__.py" "bin/ament_cpplint")
 
-  find_package(ament_pep8 REQUIRED)
+  find_package(ament_cmake_pep8 REQUIRED)
   ament_pep8(${python_files})
 
-  find_package(ament_pyflakes REQUIRED)
+  find_package(ament_cmake_pyflakes REQUIRED)
   ament_pyflakes(${python_files})
-
-  find_package(ament_lint_cmake REQUIRED)
-  ament_lint_cmake()
 endif()

@@ -56,6 +56,12 @@ def main(argv=sys.argv[1:]):
              "in %s will be considered (except directories starting with '.' "
              "or '_' and 'setup.py' files beside 'package.xml' files)." %
              ', '.join(["'.%s'" % e for e in extensions]))
+    parser.add_argument(
+        '--exclude',
+        metavar='filename',
+        nargs='*',
+        dest='excludes',
+        help='The filenames to exclude.')
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         '--add-missing',
@@ -104,6 +110,8 @@ def main(argv=sys.argv[1:]):
         start_time = time.time()
 
     filenames = get_files(args.paths, extensions)
+    if args.excludes:
+        filenames = [f for f in filenames if os.path.basename(f) not in args.excludes]
     if not filenames:
         print('No repository roots and files found', file=sys.stderr)
         return 0
@@ -181,7 +189,7 @@ def main(argv=sys.argv[1:]):
                   file=sys.stderr if has_error else sys.stdout)
         report.append((file_descriptor.path, not has_error, message))
 
-   # output summary
+    # output summary
     error_count = len([r for r in report if not r[1]])
     if not error_count:
         print('No errors, checked %d files' % len(report))

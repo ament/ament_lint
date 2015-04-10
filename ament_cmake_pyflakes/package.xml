@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ament_cmake_pyflakes</name>
+  <version>0.0.0</version>
+  <description>
+    The CMake API for ament_pyflakes to check code using pyflakes.
+  </description>
+  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake_core</buildtool_depend>
+  <buildtool_depend>ament_cmake_test</buildtool_depend>
+
+  <buildtool_export_depend>ament_cmake_test</buildtool_export_depend>
+  <buildtool_export_depend>ament_pyflakes</buildtool_export_depend>
+
+  <test_depend>ament_cmake_copyright</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+</package>
