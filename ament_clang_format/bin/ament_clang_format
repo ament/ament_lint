@@ -62,7 +62,7 @@ def main(argv=sys.argv[1:]):
     try:
         output = subprocess.check_output(cmd)
     except subprocess.CalledProcessError as e:
-        print("Could not invoke '%s' (error code: %d): %s" %
+        print("The invocation of '%s' failed with error code %d: %s" %
               (os.path.basename(clang_format_bin), e.returncode, e),
               file=sys.stderr)
         return 1
@@ -162,7 +162,7 @@ def main(argv=sys.argv[1:]):
         try:
             subprocess.check_call(cmd)
         except subprocess.CalledProcessError as e:
-            print("Could not invoke '%s' (error code: %d): %s" %
+            print("The invocation of '%s' failed with error code %d: %s" %
                   (os.path.basename(clang_format_bin), e.returncode, e),
                   file=sys.stderr)
             return 1

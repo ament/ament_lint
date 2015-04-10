@@ -89,7 +89,7 @@ def main(argv=sys.argv[1:]):
         p = subprocess.Popen(cmd, stderr=subprocess.PIPE)
         xml = p.communicate()[1]
     except subprocess.CalledProcessError as e:
-        print("Could not invoke 'cppcheck' (error code: %d): %s" %
+        print("The invocation of 'cppcheck' failed with error code %d: %s" %
               (e.returncode, e), file=sys.stderr)
         return 1
 
