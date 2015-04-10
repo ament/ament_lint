@@ -105,12 +105,13 @@ def main(argv=sys.argv[1:]):
             cmd = [uncrustify_bin,
                    '-c', args.config_file,
                    '--prefix', temp_path,
-                   '--suffix', suffix,
-                   '-q']
+                   '--suffix', suffix]
             cmd.extend(input_files)
-            subprocess.check_call(cmd, cwd=cwd)
+            subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
-            print("Could not invoke 'uncrustify' (error code: %d): %s" %
+            if e.output:
+                print(e.output.decode(), file=sys.stderr)
+            print("The invocation of 'uncrustify' failed with error code %d: %s" %
                   (e.returncode, e), file=sys.stderr)
             return 1
 
@@ -149,12 +150,13 @@ def main(argv=sys.argv[1:]):
             try:
                 cmd = [uncrustify_bin,
                        '-c', args.config_file,
-                       '--suffix', suffix,
-                       '-q']
+                       '--suffix', suffix]
                 cmd.extend(input_files)
-                subprocess.check_call(cmd)
+                subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError as e:
-                print("Could not invoke 'uncrustify' (error code: %d): %s" %
+                if e.output:
+                    print(e.output, file=sys.stderr)
+                print("The invocation of 'uncrustify' failed with error code %d: %s" %
                       (e.returncode, e), file=sys.stderr)
                 return 1
 
