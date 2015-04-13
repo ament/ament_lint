@@ -82,7 +82,7 @@ def main(argv=sys.argv[1:]):
            '-rp',
            '--xml',
            '--xml-version=1']
-    if jobs:
+    if jobs and 'AMENT_CPPCHECK_NO_MULTI_THREADED' not in os.environ:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
     try:
