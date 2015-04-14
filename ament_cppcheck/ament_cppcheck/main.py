@@ -38,8 +38,8 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help='The files or directories to check. For directories files ending '
-             'in %s will be considered.' %
+        help='Files and/or directories to be checked. Directories are searched recursively for '
+             'files ending in one of %s.' %
              ', '.join(["'.%s'" % e for e in extensions]))
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
