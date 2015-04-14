@@ -26,6 +26,13 @@ from xml.sax.saxutils import quoteattr
 import ament_lint_cmake.cmakelint as cmakelint
 
 
+# override filename check to allow any filename to be checked
+def IsValidFile(filename):
+    return True
+
+cmakelint.IsValidFile = IsValidFile
+
+
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(
         description='Check CMake code against the style conventions.',
@@ -35,7 +42,8 @@ def main(argv=sys.argv[1:]):
         nargs='*',
         default=[os.curdir],
         help="The files or directories to check. For directories files named "
-             "'CMakeLists.txt' and ending in '.cmake' will be considered.")
+             "'CMakeLists.txt' and ending in '.cmake' or '.cmake.in' will be "
+             "considered.")
     parser.add_argument(
         '--filters',
         default="",
@@ -122,7 +130,11 @@ def get_files(paths):
                 # select files by name  / extension
                 for filename in sorted(filenames):
                     fname_low = filename.lower()
-                    if fname_low == 'CMakeLists.txt'.lower() or fname_low.endswith('.cmake'):
+                    if (
+                        fname_low == 'CMakeLists.txt'.lower() or
+                        fname_low.endswith('.cmake') or
+                        fname_low.endswith('.cmake.in')
+                    ):
                         files.append(os.path.join(dirpath, filename))
         if os.path.isfile(path):
             files.append(path)
