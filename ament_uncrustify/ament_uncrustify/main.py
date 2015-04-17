@@ -115,20 +115,30 @@ def main(argv=sys.argv[1:]):
                   (e.returncode, e), file=sys.stderr)
             return 1
 
-        # remove leading slash / drive, prepend prefix path
-        output_files = [
-            os.path.join(
-                temp_path,
-                os.sep.join(f.split(os.sep)[1:]) +
-                suffix
-            ) for f in input_files
-        ]
+        if cwd:
+            # input files are relative
+            # prepend temp path, append suffix
+            output_files = [
+                os.path.join(temp_path, f + suffix) for f in input_files]
+        else:
+            # input files are absolute
+            # remove leading slash, prepend temp path, append suffix
+            output_files = [
+                os.path.join(
+                    temp_path,
+                    os.sep.join(f.split(os.sep)[1:]) +
+                    suffix
+                ) for f in input_files
+            ]
+
         i = 1
         while True:
             # identify files which have changed since the latest uncrustify run
             changed_files = []
             for input_filename, output_filename in zip(
                     input_files, output_files):
+                if cwd and not os.path.isabs(input_filename):
+                    input_filename = os.path.join(cwd, input_filename)
                 if not filecmp.cmp(input_filename, output_filename):
                     if output_filename == input_filename + suffix:
                         # for repeated invocations
@@ -167,13 +177,9 @@ def main(argv=sys.argv[1:]):
                       "after %d invocations" % i, file=sys.stderr)
 
         # compute diff
-        for filename in files:
+        for index, filename in enumerate(files):
+            modified_filename = output_files[index]
             with open(filename, 'r') as original_file:
-                # remove leading slash / drive
-                rel_abspath = os.sep.join(
-                    os.path.abspath(filename).split(os.sep)[1:])
-                modified_filename = os.path.join(
-                    temp_path, rel_abspath + suffix)
                 with open(modified_filename, 'r') as modified_file:
                     diff_lines = list(difflib.unified_diff(
                         original_file.readlines(), modified_file.readlines(),
