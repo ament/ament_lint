@@ -131,18 +131,19 @@ def main(argv=sys.argv[1:]):
                 ) for f in input_files
             ]
 
+        uncrustified_files = output_files
         i = 1
         while True:
             # identify files which have changed since the latest uncrustify run
             changed_files = []
             for input_filename, output_filename in zip(
-                    input_files, output_files):
+                    input_files, uncrustified_files):
                 if cwd and not os.path.isabs(input_filename):
                     input_filename = os.path.join(cwd, input_filename)
                 if not filecmp.cmp(input_filename, output_filename):
                     if output_filename == input_filename + suffix:
                         # for repeated invocations
-                        # #replace the previous uncrustified file
+                        # replace the previous uncrustified file
                         os.rename(output_filename, input_filename)
                         changed_files.append(input_filename)
                     else:
@@ -170,11 +171,12 @@ def main(argv=sys.argv[1:]):
                       (e.returncode, e), file=sys.stderr)
                 return 1
 
-            output_files = [f + suffix for f in input_files]
+            uncrustified_files = [f + suffix for f in input_files]
             i += 1
             if i >= 5:
                 print("'uncrustify' did not settle on a final result even "
                       "after %d invocations" % i, file=sys.stderr)
+                return 1
 
         # compute diff
         for index, filename in enumerate(files):
