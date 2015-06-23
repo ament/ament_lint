@@ -53,6 +53,11 @@ def main(argv=sys.argv[1:]):
              'in %s will be considered.' %
              ', '.join(["'.%s'" % e for e in extensions]))
     parser.add_argument(
+        '--exclude',
+        nargs='*',
+        default=[],
+        help='Exclude specific file names and directory names from the check')
+    parser.add_argument(
         '--reformat',
         action='store_true',
         help='Reformat the files in place')
@@ -70,7 +75,7 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
-    files = get_files(args.paths, extensions)
+    files = get_files(args.paths, extensions, args.exclude)
     if not files:
         print('No files found', file=sys.stderr)
         return 1
@@ -252,20 +257,25 @@ def find_executable(file_name, additional_paths=None):
     return shutil.which(file_name, path=path)
 
 
-def get_files(paths, extensions):
+def get_files(paths, extensions, excludes=[]):
     files = []
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
                 # ignore folder starting with . or _
                 dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                # ignore excluded folders
+                dirnames[:] = [d for d in dirnames if d not in excludes]
                 dirnames.sort()
 
                 # select files by extension
                 for filename in sorted(filenames):
+                    if filename in excludes:
+                        continue
                     _, ext = os.path.splitext(filename)
-                    if ext in ['.%s' % e for e in extensions]:
-                        files.append(os.path.join(dirpath, filename))
+                    if ext not in ['.%s' % e for e in extensions]:
+                        continue
+                    files.append(os.path.join(dirpath, filename))
         if os.path.isfile(path):
             files.append(path)
     return files
