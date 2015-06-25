@@ -118,7 +118,6 @@ def main(argv=sys.argv[1:]):
 
     file_descriptors = {}
     for filename in sorted(filenames):
-        print(filename)
         file_descriptors[filename] = parse_file(filename)
 
     if args.add_missing:
