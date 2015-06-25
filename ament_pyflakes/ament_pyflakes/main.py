@@ -116,7 +116,7 @@ def get_files(paths):
                         files.append(os.path.join(dirpath, filename))
         if os.path.isfile(path):
             files.append(path)
-    return files
+    return [os.path.normpath(f) for f in files]
 
 
 def get_xunit_content(report, testname, elapsed):

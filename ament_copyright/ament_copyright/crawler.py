@@ -53,7 +53,7 @@ def get_files(paths, extensions, skip_package_level_setup_py=True):
                 if filename == basename:
                     files[path] = filetype
                     break
-    return files
+    return {os.path.normpath(path): filetype for path, filetype in files.items()}
 
 
 def is_repository_root(path):
