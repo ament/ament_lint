@@ -16,4 +16,8 @@
   <test_depend>ament_cmake_lint_cmake</test_depend>
   <test_depend>ament_cmake_pep8</test_depend>
   <test_depend>ament_cmake_pyflakes</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

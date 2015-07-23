@@ -14,4 +14,8 @@
   <buildtool_export_depend>ament_copyright</buildtool_export_depend>
 
   <test_depend>ament_cmake_lint_cmake</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>
