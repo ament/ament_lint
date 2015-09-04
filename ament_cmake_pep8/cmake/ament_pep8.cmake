@@ -33,7 +33,8 @@ function(ament_pep8)
     message(FATAL_ERROR "ament_pep8() could not find program 'ament_pep8'")
   endif()
 
-  set(cmd "${ament_pep8_BIN}" "--xunit-file" "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xml")
+  set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
+  set(cmd "${ament_pep8_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pep8")
@@ -41,6 +42,7 @@ function(ament_pep8)
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_pep8/${ARG_TESTNAME}.txt"
+    RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 endfunction()
