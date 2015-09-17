@@ -1,17 +1,21 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>ament_copyright</name>
+  <name>ament_pep257</name>
   <version>0.0.0</version>
   <description>
-    The ability to check source files for copyright and license
-    information.
+    The ability to check code against the style conventions in PEP 8 and
+    generate xUnit test result files.
   </description>
   <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
   <license>Apache License 2.0</license>
+  <license>MIT</license>
 
-  <test_depend>ament_pep257</test_depend>
+  <!--
+  the dependency is not available in Trusty and therfore packaged within this package
+  <exec_depend>python3-pep257</exec_depend>
+  -->
+
   <test_depend>ament_pep8</test_depend>
-  <test_depend>ament_pyflakes</test_depend>
 
   <export>
     <build_type>ament_python</build_type>
