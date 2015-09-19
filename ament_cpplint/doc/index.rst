@@ -22,14 +22,14 @@ How to run the check from within a CMake ament package as part of the tests?
 
 .. code:: xml
 
-    <build_depend>ament_cmake_test</build_depend>
+    <buildtool_depend>ament_cmake</buildtool_depend>
     <test_depend>ament_cpplint</test_depend>
 
 ``CMakeLists.txt``:
 
 .. code:: cmake
 
-    find_package(ament_cmake_test REQUIRED)
+    find_package(ament_cmake REQUIRED)
     if(AMENT_ENABLE_TESTING)
       find_package(ament_cpplint REQUIRED)
       ament_cpplint()
