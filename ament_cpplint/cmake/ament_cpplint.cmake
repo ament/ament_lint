@@ -45,4 +45,9 @@ function(ament_cpplint)
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   )
+  set_tests_properties(
+    "${ARG_TESTNAME}"
+    PROPERTIES
+    LABELS "cpplint;linter"
+  )
 endfunction()
