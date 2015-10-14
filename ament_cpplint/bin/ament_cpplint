@@ -194,13 +194,18 @@ def append_file_to_group(groups, path):
 
     # try to determine root from path
     base_path = os.path.dirname(path)
-    for p in ['include', 'src', 'test']:
-        match = re.search(
-            '^(.+%s%s)%s' %
-            (re.escape(os.sep), re.escape(p), re.escape(os.sep)), path)
-        if match:
-            base_path = match.group(1)
+    subfolder_names = ['include', 'src', 'test']
+    for p in subfolder_names:
+        if base_path.endswith(os.sep + p):
             break
+    else:
+        for p in subfolder_names:
+            match = re.search(
+                '^(.+%s%s)%s' %
+                (re.escape(os.sep), re.escape(p), re.escape(os.sep)), path)
+            if match:
+                base_path = match.group(1)
+                break
 
     # try to find repository root
     repo_root = None
