@@ -9,10 +9,33 @@ import re
 import sys
 import time
 
+from ament_cpplint import cpplint
 from ament_cpplint import get_xunit_content
 from ament_cpplint.cpplint import _cpplint_state
 from ament_cpplint.cpplint import ParseArguments
 from ament_cpplint.cpplint import ProcessFile
+
+
+# use custom header guard with two underscore between the name parts
+def CustomGetHeaderGuardCPPVariable(filename):
+    from ament_cpplint.cpplint import _root
+    from ament_cpplint.cpplint import FileInfo
+    # Restores original filename in case that cpplint is invoked from Emacs's
+    # flymake.
+    filename = re.sub(r'_flymake\.h$', '.h', filename)
+    filename = re.sub(r'/\.flymake/([^/]*)$', r'/\1', filename)
+    # Replace 'c++' with 'cpp'.
+    filename = filename.replace('C++', 'cpp').replace('c++', 'cpp')
+
+    fileinfo = FileInfo(filename)
+    file_path_from_root = fileinfo.RepositoryName()
+    if _root:
+        file_path_from_root = re.sub('^' + _root + os.sep, '', file_path_from_root)
+    # use double separator
+    file_path_from_root = file_path_from_root.replace(os.sep, os.sep + os.sep)
+    return re.sub(r'[^a-zA-Z0-9]', '_', file_path_from_root).upper() + '_'
+
+cpplint.GetHeaderGuardCPPVariable = CustomGetHeaderGuardCPPVariable
 
 
 def main(argv=sys.argv[1:]):
@@ -22,6 +45,9 @@ def main(argv=sys.argv[1:]):
         description='Check code against the Google style conventions using '
                     'cpplint.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--linelength', metavar='N', type=int, default=100,
+        help='The maximum line length')
     parser.add_argument(
         'paths',
         nargs='*',
@@ -43,6 +69,21 @@ def main(argv=sys.argv[1:]):
     # collect category based counts
     argv.append('--counting=detailed')
     argv.append('--extensions=%s' % ','.join(extensions))
+    filters = [
+        # we do allow C++11
+        '-build/c++11',
+        # we consider passing non-const references to be ok
+        '-runtime/references',
+        # we wrap open curly braces for namespaces, classes and functions
+        '-whitespace/braces',
+        # we don't indent keywords like public, protected and private with one space
+        '-whitespace/indent',
+        # we allow closing parenthesis to be on the next line
+        '-whitespace/parens',
+    ]
+    argv.append('--filter=%s' % ','.join(filters))
+
+    argv.append('--linelength=%d' % args.linelength)
 
     groups = get_file_groups(args.paths, extensions)
     if not groups:
@@ -83,12 +124,13 @@ def main(argv=sys.argv[1:]):
             errors = []
 
             def custom_error(filename, linenum, category, confidence, message):
-                errors.append({
-                    'linenum': linenum,
-                    'category': category,
-                    'confidence': confidence,
-                    'message': message,
-                })
+                if ament_cpplint.cpplint._ShouldPrintError(category, confidence, linenum):
+                    errors.append({
+                        'linenum': linenum,
+                        'category': category,
+                        'confidence': confidence,
+                        'message': message,
+                    })
                 DefaultError(filename, linenum, category, confidence, message)
             ament_cpplint.cpplint.Error = custom_error
 
