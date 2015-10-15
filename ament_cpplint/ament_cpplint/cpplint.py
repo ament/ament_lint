@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# https://code.google.com/p/google-styleguide/source/browse/trunk/cpplint/cpplint.py?r=141
+# https://github.com/google/styleguide/blob/554223dc5432f9bd67951cde662f7a023c512dec/cpplint/cpplint.py
 
 """Does google-lint on c++ files.
 
