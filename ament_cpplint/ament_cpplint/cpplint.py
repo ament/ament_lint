@@ -5432,6 +5432,10 @@ def CheckCStyleCast(filename, clean_lines, linenum, cast_type, pattern, error):
           'All parameters should be named in a function')
     return True
 
+  # Don't warn in C files about C-style casts
+  if os.path.splitext(filename)[1] in ['.c', '.h']:
+    return False
+
   # At this point, all that should be left is actual casts.
   error(filename, linenum, 'readability/casting', 4,
         'Using C-style cast.  Use %s<%s>(...) instead' %
