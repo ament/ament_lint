@@ -72,8 +72,6 @@ def main(argv=sys.argv[1:]):
     filters = [
         # we do allow C++11
         '-build/c++11',
-        # we currently use long throughout the code base
-        '-runtime/int',
         # we consider passing non-const references to be ok
         '-runtime/references',
         # we wrap open curly braces for namespaces, classes and functions
