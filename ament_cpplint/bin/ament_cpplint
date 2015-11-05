@@ -211,6 +211,9 @@ def append_file_to_group(groups, path):
     repo_root = None
     p = path
     while p and repo_root is None:
+        # abort if root is reached
+        if os.path.dirname(p) == p:
+            break
         p = os.path.dirname(p)
         for marker in ['.git', '.hg', '.svn']:
             if os.path.exists(os.path.join(p, marker)):

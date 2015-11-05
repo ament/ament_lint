@@ -2164,7 +2164,7 @@ class _NamespaceInfo(_BlockInfo):
     # expected namespace.
     if self.name:
       # Named namespace
-      if not Match((r'};*\s*(//|/\*).*\bnamespace\s+' + re.escape(self.name) +
+      if not Match((r'};*\s*(//).*\bnamespace\s+' + re.escape(self.name) +
                     r'[\*/\.\\\s]*$'),
                    line):
         error(filename, linenum, 'readability/namespace', 5,
@@ -2172,7 +2172,7 @@ class _NamespaceInfo(_BlockInfo):
               self.name)
     else:
       # Anonymous namespace
-      if not Match(r'};*\s*(//|/\*).*\bnamespace[\*/\.\\\s]*$', line):
+      if not Match(r'};*\s*(//).*\bnamespace[\*/\.\\\s]*$', line):
         # If "// namespace anonymous" or "// anonymous namespace (more text)",
         # mention "// anonymous namespace" as an acceptable form
         if Match(r'}.*\b(namespace anonymous|anonymous namespace)\b', line):
