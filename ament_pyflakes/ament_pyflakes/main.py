@@ -69,7 +69,8 @@ def main(argv=sys.argv[1:]):
         print(filename)
         checkPath(filename, reporter=reporter)
         for error in reporter.errors:
-            print(error, file=sys.stderr)
+            sys.stderr.write('message:' + error.message + '\n')
+            sys.stderr.write('args: ' + str(error.message_args) + '\n')
         report.append((filename, reporter.errors))
         print('')
 
