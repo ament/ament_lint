@@ -28,13 +28,16 @@ function(ament_cpplint)
     set(ARG_TESTNAME "cpplint")
   endif()
 
+  if(NOT PYTHON_EXECUTABLE)
+    message(FATAL_ERROR "ament_cpplint() variable 'PYTHON_EXECUTABLE' must not be empty")
+  endif()
   if(NOT ament_cpplint_BIN)
     message(FATAL_ERROR "ament_cpplint() variable 'ament_cpplint_BIN' must not be empty")
   endif()
 
   # cpplint only works with Python 2
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
-  set(cmd "python2" "${ament_cpplint_BIN}" "--xunit-file" "${result_file}")
+  set(cmd "${PYTHON_EXECUTABLE}" "${ament_cpplint_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")

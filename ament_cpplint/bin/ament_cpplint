@@ -1,9 +1,8 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 from __future__ import print_function
 
 import argparse
-import codecs
 import os
 import re
 import sys
@@ -89,14 +88,6 @@ def main(argv=sys.argv[1:]):
     if not groups:
         print('No files found', file=sys.stderr)
         return 1
-
-    # change stderr to write with replacement characters so we don't die
-    # if we try to print something containing non-ASCII characters.
-    sys.stderr = codecs.StreamReaderWriter(
-        sys.stderr,
-        codecs.getreader('utf8'),
-        codecs.getwriter('utf8'),
-        'replace')
 
     # hook into error reporting
     import ament_cpplint.cpplint
