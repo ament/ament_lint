@@ -44,9 +44,13 @@ def CustomGetHeaderGuardCPPVariable(filename):
     fileinfo = FileInfo(filename)
     file_path_from_root = fileinfo.RepositoryName()
     if _root:
-        file_path_from_root = re.sub('^' + _root + os.sep, '', file_path_from_root)
+        prefix = _root + os.sep
+        # use consistent separator on Windows
+        if os.sep != '/':
+            prefix = prefix.replace(os.sep, '/')
+        file_path_from_root = re.sub('^' + re.escape(prefix), '', file_path_from_root)
     # use double separator
-    file_path_from_root = file_path_from_root.replace(os.sep, os.sep + os.sep)
+    file_path_from_root = file_path_from_root.replace('/', '//')
     return re.sub(r'[^a-zA-Z0-9]', '_', file_path_from_root).upper() + '_'
 
 cpplint.GetHeaderGuardCPPVariable = CustomGetHeaderGuardCPPVariable
