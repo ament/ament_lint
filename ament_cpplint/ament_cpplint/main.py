@@ -67,6 +67,9 @@ def main(argv=sys.argv[1:]):
         '--linelength', metavar='N', type=int, default=100,
         help='The maximum line length')
     parser.add_argument(
+        '--root', type=str,
+        help='The --root option for cpplint')
+    parser.add_argument(
         'paths',
         nargs='*',
         default=[os.curdir],
@@ -119,6 +122,8 @@ def main(argv=sys.argv[1:]):
         files = groups[root]
 
         arguments = list(argv)
+        if args.root:
+            root = os.path.abspath(args.root)
         if root:
             root_arg = '--root=%s' % root
             arguments.append(root_arg)
