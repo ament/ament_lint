@@ -27,6 +27,6 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
   "*.py"
 )
 if(_source_files)
-  message(" - Added test 'copyright' to check for copyright in CMake / C / C++ / Python code")
+  message(STATUS "Added test 'copyright' to check for copyright in CMake / C / C++ / Python code")
   ament_copyright()
 endif()

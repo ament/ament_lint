@@ -23,6 +23,6 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
   "*.hxx"
 )
 if(_source_files)
-  message(" - Added test 'uncrustify' to check C / C++ code style")
+  message(STATUS "Added test 'uncrustify' to check C / C++ code style")
   ament_uncrustify()
 endif()

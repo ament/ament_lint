@@ -23,6 +23,6 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
   "*.hxx"
 )
 if(_source_files)
-  message(" - Added test 'cppcheck' to perform static code analysis on C / C++ code")
+  message(STATUS "Added test 'cppcheck' to perform static code analysis on C / C++ code")
   ament_cppcheck()
 endif()
