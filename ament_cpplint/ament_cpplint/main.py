@@ -171,6 +171,9 @@ def main(argv=sys.argv[1:]):
         suffix = '.xml'
         if file_name.endswith(suffix):
             file_name = file_name[0:-len(suffix)]
+            suffix = '.xunit'
+            if file_name.endswith(suffix):
+                file_name = file_name[0:-len(suffix)]
         testname = '%s.%s' % (folder_name, file_name)
 
         xml = get_xunit_content(report, testname, time.time() - start_time)
