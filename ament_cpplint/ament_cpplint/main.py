@@ -101,6 +101,8 @@ def main(argv=sys.argv[1:]):
         '-whitespace/indent',
         # we allow closing parenthesis to be on the next line
         '-whitespace/parens',
+        # we allow the developer to decide about whitespace after a semicolon
+        '-whitespace/semicolon',
     ]
     argv.append('--filter=%s' % ','.join(filters))
 
