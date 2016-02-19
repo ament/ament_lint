@@ -214,18 +214,18 @@ def append_file_to_group(groups, path):
 
     # try to determine root from path
     base_path = os.path.dirname(path)
+    # find longest subpath which ends with one of the following subfolder names
     subfolder_names = ['include', 'src', 'test']
-    for p in subfolder_names:
-        if base_path.endswith(os.sep + p):
-            break
-    else:
-        for p in subfolder_names:
-            match = re.search(
-                '^(.+%s%s)%s' %
-                (re.escape(os.sep), re.escape(p), re.escape(os.sep)), path)
-            if match:
-                base_path = match.group(1)
-                break
+    matches = [
+        re.search(
+            '^(.+%s%s)%s' %
+            (re.escape(os.sep), re.escape(subfolder_name), re.escape(os.sep)), path)
+        for subfolder_name in subfolder_names]
+    match_groups = [match.group(1) for match in matches if match]
+    if match_groups:
+        match_groups = [{'group_len': len(x), 'group': x} for x in match_groups]
+        sorted_groups = sorted(match_groups, key=lambda k: k['group_len'])
+        base_path = sorted_groups[-1]['group']
 
     # try to find repository root
     repo_root = None
