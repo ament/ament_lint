@@ -24,10 +24,10 @@ import time
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-from ament_pep257.pep257 import check
-from ament_pep257.pep257 import collect
-from ament_pep257.pep257 import Error
-from ament_pep257.pep257 import log
+from pydocstyle import check
+from pydocstyle import ConfigurationParser
+from pydocstyle import Error
+from pydocstyle import log
 log.setLevel(logging.INFO)
 
 
@@ -38,7 +38,7 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--ignore',
         nargs='*',
-        default=['D100', 'D101', 'D102', 'D103', 'D203'],
+        default=['D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D203'],
         help='The pep257 categories to ignore')
     parser.add_argument(
         'paths',
@@ -98,21 +98,30 @@ def main(argv=sys.argv[1:]):
 
 
 def generate_pep257_report(paths, excludes, ignore):
-    def match(filename):
-        return filename.endswith('.py')
-
-    def match_dir(dirname):
-        return dirname[0] not in ['.', '_']
-
-    files = collect(paths, match=match, match_dir=match_dir)
-    files = [f for f in files if os.path.abspath(f) not in excludes]
+    conf = ConfigurationParser()
+    sys_argv = sys.argv
+    sys.argv = [
+        'main',
+        '--ignore=' + ','.join(ignore),
+        '--match', '.*\.py',
+        '--match-dir', '[^\._].*',
+    ]
+    conf.parse()
+    sys.argv = sys_argv
+    files_to_check = conf.get_files_to_check()
 
     report = []
 
-    for filename in sorted(files):
+    files_dict = {}
+    for filename, select in files_to_check:
+        if os.path.abspath(filename) in excludes:
+            continue
+        files_dict[filename] = select
+
+    for filename in sorted(files_dict.keys()):
         print('checking', filename)
         errors = []
-        pep257_errors = check([filename], ignore=ignore)
+        pep257_errors = check([filename], select=files_dict[filename])
         for pep257_error in pep257_errors:
             if isinstance(pep257_error, Error):
                 errors.append({

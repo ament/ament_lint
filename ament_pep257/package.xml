@@ -10,10 +10,7 @@
   <license>Apache License 2.0</license>
   <license>MIT</license>
 
-  <!--
-  the dependency is not available in Trusty and therfore packaged within this package
-  <exec_depend>python3-pep257</exec_depend>
-  -->
+  <exec_depend>pydocstyle</exec_depend>
 
   <test_depend>ament_pep8</test_depend>
 

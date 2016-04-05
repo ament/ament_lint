@@ -9,7 +9,7 @@
   <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
   <license>Apache License 2.0</license>
 
-  <exec_depend>pyflakes</exec_depend>
+  <exec_depend>pyflakes3</exec_depend>
 
   <test_depend>ament_pep8</test_depend>
 
