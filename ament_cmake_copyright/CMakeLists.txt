@@ -18,7 +18,7 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-if(AMENT_ENABLE_TESTING)
+if(BUILD_TESTING)
   find_package(ament_cmake_lint_cmake REQUIRED)
   ament_lint_cmake()
 

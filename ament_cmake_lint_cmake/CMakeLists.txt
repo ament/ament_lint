@@ -18,6 +18,6 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-if(AMENT_ENABLE_TESTING)
+if(BUILD_TESTING)
   ament_lint_cmake()
 endif()
