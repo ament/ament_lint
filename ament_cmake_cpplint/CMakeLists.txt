@@ -14,7 +14,7 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-if(AMENT_ENABLE_TESTING)
+if(BUILD_TESTING)
   find_package(ament_cmake_copyright REQUIRED)
   ament_copyright()
 

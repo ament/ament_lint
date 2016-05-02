@@ -9,7 +9,7 @@ It reduces the amount of CMake code to a bare minimum.
 .. code:: cmake
 
     # this must happen before the invocation of ament_package()
-    if(AMENT_ENABLE_TESTING)
+    if(BUILD_TESTING)
       find_package(ament_lint_auto REQUIRED)
       ament_lint_auto_find_test_dependencies()
     endif()

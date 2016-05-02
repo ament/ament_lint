@@ -32,7 +32,7 @@ How to run the check from within a CMake ament package as part of the tests?
 .. code:: cmake
 
     find_package(ament_cmake REQUIRED)
-    if(AMENT_ENABLE_TESTING)
+    if(BUILD_TESTING)
       find_package(ament_clang_format REQUIRED)
       ament_clang_format()
     endif()
