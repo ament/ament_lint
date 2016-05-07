@@ -17,9 +17,11 @@
 from __future__ import print_function
 
 import argparse
+from configparser import ConfigParser
 import difflib
 import filecmp
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -46,6 +48,9 @@ def main(argv=sys.argv[1:]):
         dest='config_file',
         help='The config file')
     parser.add_argument(
+        '--linelength', metavar='N', type=int,
+        help='The maximum line length (default: specified in the config file)')
+    parser.add_argument(
         'paths',
         nargs='*',
         default=[os.curdir],
@@ -71,6 +76,20 @@ def main(argv=sys.argv[1:]):
     if not os.path.exists(args.config_file):
         print("Could not config file '%s'" % args.config_file, file=sys.stderr)
         return 1
+
+    if args.linelength is not None:
+        # check if different from config file
+        config = ConfigParser()
+        with open(args.config_file, 'r') as h:
+            config_str = h.read()
+        config.read_string('[DEFAULT]\n' + config_str)
+        code_width = config['DEFAULT']['code_width']
+        code_width = int(re.split('[ \t#]', code_width, maxsplit=1)[0])
+        if args.linelength != code_width:
+            # generate temporary config file with custom line length
+            temp_config = tempfile.NamedTemporaryFile('w')
+            temp_config.write(config_str + '\ncode_width=%d' % args.linelength)
+            args.config_file = temp_config.name
 
     if args.xunit_file:
         start_time = time.time()

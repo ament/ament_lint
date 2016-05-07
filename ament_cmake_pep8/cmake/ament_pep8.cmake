@@ -17,13 +17,16 @@
 #
 # :param TESTNAME: the name of the test, default: "pep8"
 # :type TESTNAME: string
+# :param MAX_LINE_LENGTH: override the maximum line length,
+#   the default is defined in ament_cpplint
+# :type MAX_LINE_LENGTH: integer
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_pep8)
-  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "pep8")
   endif()
@@ -35,6 +38,9 @@ function(ament_pep8)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_pep8_BIN}" "--xunit-file" "${result_file}")
+  if(ARG_MAX_LINE_LENGTH)
+    list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
+  endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pep8")

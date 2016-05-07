@@ -38,6 +38,9 @@ def main(argv=sys.argv[1:]):
         dest='config_file',
         help='The config file')
     parser.add_argument(
+        '--linelength', metavar='N', type=int,
+        help='The maximum line length (default: specified in the config file)')
+    parser.add_argument(
         'paths',
         nargs='*',
         default=[os.curdir],
@@ -60,7 +63,9 @@ def main(argv=sys.argv[1:]):
         print("Could not config file '%s'" % args.config_file, file=sys.stderr)
         return 1
 
-    report = generate_pep8_report(args.config_file, args.paths, args.excludes)
+    report = generate_pep8_report(
+        args.config_file, args.paths, args.excludes,
+        max_line_length=args.linelength)
 
     # print statistics about errors
     if report.total_errors:
@@ -100,14 +105,17 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def generate_pep8_report(config_file, paths, excludes):
-    pep8style = CustomStyleGuide(
-        repeat=True,
-        show_source=True,
-        verbose=True,
-        reporter=CustomReport,
-        config_file=config_file,
-    )
+def generate_pep8_report(config_file, paths, excludes, max_line_length=None):
+    kwargs = {
+        'repeat': True,
+        'show_source': True,
+        'verbose': True,
+        'reporter': CustomReport,
+        'config_file': config_file,
+    }
+    if max_line_length is not None:
+        kwargs['max_line_length'] = max_line_length
+    pep8style = CustomStyleGuide(**kwargs)
     if excludes:
         pep8style.options.exclude += excludes
     return pep8style.check_files(paths)
