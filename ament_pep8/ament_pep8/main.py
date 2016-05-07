@@ -193,7 +193,7 @@ class CustomReport(pep8.StandardReport):
             'column': offset + 1,
             'error_code': code,
             'error_message': text,
-            'source_line': line.splitlines()[0],
+            'source_line': line.splitlines()[0] if line else '',
         })
         return code
 
