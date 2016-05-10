@@ -69,7 +69,11 @@ def main(argv=sys.argv[1:]):
         print(filename)
         checkPath(filename, reporter=reporter)
         for error in reporter.errors:
-            print(error, file=sys.stderr)
+            try:
+                print(error, file=sys.stderr)
+            except TypeError:
+                # this can happen if the line contains percent characters
+                print(error.__dict__, file=sys.stderr)
         report.append((filename, reporter.errors))
         print('')
 
@@ -145,13 +149,17 @@ def get_xunit_content(report, testname, elapsed):
         if errors:
             # report each pyflakes error as a failing testcase
             for error in errors:
+                try:
+                    msg = error.message % error.message_args
+                except TypeError:
+                    # this can happen if the line contains percent characters
+                    msg = error.message + ' ' + str(error.message_args)
                 data = {
                     'quoted_name': quoteattr(
                         '%s (%s:%d)' % (
                             type(error).__name__, filename, error.lineno)),
                     'testname': testname,
-                    'quoted_message': quoteattr(
-                        error.message % error.message_args),
+                    'quoted_message': quoteattr(msg),
                 }
                 xml += '''  <testcase
     name=%(quoted_name)s

@@ -17,13 +17,18 @@
 #
 # :param TESTNAME: the name of the test, default: "cpplint"
 # :type TESTNAME: string
+# :param MAX_LINE_LENGTH: override the maximum line length,
+#   the default is defined in ament_cpplint
+# :type MAX_LINE_LENGTH: integer
+# :param ROOT: override the --root option of cpplint
+# :type ROOT: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cpplint)
-  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cpplint")
   endif()
@@ -35,6 +40,12 @@ function(ament_cpplint)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_cpplint_BIN}" "--xunit-file" "${result_file}")
+  if(ARG_MAX_LINE_LENGTH)
+    list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
+  endif()
+  if(ARG_ROOT)
+    list(APPEND cmd "--root" "${ARG_ROOT}")
+  endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")
