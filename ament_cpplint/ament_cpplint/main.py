@@ -48,7 +48,12 @@ def CustomGetHeaderGuardCPPVariable(filename):
         # use consistent separator on Windows
         if os.sep != '/':
             prefix = prefix.replace(os.sep, '/')
-        file_path_from_root = re.sub('^' + re.escape(prefix), '', file_path_from_root)
+        if file_path_from_root.startswith(prefix):
+            file_path_from_root = file_path_from_root[len(prefix):]
+        else:
+            filename = filename.replace(os.sep, '/')
+            if filename.startswith(prefix):
+                file_path_from_root = filename[len(prefix):]
     # use double separator
     file_path_from_root = file_path_from_root.replace('/', '//')
     return re.sub(r'[^a-zA-Z0-9]', '_', file_path_from_root).upper() + '_'
