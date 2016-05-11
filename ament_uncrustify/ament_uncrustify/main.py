@@ -77,37 +77,39 @@ def main(argv=sys.argv[1:]):
         print("Could not config file '%s'" % args.config_file, file=sys.stderr)
         return 1
 
-    if args.linelength is not None:
-        # check if different from config file
-        config = ConfigParser()
-        with open(args.config_file, 'r') as h:
-            config_str = h.read()
-        config.read_string('[DEFAULT]\n' + config_str)
-        code_width = config['DEFAULT']['code_width']
-        code_width = int(re.split('[ \t#]', code_width, maxsplit=1)[0])
-        if args.linelength != code_width:
-            # generate temporary config file with custom line length
-            temp_config = tempfile.NamedTemporaryFile('w')
-            temp_config.write(config_str + '\ncode_width=%d' % args.linelength)
-            args.config_file = temp_config.name
-
-    if args.xunit_file:
-        start_time = time.time()
-
-    files = get_files(args.paths, extensions, args.exclude)
-    if not files:
-        print('No files found', file=sys.stderr)
-        return 1
-
-    uncrustify_bin = find_executable('uncrustify')
-    if not uncrustify_bin:
-        print("Could not find 'uncrustify' executable", file=sys.stderr)
-        return 1
-
-    suffix = '.uncrustify'
-
-    report = []
+    temp_config = None
     try:
+        if args.linelength is not None:
+            # check if different from config file
+            config = ConfigParser()
+            with open(args.config_file, 'r') as h:
+                config_str = h.read()
+            config.read_string('[DEFAULT]\n' + config_str)
+            code_width = config['DEFAULT']['code_width']
+            code_width = int(re.split('[ \t#]', code_width, maxsplit=1)[0])
+            if args.linelength != code_width:
+                # generate temporary config file with custom line length
+                temp_config_fd, args.config_file = tempfile.mkstemp(prefix='uncrustify_')
+                temp_config = os.fdopen(temp_config_fd, 'w')
+                temp_config.write(config_str + '\ncode_width=%d' % args.linelength)
+                temp_config.close()
+
+        if args.xunit_file:
+            start_time = time.time()
+
+        files = get_files(args.paths, extensions, args.exclude)
+        if not files:
+            print('No files found', file=sys.stderr)
+            return 1
+
+        uncrustify_bin = find_executable('uncrustify')
+        if not uncrustify_bin:
+            print("Could not find 'uncrustify' executable", file=sys.stderr)
+            return 1
+
+        suffix = '.uncrustify'
+
+        report = []
         temp_path = tempfile.mkdtemp(prefix='uncrustify_')
 
         # invoke uncrustify on all files
@@ -218,6 +220,8 @@ def main(argv=sys.argv[1:]):
                     with open(modified_filename, 'rb') as modified_file:
                         original_file.write(modified_file.read())
     finally:
+        if temp_config:
+            os.remove(args.config_file)
         if os.path.exists(temp_path):
             shutil.rmtree(temp_path)
 
