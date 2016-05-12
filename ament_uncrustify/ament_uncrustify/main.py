@@ -78,6 +78,7 @@ def main(argv=sys.argv[1:]):
         return 1
 
     temp_config = None
+    temp_path = None
     try:
         if args.linelength is not None:
             # check if different from config file
@@ -222,7 +223,7 @@ def main(argv=sys.argv[1:]):
     finally:
         if temp_config:
             os.remove(args.config_file)
-        if os.path.exists(temp_path):
+        if temp_path and os.path.exists(temp_path):
             shutil.rmtree(temp_path)
 
     # output diffs
