@@ -121,6 +121,7 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
     # add options for flake8 plugins
     kwargs['parser'], options_hooks = flake8.engine.get_parser()
     flake8style = CustomStyleGuide(**kwargs)
+    print('Creating CustomStyleGuide with kwargs: {0}'.format(kwargs))
     options = flake8style.options
     for options_hook in options_hooks:
         options_hook(options)
@@ -190,6 +191,7 @@ def get_xunit_content(report, testname):
 class CustomStyleGuide(flake8.engine.StyleGuide):
 
     def input_file(self, filename, **kwargs):
+        print('Adding file to list of files checked: %s' % filename)
         self.options.reporter.files.append(filename)
         return super(CustomStyleGuide, self).input_file(filename, **kwargs)
 
