@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
 
+# Copyright 2014-2016 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from __future__ import print_function
 
 import argparse
@@ -8,16 +22,25 @@ import subprocess
 import sys
 import time
 from xml.etree import ElementTree
-
-from ament_clang_format import get_xunit_content
+from xml.sax.saxutils import escape
+from xml.sax.saxutils import quoteattr
+import yaml
 
 
 def main(argv=sys.argv[1:]):
+    config_file = os.path.join(
+        os.path.dirname(__file__), 'configuration', '.clang-format')
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
     parser = argparse.ArgumentParser(
         description='Check code style using clang_format.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--config',
+        metavar='path',
+        default=config_file,
+        dest='config_file',
+        help='The config file')
     parser.add_argument(
         'paths',
         nargs='*',
@@ -36,6 +59,11 @@ def main(argv=sys.argv[1:]):
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
+    if not os.path.exists(args.config_file):
+        print("Could not find config file '%s'" % args.config_file,
+              file=sys.stderr)
+        return 1
+
     if args.xunit_file:
         start_time = time.time()
 
@@ -44,7 +72,15 @@ def main(argv=sys.argv[1:]):
         print('No files found', file=sys.stderr)
         return 1
 
-    bin_names = ['clang-format-3.5', 'clang-format-3.4', 'clang-format-3.3']
+    bin_names = [
+        'clang-format',
+        'clang-format-3.8',
+        'clang-format-3.7',
+        'clang-format-3.6',
+        'clang-format-3.5',
+        'clang-format-3.4',
+        'clang-format-3.3'
+    ]
     clang_format_bin = find_executable(bin_names)
     if not clang_format_bin:
         print("Could not find %s executable" %
@@ -54,7 +90,10 @@ def main(argv=sys.argv[1:]):
     report = []
 
     # invoke clang_format
-    style = '{BasedOnStyle: Google}'
+    with open(args.config_file, 'r') as h:
+        content = h.read()
+    data = yaml.load(content)
+    style = yaml.dump(data, default_flow_style=True, width=float('inf'))
     cmd = [clang_format_bin,
            '-output-replacements-xml',
            '-style=%s' % style]
@@ -247,6 +286,80 @@ def find_index_of_line_end(data, offset):
 
 def get_line_number(data, offset):
     return data[0:offset].count('\n') + data[0:offset].count('\r') + 1
+
+
+def get_xunit_content(report, testname, elapsed):
+    test_count = sum([max(len(r), 1) for r in report.values()])
+    error_count = sum([len(r) for r in report.values()])
+    data = {
+        'testname': testname,
+        'test_count': test_count,
+        'error_count': error_count,
+        'time': '%.3f' % round(elapsed, 3),
+    }
+    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<testsuite
+  name="%(testname)s"
+  tests="%(test_count)d"
+  failures="%(error_count)d"
+  time="%(time)s"
+>
+''' % data
+
+    for filename in sorted(report.keys()):
+        replacements = report[filename]
+
+        if replacements:
+            # report each replacement as a failing testcase
+            for replacement in replacements:
+                data = {
+                    'quoted_location': quoteattr(
+                        '%s:%d:%d' % (
+                            filename, replacement['line_no'],
+                            replacement['offset_in_line'])),
+                    'testname': testname,
+                    'quoted_message': quoteattr(
+                        'Replace [%s] with [%s]' %
+                        (replacement['original'], replacement['replacement'])
+                    ),
+                    'cdata': '\n'.join([
+                        '%s:%d:%d' % (
+                            filename, replacement['line_no'],
+                            replacement['offset_in_line']),
+                        replacement['deletion'],
+                        replacement['addition'],
+                    ]),
+                }
+                xml += '''  <testcase
+    name=%(quoted_location)s
+    classname="%(testname)s"
+  >
+      <failure message=%(quoted_message)s><![CDATA[%(cdata)s]]></failure>
+  </testcase>
+''' % data
+
+        else:
+            # if there are no replacements report a single successful test
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+            }
+            xml += '''  <testcase
+    name=%(quoted_location)s
+    classname="%(testname)s"
+    status="No errors"/>
+''' % data
+
+    # output list of checked files
+    data = {
+        'escaped_files': escape(''.join(['\n* %s' % r
+                                         for r in sorted(report.keys())])),
+    }
+    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
+''' % data
+
+    xml += '</testsuite>\n'
+    return xml
 
 
 if __name__ == '__main__':

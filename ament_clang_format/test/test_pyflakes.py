@@ -1,4 +1,4 @@
-# Copyright 2014-2015 Open Source Robotics Foundation, Inc.
+# Copyright 2015 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# copied from ament_clang_format/ament_clang_format-extras.cmake
+from ament_pyflakes.main import main
 
-find_package(ament_cmake_core QUIET REQUIRED)
-find_package(ament_cmake_test QUIET REQUIRED)
 
-set(ament_clang_format_BIN "${ament_clang_format_DIR}/../../../bin/ament_clang_format")
-
-include("${ament_clang_format_DIR}/ament_clang_format.cmake")
-
-ament_register_extension("ament_lint_auto" "ament_clang_format"
-  "ament_clang_format_lint_hook.cmake")
+def test_pyflakes():
+    rc = main(argv=['ament_clang_format', 'test'])
+    assert rc == 0, 'Found errors'
