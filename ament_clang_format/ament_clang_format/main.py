@@ -72,7 +72,15 @@ def main(argv=sys.argv[1:]):
         print('No files found', file=sys.stderr)
         return 1
 
-    bin_names = ['clang-format-3.8', 'clang-format-3.7', 'clang-format-3.6', 'clang-format-3.5', 'clang-format-3.4', 'clang-format-3.3']
+    bin_names = [
+        'clang-format',
+        'clang-format-3.8',
+        'clang-format-3.7',
+        'clang-format-3.6',
+        'clang-format-3.5',
+        'clang-format-3.4',
+        'clang-format-3.3'
+    ]
     clang_format_bin = find_executable(bin_names)
     if not clang_format_bin:
         print("Could not find %s executable" %
