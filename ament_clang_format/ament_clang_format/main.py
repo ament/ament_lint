@@ -24,14 +24,23 @@ import time
 from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
+import yaml
 
 
 def main(argv=sys.argv[1:]):
+    config_file = os.path.join(
+        os.path.dirname(__file__), 'configuration', '.clang-format')
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
     parser = argparse.ArgumentParser(
         description='Check code style using clang_format.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--config',
+        metavar='path',
+        default=config_file,
+        dest='config_file',
+        help='The config file')
     parser.add_argument(
         'paths',
         nargs='*',
@@ -49,6 +58,11 @@ def main(argv=sys.argv[1:]):
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
+
+    if not os.path.exists(args.config_file):
+        print("Could not find config file '%s'" % args.config_file,
+              file=sys.stderr)
+        return 1
 
     if args.xunit_file:
         start_time = time.time()
@@ -68,7 +82,10 @@ def main(argv=sys.argv[1:]):
     report = []
 
     # invoke clang_format
-    style = '{BasedOnStyle: Google}'
+    with open(args.config_file, 'r') as h:
+        content = h.read()
+    data = yaml.load(content)
+    style = yaml.dump(data, default_flow_style=True, width=float('inf'))
     cmd = [clang_format_bin,
            '-output-replacements-xml',
            '-style=%s' % style]

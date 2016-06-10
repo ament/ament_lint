@@ -6,6 +6,9 @@ setup(
     version='0.0.0',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
+    package_data={'': [
+        'configuration/.clang-format',
+    ]},
     author='Dirk Thomas',
     author_email='dthomas@osrfoundation.org',
     maintainer='Dirk Thomas',
