@@ -106,6 +106,7 @@ def generate_pep257_report(paths, excludes, ignore):
         '--match', '.*\.py',
         '--match-dir', '[^\._].*',
     ]
+    sys.argv += paths
     conf.parse()
     sys.argv = sys_argv
     files_to_check = conf.get_files_to_check()
