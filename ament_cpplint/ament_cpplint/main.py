@@ -62,7 +62,8 @@ cpplint.GetHeaderGuardCPPVariable = CustomGetHeaderGuardCPPVariable
 
 
 def main(argv=sys.argv[1:]):
-    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
+    extensions = ['c', 'cc', 'cpp', 'cxx']
+    headers = ['h', 'hh', 'hpp', 'hxx']
 
     parser = argparse.ArgumentParser(
         description='Check code against the Google style conventions using '
@@ -80,7 +81,7 @@ def main(argv=sys.argv[1:]):
         default=[os.curdir],
         help="The files or directories to check. For directories files ending "
              'in %s will be considered.' %
-             ', '.join(["'.%s'" % e for e in extensions]))
+             ', '.join(["'.%s'" % e for e in extensions + headers]))
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -95,6 +96,7 @@ def main(argv=sys.argv[1:]):
     # collect category based counts
     argv.append('--counting=detailed')
     argv.append('--extensions=%s' % ','.join(extensions))
+    argv.append('--headers=%s' % ','.join(headers))
     filters = [
         # we do allow C++11
         '-build/c++11',
@@ -113,7 +115,7 @@ def main(argv=sys.argv[1:]):
 
     argv.append('--linelength=%d' % args.linelength)
 
-    groups = get_file_groups(args.paths, extensions)
+    groups = get_file_groups(args.paths, extensions + headers)
     if not groups:
         print('No files found', file=sys.stderr)
         return 1
