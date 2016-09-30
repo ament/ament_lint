@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2009 Google Inc. All rights reserved.
 #
@@ -68,7 +68,6 @@ try:
 except NameError:
   #  -- pylint: disable=redefined-builtin
   xrange = range  # Python 3
-
 
 _USAGE = """
 Syntax: cpplint.py [--verbose=#] [--output=emacs|eclipse|vs7|junit|sed|gsed]
@@ -1612,6 +1611,7 @@ class FileInfo(object):
             os.path.exists(os.path.join(current_dir, ".hg")) or
             os.path.exists(os.path.join(current_dir, ".svn"))):
           root_dir = current_dir
+          break
         current_dir = os.path.dirname(current_dir)
 
       if (os.path.exists(os.path.join(root_dir, ".git")) or
@@ -2845,7 +2845,7 @@ class _NamespaceInfo(_BlockInfo):
     # deciding what these nontrivial things are, so this check is
     # triggered by namespace size only, which works most of the time.
     if (linenum - self.starting_linenum < 10
-        and not Match(r'^\s*};*\s*(//|/\*).*\bnamespace\b', line)):
+        and not Match(r'^\s*};*\s*(//).*\bnamespace\b', line)):
       return
 
     # Look for matching comment at end of namespace.
@@ -2862,7 +2862,7 @@ class _NamespaceInfo(_BlockInfo):
     # expected namespace.
     if self.name:
       # Named namespace
-      if not Match((r'^\s*};*\s*(//|/\*).*\bnamespace\s+' +
+      if not Match((r'^\s*};*\s*(//).*\bnamespace\s+' +
                     re.escape(self.name) + r'[\*/\.\\\s]*$'),
                    line):
         error(filename, linenum, 'readability/namespace', 5,
@@ -5322,12 +5322,28 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
           'Did you mean "memset(%s, 0, %s)"?'
           % (match.group(1), match.group(2)))
 
-  if Search(r'\busing namespace\b', line):
-    if Search(r'\bliterals\b', line):
-      error(filename, linenum, 'build/namespaces_literals', 5,
-            'Do not use namespace using-directives.  '
-            'Use using-declarations instead.')
-    else:
+  # Check for 'using namespace' which pollutes namespaces.
+  # This is tricky. Although in general 'using namespace' is a Bad Thing,
+  # an exception is made for certain standard namespaces, like std::*literals
+  # and std::placeholders, which are intended to be used in this fashion.
+  # This whitelist may grow over time as needed if/when shiny new libraries
+  # come along that are well-behaved in a 'using namespace' context.
+  # For example, 'using namespace std::chrono_literals;' is allowed, but
+  # 'using namespace foo;' is not allowed.
+  # Note that headers are not permitted to use this exception.
+  match = Search(r'\busing namespace\s+((\w|::)+)', line)
+  if match:
+    whitelist = [
+      'std::chrono_literals',
+      'std::complex_literals',
+      'std::literals',
+      'std::literals::chrono_literals',
+      'std::literals::complex_literals',
+      'std::literals::string_literals',
+      'std::placeholders',
+      'std::string_literals',
+    ]
+    if IsHeaderExtension(file_extension) or match.group(1) not in whitelist:
       error(filename, linenum, 'build/namespaces', 5,
             'Do not use namespace using-directives.  '
             'Use using-declarations instead.')
@@ -5854,6 +5870,10 @@ def CheckCStyleCast(filename, clean_lines, linenum, cast_type, pattern, error):
   remainder = line[match.end(0):]
   if Match(r'^\s*(?:;|const\b|throw\b|final\b|override\b|[=>{),]|->)',
            remainder):
+    return False
+
+  # Don't warn in C files about C-style casts
+  if os.path.splitext(filename)[1] in ['.c', '.h']:
     return False
 
   # At this point, all that should be left is actual casts.
