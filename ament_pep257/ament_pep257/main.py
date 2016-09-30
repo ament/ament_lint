@@ -25,9 +25,16 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 from pydocstyle import check
-from pydocstyle import ConfigurationParser
-from pydocstyle import Error
-from pydocstyle import log
+
+try:  # as of version 1.1.0
+    from pydocstyle.config import ConfigurationParser
+    from pydocstyle.violations import Error
+    from pydocstyle.utils import log
+except ImportError:  # try version 1.0.0
+    from pydocstyle import ConfigurationParser
+    from pydocstyle import Error
+    from pydocstyle import log
+
 log.setLevel(logging.INFO)
 
 
