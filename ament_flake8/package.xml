@@ -5,7 +5,7 @@
   <description>
     The ability to check code for style and syntax conventions with flake8.
   </description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="dhood@osrfoundation.org">D. Hood</maintainer>
   <license>Apache License 2.0</license>
 
   <exec_depend>python3-flake8</exec_depend>
