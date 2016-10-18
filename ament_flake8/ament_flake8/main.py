@@ -121,14 +121,15 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
     # add options for flake8 plugins
     kwargs['parser'], options_hooks = flake8.engine.get_parser()
     flake8style = CustomStyleGuide(**kwargs)
-    print('Creating CustomStyleGuide with kwargs: {0}'.format(kwargs))
-    options = flake8style.options
+    kwargs['styleguide'] = flake8style
+    wrapperStyleGuide = flake8.engine.StyleGuide(**kwargs)
+    options = wrapperStyleGuide.options
     for options_hook in options_hooks:
         options_hook(options)
 
     if excludes:
-        flake8style.options.exclude += excludes
-    return flake8style.check_files(paths)
+        wrapperStyleGuide.options.exclude += excludes
+    return wrapperStyleGuide.check_files(paths)
 
 
 def get_xunit_content(report, testname):
@@ -188,10 +189,9 @@ def get_xunit_content(report, testname):
     return xml
 
 
-class CustomStyleGuide(flake8.engine.StyleGuide):
+class CustomStyleGuide(flake8.engine.NoQAStyleGuide):
 
     def input_file(self, filename, **kwargs):
-        print('Adding file to list of files checked: %s' % filename)
         self.options.reporter.files.append(filename)
         return super(CustomStyleGuide, self).input_file(filename, **kwargs)
 
