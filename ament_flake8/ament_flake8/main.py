@@ -121,14 +121,17 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
     # add options for flake8 plugins
     kwargs['parser'], options_hooks = flake8.engine.get_parser()
     flake8style = CustomStyleGuide(**kwargs)
-    kwargs['styleguide'] = flake8style
-    wrapperStyleGuide = flake8.engine.StyleGuide(**kwargs)
-    options = wrapperStyleGuide.options
+    options = flake8style.options
     for options_hook in options_hooks:
         options_hook(options)
 
     if excludes:
-        wrapperStyleGuide.options.exclude += excludes
+        flake8style.options.exclude += excludes
+
+    # flake8 uses a wrapper StyleGuide to handle particular OSErrors
+    kwargs['styleguide'] = flake8style
+    wrapperStyleGuide = flake8.engine.StyleGuide(**kwargs)
+
     return wrapperStyleGuide.check_files(paths)
 
 
