@@ -19,11 +19,11 @@ from __future__ import print_function
 import argparse
 import os
 import sys
+import time
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import flake8.engine
-import pep8
+from flake8.api.legacy import get_style_guide
 
 
 def main(argv=sys.argv[1:]):
@@ -61,6 +61,9 @@ def main(argv=sys.argv[1:]):
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
+    if args.xunit_file:
+        start_time = time.time()
+
     if not os.path.exists(args.config_file):
         print("Could not config file '%s'" % args.config_file, file=sys.stderr)
         return 1
@@ -80,8 +83,8 @@ def main(argv=sys.argv[1:]):
         print('No errors or warnings')
         rc = 0
     else:
-        errors = report.get_count('E')
-        warnings = report.get_count('W')
+        errors = report.get_error_count()
+        warnings = report.get_warning_count()
         print('%d errors, %d warnings' % (errors, warnings))
         rc = 1
 
@@ -97,7 +100,7 @@ def main(argv=sys.argv[1:]):
                 file_name = file_name[0:-len(suffix)]
         testname = '%s.%s' % (folder_name, file_name)
 
-        xml = get_xunit_content(report, testname)
+        xml = get_xunit_content(report, testname, time.time() - start_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
@@ -109,38 +112,49 @@ def main(argv=sys.argv[1:]):
 
 def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
     kwargs = {
-        'repeat': True,
+        'config': config_file,
+        'exclude': excludes,
+        'ignore': [
+            'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D203', 'D212',
+            'D404'],
+        'import_order_style': 'google',
+        'max_line_length': 99,
         'show_source': True,
-        'verbose': True,
-        'reporter': CustomReport,
-        'config_file': config_file,
+        'statistics': True,
     }
     if max_line_length is not None:
         kwargs['max_line_length'] = max_line_length
 
-    # add options for flake8 plugins
-    kwargs['parser'], options_hooks = flake8.engine.get_parser()
-    flake8style = CustomStyleGuide(**kwargs)
-    options = flake8style.options
-    for options_hook in options_hooks:
-        options_hook(options)
+    style = get_style_guide(**kwargs)
 
-    if excludes:
-        flake8style.options.exclude += excludes
+    # monkey patch StyleGuide to collect all files
+    input_file_func = style.input_file
 
-    # flake8 uses a wrapper StyleGuide to handle particular OSErrors
-    kwargs['styleguide'] = flake8style
-    wrapperStyleGuide = flake8.engine.StyleGuide(**kwargs)
+    def custom_input_file(self, filename, *args, **kwargs):
+        input_file_func(self, filename, *args, **kwargs)
+        report.add_filename(filename)
+    style.input_file = custom_input_file
 
-    return wrapperStyleGuide.check_files(paths)
+    # monkey patch formatter to collect all errors
+    format_func = style._application.formatter.format
+    report = CustomReport()
+
+    def custom_format(error):
+        format_func(error)
+        report.add_error(error)
+    style._application.formatter.format = custom_format
+
+    report.report = style.check_files(paths)
+    assert report.report.total_errors == len(report.errors)
+    return report
 
 
-def get_xunit_content(report, testname):
+def get_xunit_content(report, testname, elapsed):
     data = {
         'testname': testname,
         'test_count': max(report.total_errors, 1),
         'error_count': report.total_errors,
-        'time': '%.3f' % round(report.elapsed, 3),
+        'time': '%.3f' % round(elapsed, 3),
     }
     xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
@@ -156,11 +170,12 @@ def get_xunit_content(report, testname):
         for error in report.errors:
             data = {
                 'quoted_name': quoteattr(
-                    error['error_code'] +
-                    ' (%(path)s:%(row)d:%(column)d)' % error),
+                    '%s (%s:%d:%d)' % (
+                        error.code, error.filename, error.line_number,
+                        error.column_number)),
                 'testname': testname,
                 'quoted_message': quoteattr(
-                    '%(error_message)s:\n%(source_line)s' % error),
+                    '%s:\n%s' % (error.text, error.physical_line)),
             }
             xml += '''  <testcase
     name=%(quoted_name)s
@@ -171,7 +186,7 @@ def get_xunit_content(report, testname):
 ''' % data
 
     else:
-        # if there are no flake8 errors/warnings report a single successful test
+        # if there are no flake8 problems report a single successful test
         data = {
             'testname': testname,
         }
@@ -192,32 +207,31 @@ def get_xunit_content(report, testname):
     return xml
 
 
-class CustomStyleGuide(flake8.engine.NoQAStyleGuide):
+class CustomReport(object):
 
-    def input_file(self, filename, **kwargs):
-        self.options.reporter.files.append(filename)
-        return super(CustomStyleGuide, self).input_file(filename, **kwargs)
+    def __init__(self):
+        self.files = []
+        self.errors = []
+        self.report = None
 
+    def add_filename(self, filename):
+        self.files.append(filename)
 
-class CustomReport(pep8.StandardReport):
+    @property
+    def total_errors(self):
+        return len(self.errors)
 
-    errors = []
-    files = []
+    def add_error(self, error):
+        self.errors.append(error)
 
-    def error(self, line_number, offset, text, check):
-        code = super(CustomReport, self).error(
-            line_number, offset, text, check)
-        line = self.lines[line_number - 1] \
-            if line_number <= len(self.lines) else ''
-        self.errors.append({
-            'path': self.filename,
-            'row': self.line_offset + line_number,
-            'column': offset + 1,
-            'error_code': code,
-            'error_message': text,
-            'source_line': line.splitlines()[0] if line else '',
-        })
-        return code
+    def get_error_count(self):
+        return len([e for e in self.errors if e.code.startswith('E')])
+
+    def get_warning_count(self):
+        return len([e for e in self.errors if not e.code.startswith('E')])
+
+    def print_statistics(self):
+        self.report._application.report_statistics()
 
 
 if __name__ == '__main__':
