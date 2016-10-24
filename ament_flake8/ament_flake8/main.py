@@ -83,9 +83,14 @@ def main(argv=sys.argv[1:]):
         print('No errors or warnings')
         rc = 0
     else:
-        errors = report.get_error_count()
-        warnings = report.get_warning_count()
-        print('%d errors, %d warnings' % (errors, warnings))
+        print('%d errors' % (report.total_errors))
+        print('%d files checked' % len(report.files))
+
+        print('')
+        error_type_counts = report.get_error_type_counts()
+        for k, v in error_type_counts.items():
+            print("'%s'-type errors: %d" % (k, v))
+
         rc = 1
 
     # generate xunit file
@@ -217,11 +222,19 @@ class CustomReport(object):
     def add_error(self, error):
         self.errors.append(error)
 
-    def get_error_count(self):
-        return len([e for e in self.errors if e.code.startswith('E')])
+    def get_error_type_counts(self):
+        error_codes = [e.code for e in self.errors]
 
-    def get_warning_count(self):
-        return len([e for e in self.errors if not e.code.startswith('E')])
+        # Determine the type of error by the first character in its error code
+        # e.g. 'E261' is type 'E'
+        error_types = sorted(set([e[0] for e in error_codes]))
+
+        # Create dictionary of error code types and their counts
+        error_type_counts = {}
+        for error_type in error_types:
+            error_type_counts[error_type] = len([
+                e for e in error_codes if e.startswith(error_type)])
+        return error_type_counts
 
     def print_statistics(self):
         self.report._application.report_statistics()
