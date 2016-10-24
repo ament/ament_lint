@@ -127,15 +127,7 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
 
     style = get_style_guide(**kwargs)
 
-    # monkey patch StyleGuide to collect all files
-    input_file_func = style.input_file
-
-    def custom_input_file(self, filename, *args, **kwargs):
-        input_file_func(self, filename, *args, **kwargs)
-        report.add_filename(filename)
-    style.input_file = custom_input_file
-
-    # monkey patch formatter to collect all errors
+    # Monkey patch formatter to collect all errors
     format_func = style._application.formatter.format
     report = CustomReport()
 
@@ -144,7 +136,11 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
         report.add_error(error)
     style._application.formatter.format = custom_format
 
+    # Get the names of files checked
     report.report = style.check_files(paths)
+    file_checkers = style._application.file_checker_manager.checkers
+    report.files = [file_checker.filename for file_checker in file_checkers]
+
     assert report.report.total_errors == len(report.errors)
     return report
 
@@ -213,9 +209,6 @@ class CustomReport(object):
         self.files = []
         self.errors = []
         self.report = None
-
-    def add_filename(self, filename):
-        self.files.append(filename)
 
     @property
     def total_errors(self):
