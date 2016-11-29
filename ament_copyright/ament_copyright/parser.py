@@ -24,6 +24,19 @@ from ament_copyright import SOURCE_FILETYPE
 from ament_copyright import UNKNOWN_IDENTIFIER
 
 
+class CopyrightDescriptor(object):
+
+    def __init__(self, name, year_range):
+        self.name = name
+        self.year_range = year_range
+
+    def __str__(self):
+        s = self.name
+        if self.year_range:
+            s += ' (%s)' % self.year_range
+        return s
+
+
 class FileDescriptor(object):
 
     def __init__(self, filetype, path):
@@ -42,12 +55,15 @@ class FileDescriptor(object):
         raise NotImplemented()
 
     def identify_copyright(self):
-        for identifier, name in get_copyright_names().items():
-            if self.copyright_name is not None and self.copyright_name == name:
-                self.copyright_identifier = identifier
-                break
-        else:
-            self.copyright_identifier = UNKNOWN_IDENTIFIER
+        known_copyrights = get_copyright_names()
+        for c in self.copyrights:
+            found_name = c.name
+            for identifier, name in known_copyrights.items():
+                if name == found_name:
+                    self.copyright_identifiers.append(identifier)
+                    break
+            else:
+                self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
 
     def identify_license(self, content, license_part):
         for name, license in get_licenses().items():
@@ -63,10 +79,9 @@ class SourceDescriptor(FileDescriptor):
     def __init__(self, path):
         super(SourceDescriptor, self).__init__(SOURCE_FILETYPE, path)
 
-        self.copyright_name = None
-        self.copyright_years = None
+        self.copyrights = []
 
-        self.copyright_identifier = None
+        self.copyright_identifiers = []
         self.license_identifier = None
 
     def parse(self):
@@ -82,16 +97,15 @@ class SourceDescriptor(FileDescriptor):
         block, _ = get_comment_block(self.content, index)
         if not block:
             return
-        copyright_span, years_span, name_span = search_copyright_information(block)
-        if copyright_span is None:
+        copyrights, remaining_block = search_copyright_information(block)
+        if not copyrights:
             return None
 
-        self.copyright_years = block[years_span[0]:years_span[1]]
-        self.copyright_name = block[name_span[0]:name_span[1]]
+        self.copyrights = copyrights
 
         self.identify_copyright()
 
-        content = '{copyright}' + block[name_span[1]:]
+        content = '{copyright}' + remaining_block
         self.identify_license(content, 'file_header')
 
 
@@ -152,14 +166,22 @@ def search_copyright_information(content):
     year = '\d{4}'
     year_range = '%s-%s' % (year, year)
     year_or_year_range = '(?:%s|%s)' % (year, year_range)
-    pattern = '^[^\n\r]?\s*(Copyright)\s+(%s(?:,\s*%s)*)\s+([^\n\r]+)$' % \
+    pattern = '^[^\n\r]?\s*Copyright\s+(%s(?:,\s*%s)*)\s+([^\n\r]+)$' % \
         (year_or_year_range, year_or_year_range)
     regex = re.compile(pattern, re.DOTALL | re.MULTILINE)
 
-    match = regex.search(content)
-    if not match:
-        return None, None, None
-    return match.span(1), match.span(2), match.span(3)
+    copyrights = []
+    while True:
+        match = regex.search(content)
+        if not match:
+            break
+        years_span, name_span = match.span(1), match.span(2)
+        years = content[years_span[0]:years_span[1]]
+        name = content[name_span[0]:name_span[1]]
+        copyrights.append(CopyrightDescriptor(name, years))
+        content = content[name_span[1]:]
+
+    return copyrights, content
 
 
 def scan_past_coding_and_shebang_lines(content):
