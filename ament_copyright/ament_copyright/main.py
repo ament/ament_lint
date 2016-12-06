@@ -30,8 +30,8 @@ from ament_copyright import LICENSE_FILETYPE
 from ament_copyright import SOURCE_FILETYPE
 from ament_copyright import UNKNOWN_IDENTIFIER
 from ament_copyright.crawler import get_files
-from ament_copyright.parser import get_index_of_next_line
 from ament_copyright.parser import get_comment_block
+from ament_copyright.parser import get_index_of_next_line
 from ament_copyright.parser import parse_file
 from ament_copyright.parser import scan_past_coding_and_shebang_lines
 from ament_copyright.parser import scan_past_empty_lines
@@ -153,15 +153,13 @@ def main(argv=sys.argv[1:]):
             elif not file_descriptor.content:
                 message = 'file empty'
 
-            elif not file_descriptor.copyright_identifier:
+            elif not file_descriptor.copyright_identifiers:
                 message = 'could not find copyright notice'
                 has_error = True
 
             else:
-                message = 'copyright=%s%s, license=%s' % \
-                    (file_descriptor.copyright_identifier,
-                     ' (%s)' % file_descriptor.copyright_years
-                     if file_descriptor.copyright_years else '',
+                message = 'copyright=%s, license=%s' % \
+                    (', '.join([str(c) for c in file_descriptor.copyrights]),
                      file_descriptor.license_identifier)
                 has_error = file_descriptor.license_identifier == UNKNOWN_IDENTIFIER
 
@@ -240,7 +238,7 @@ def add_missing_header(file_descriptors, name, license, verbose):
             if not file_descriptor.content:
                 skip = True
             # ignore files which already have a header
-            if file_descriptor.copyright_identifier is not None:
+            if file_descriptor.copyright_identifiers:
                 skip = True
         elif file_descriptor.exists:
             # ignore non-source files if they already exist
