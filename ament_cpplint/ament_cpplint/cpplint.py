@@ -4742,9 +4742,12 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
   if match:
     whitelist = [
       'std::chrono_literals',
+      'std::complex_literals',
       'std::literals',
-      'std::literals::chrono_literals',
       'std::string_literals',
+      'std::literals::chrono_literals',
+      'std::literals::complex_literals',
+      'std::literals::string_literals',
       'std::placeholders',
     ]
     if IsHeaderExtension(file_extension) or match.group(1) not in whitelist:
