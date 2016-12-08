@@ -4736,11 +4736,14 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
   # e.g. 'using namespace std::chrono_literals;'.
   # Headers do not take part of this 'literals' exception.
   match = Search(r'\busing namespace\s+((\w|::)+)', line)
-  if (match and
-      (IsHeaderExtension(file_extension) or 'literals' not in match.group(1))):
-    error(filename, linenum, 'build/namespaces', 5,
-          'Do not use namespace using-directives.  '
-          'Use using-declarations instead.')
+  if match:
+    matched = match.group(1)
+    match_contains_std_literals = \
+      matched.startswith('std::') and matched.endswith('literals')
+    if IsHeaderExtension(file_extension) or not match_contains_std_literals:
+      error(filename, linenum, 'build/namespaces', 5,
+            'Do not use namespace using-directives.  '
+            'Use using-declarations instead.')
 
   # Detect variable-length arrays.
   match = Match(r'\s*(.+::)?(\w+) [a-z]\w*\[(.+)];', line)
