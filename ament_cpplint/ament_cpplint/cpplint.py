@@ -4730,19 +4730,24 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
           % (match.group(1), match.group(2)))
 
   # Check for 'using namespace' which pollutes namespaces.
-  # An exception is made for standard namespaces which end with 'literals',
-  # as such namespaces by design are supposed to be imported by
-  # using-directives, and cannot collide with legal user-defined literals
-  # that begin with an underscore.
+  # This is tricky. Although in general 'using namespace' is a Bad Thing,
+  # an exception is made for certain standard namespaces, like std::*literals
+  # and std::placeholders, which are intended to be used in this fashion.
+  # This whitelist may grow over time as needed if/when shiny new libraries
+  # come along that are well-behaved in a 'using namespace' context.
   # For example, 'using namespace std::chrono_literals;' is allowed, but
   # 'using namespace foo;' is not allowed.
-  # Headers do not take part of this 'literals' exception.
+  # Note that headers are not permitted to use this exception.
   match = Search(r'\busing namespace\s+((\w|::)+)', line)
   if match:
-    matched = match.group(1)
-    match_contains_std_literals = \
-      matched.startswith('std::') and matched.endswith('literals')
-    if IsHeaderExtension(file_extension) or not match_contains_std_literals:
+    whitelist = [
+      'std::chrono_literals',
+      'std::literals',
+      'std::literals::chrono_literals',
+      'std::string_literals',
+      'std::placeholders',
+    ]
+    if IsHeaderExtension(file_extension) or match.group(1) not in whitelist:
       error(filename, linenum, 'build/namespaces', 5,
             'Do not use namespace using-directives.  '
             'Use using-declarations instead.')
