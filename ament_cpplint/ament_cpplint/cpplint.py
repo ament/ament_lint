@@ -4730,10 +4730,12 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
           % (match.group(1), match.group(2)))
 
   # Check for 'using namespace' which pollutes namespaces.
-  # An exception is made for namespaces with the word 'literals',
-  # such namespaces are likely to only contain user-defined literals
-  # which by design are supposed to be imported by using-directives,
-  # e.g. 'using namespace std::chrono_literals;'.
+  # An exception is made for standard namespaces which end with 'literals',
+  # as such namespaces by design are supposed to be imported by
+  # using-directives, and cannot collide with legal user-defined literals
+  # that begin with an underscore.
+  # For example, 'using namespace std::chrono_literals;' is allowed, but
+  # 'using namespace foo;' is not allowed.
   # Headers do not take part of this 'literals' exception.
   match = Search(r'\busing namespace\s+((\w|::)+)', line)
   if match:
