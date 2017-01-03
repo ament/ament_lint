@@ -23,11 +23,21 @@ import time
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-from flake8.main import application as flake8_app
-from flake8.api.legacy import StyleGuide
+import flake8
+from distutils.version import LooseVersion
 
 
 def main(argv=sys.argv[1:]):
+    if LooseVersion(flake8.__version__) < '3.0':
+        print(
+            "Found Flake8 version '%s'; " % flake8.__version__ +
+            "only version >= 3.0 is supported.", file=sys.stderr)
+        return 1
+
+    global flake8_app, StyleGuide
+    from flake8.main import application as flake8_app
+    from flake8.api.legacy import StyleGuide
+
     config_file = os.path.join(
         os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
 
@@ -66,7 +76,7 @@ def main(argv=sys.argv[1:]):
         start_time = time.time()
 
     if not os.path.exists(args.config_file):
-        print("Could not config file '%s'" % args.config_file, file=sys.stderr)
+        print("Could not find config file '%s'" % args.config_file, file=sys.stderr)
         return 1
 
     report = generate_flake8_report(
