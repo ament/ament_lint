@@ -23,7 +23,8 @@ import time
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-from flake8.api.legacy import get_style_guide
+from flake8.main import application as flake8_app
+from flake8.api.legacy import StyleGuide
 
 
 def main(argv=sys.argv[1:]):
@@ -115,22 +116,27 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
-    kwargs = {
-        'config': config_file,
-        'exclude': excludes,
-        'ignore': [
-            'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D203', 'D212',
-            'D404'],
-        'import_order_style': 'google',
-        'max_line_length': 99,
-        'show_source': True,
-        'statistics': True,
-    }
-    if max_line_length is not None:
-        kwargs['max_line_length'] = max_line_length
+def get_flake8_style_guide(argv):
+    application = flake8_app.Application()
+    application.find_plugins()
+    application.register_plugin_options()
+    application.parse_configuration_and_cli(argv)
+    application.make_formatter()
+    application.make_notifier()
+    application.make_guide()
+    application.make_file_checker_manager()
+    return StyleGuide(application)
 
-    style = get_style_guide(**kwargs)
+
+def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
+    flake8_argv = []
+    flake8_argv.append('--config={0}'.format(config_file))
+    flake8_argv.append('--exclude={0}'.format(excludes))
+
+    if max_line_length is not None:
+        flake8_argv.append('--max-line-length={0}'.format(max_line_length))
+
+    style = get_flake8_style_guide(flake8_argv)
 
     # Monkey patch formatter to collect all errors
     format_func = style._application.formatter.format
