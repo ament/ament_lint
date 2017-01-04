@@ -155,6 +155,11 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
     def custom_format(error):
         format_func(error)
         report.add_error(error)
+        print('')
+        print(
+            '%s:%d:%d: %s %s' % (
+                error.filename, error.line_number,
+                error.column_number, error.code, error.text))
     style._application.formatter.format = custom_format
 
     # Get the names of files checked
