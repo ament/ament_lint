@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+from distutils.version import LooseVersion
 import os
 import sys
 import time
@@ -22,20 +23,12 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 import flake8
-from distutils.version import LooseVersion
-
-
-def main(argv=sys.argv[1:]):
-    if LooseVersion(flake8.__version__) < '3.0':
-        print(
-            "Found Flake8 version '%s'; " % flake8.__version__ +
-            "only version >= 3.0 is supported.", file=sys.stderr)
-        return 1
-
-    global flake8_app, StyleGuide
+if LooseVersion(flake8.__version__) >= '3.0':
     from flake8.main import application as flake8_app
     from flake8.api.legacy import StyleGuide
 
+
+def main(argv=sys.argv[1:]):
     config_file = os.path.join(
         os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
 
@@ -137,6 +130,10 @@ def get_flake8_style_guide(argv):
 
 
 def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
+    if LooseVersion(flake8.__version__) < '3.0':
+        from ament_flake8.legacy import generate_flake8_report
+        return generate_flake8_report(config_file, paths, excludes, max_line_length)
+
     flake8_argv = []
     flake8_argv.append('--config={0}'.format(config_file))
     flake8_argv.append('--exclude={0}'.format(excludes))
