@@ -81,12 +81,12 @@ def main(argv=sys.argv[1:]):
 
     # print summary
     print('')
+    print('%d files checked' % len(report.files))
     if not report.total_errors:
         print('No errors or warnings')
         rc = 0
     else:
         print('%d errors' % (report.total_errors))
-        print('%d files checked' % len(report.files))
 
         print('')
         error_type_counts = report.get_error_type_counts()
@@ -94,6 +94,10 @@ def main(argv=sys.argv[1:]):
             print("'%s'-type errors: %d" % (k, v))
 
         rc = 1
+
+    print('')
+    print('Checked files:')
+    print(''.join(['\n* %s' % f for f in report.files]))
 
     # generate xunit file
     if args.xunit_file:
