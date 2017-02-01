@@ -1,4 +1,4 @@
-# Copyright 2015 Open Source Robotics Foundation, Inc.
+# Copyright 2016 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ament_pep8.main import main
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+from ament_flake8.main import main  # noqa
 
 
-def test_pep8():
-    excluded = ['cmakelint.py']
-    rc = main(argv=['--exclude'] + excluded)
+def test_flake8():
+    rc = main(argv=[])
     assert rc == 0, 'Found code style errors / warnings'

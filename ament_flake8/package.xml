@@ -1,18 +1,15 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
-  <name>ament_lint_cmake</name>
+  <name>ament_flake8</name>
   <version>0.0.0</version>
   <description>
-    The ability to lint CMake code using cmakelint and generate xUnit test
-    result files.
+    The ability to check code for style and syntax conventions with flake8.
   </description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="dhood@osrfoundation.org">D. Hood</maintainer>
   <license>Apache License 2.0</license>
 
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
+  <exec_depend>python3-flake8</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>

@@ -16,10 +16,9 @@
   <exec_depend>ament_cmake_copyright</exec_depend>
   <exec_depend>ament_cmake_cppcheck</exec_depend>
   <exec_depend>ament_cmake_cpplint</exec_depend>
+  <exec_depend>ament_cmake_flake8</exec_depend>
   <exec_depend>ament_cmake_lint_cmake</exec_depend>
   <exec_depend>ament_cmake_pep257</exec_depend>
-  <exec_depend>ament_cmake_pep8</exec_depend>
-  <exec_depend>ament_cmake_pyflakes</exec_depend>
   <exec_depend>ament_cmake_uncrustify</exec_depend>
 
   <export>
