@@ -79,7 +79,7 @@ def main(argv=sys.argv[1:]):
            '-q',
            '-rp',
            '--xml',
-           '--xml-version=1']
+           '--xml-version=2']
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
