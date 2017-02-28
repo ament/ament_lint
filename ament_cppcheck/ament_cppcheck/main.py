@@ -102,8 +102,7 @@ def main(argv=sys.argv[1:]):
     report = {}
     for filename in files:
         report[filename] = []
-    errors = root.find('errors')
-    for error in errors:
+    for error in root.find('errors'):
         location = error.find('location')
         filename = location.get('file')
         data = {
