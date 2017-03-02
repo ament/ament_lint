@@ -79,7 +79,7 @@ def main(argv=sys.argv[1:]):
            '-q',
            '-rp',
            '--xml',
-           '--xml-version=1']
+           '--xml-version=2']
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
@@ -102,13 +102,14 @@ def main(argv=sys.argv[1:]):
     report = {}
     for filename in files:
         report[filename] = []
-    for error in root.findall('error'):
-        filename = error.get('file')
+    for error in root.find('errors'):
+        location = error.find('location')
+        filename = location.get('file')
         data = {
-            'line': int(error.get('line')),
+            'line': int(location.get('line')),
             'id': error.get('id'),
             'severity': error.get('severity'),
-            'msg': error.get('msg'),
+            'msg': error.get('verbose'),
         }
         report[filename].append(data)
 
