@@ -44,6 +44,9 @@ if LooseVersion(flake8.__version__) < '3.0':
             })
             return code
 
+        def get_error_codes(self):
+            return [e['error_code'] for e in self.errors]
+
     class CustomStyleGuide(flake8.engine.NoQAStyleGuide):
 
         def input_file(self, filename, **kwargs):

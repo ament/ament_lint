@@ -89,7 +89,7 @@ def main(argv=sys.argv[1:]):
         print('%d errors' % (report.total_errors))
 
         print('')
-        error_type_counts = report.get_error_type_counts()
+        error_type_counts = get_error_type_counts(report.get_error_codes())
         for k, v in error_type_counts.items():
             print("'%s'-type errors: %d" % (k, v))
 
@@ -228,6 +228,19 @@ def get_xunit_content(report, testname, elapsed):
     return xml
 
 
+def get_error_type_counts(error_codes):
+    # Determine the type of error by the first character in its error code
+    # e.g. 'E261' is type 'E'
+    error_types = sorted(set([e[0] for e in error_codes]))
+
+    # Create dictionary of error code types and their counts
+    error_type_counts = {}
+    for error_type in error_types:
+        error_type_counts[error_type] = len([
+            e for e in error_codes if e.startswith(error_type)])
+    return error_type_counts
+
+
 class CustomReport(object):
 
     def __init__(self):
@@ -242,19 +255,8 @@ class CustomReport(object):
     def add_error(self, error):
         self.errors.append(error)
 
-    def get_error_type_counts(self):
-        error_codes = [e.code for e in self.errors]
-
-        # Determine the type of error by the first character in its error code
-        # e.g. 'E261' is type 'E'
-        error_types = sorted(set([e[0] for e in error_codes]))
-
-        # Create dictionary of error code types and their counts
-        error_type_counts = {}
-        for error_type in error_types:
-            error_type_counts[error_type] = len([
-                e for e in error_codes if e.startswith(error_type)])
-        return error_type_counts
+    def get_error_codes(self):
+        return [e.code for e in self.errors]
 
     def print_statistics(self):
         self.report._application.report_statistics()
