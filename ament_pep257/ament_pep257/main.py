@@ -119,15 +119,19 @@ def generate_pep257_report(paths, excludes, ignore):
     report = []
 
     files_dict = {}
-    for filename, select in files_to_check:
+    for filename, checked_codes, ignore_decorators in files_to_check:
         if os.path.abspath(filename) in excludes:
             continue
-        files_dict[filename] = select
+        files_dict[filename] = (checked_codes, ignore_decorators)
 
     for filename in sorted(files_dict.keys()):
         print('checking', filename)
         errors = []
-        pep257_errors = check([filename], select=files_dict[filename])
+        pep257_errors = check(
+            [filename],
+            select=files_dict[filename][0],
+            ignore_decorators=files_dict[filename][1]
+        )
         for pep257_error in pep257_errors:
             if isinstance(pep257_error, Error):
                 errors.append({
