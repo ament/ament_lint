@@ -55,6 +55,15 @@ class FileDescriptor(object):
     def parse(self):
         raise NotImplemented()
 
+    def identify_license(self, content, license_part):
+        if content is None:
+            return
+
+        for name, license in get_licenses().items():
+            if getattr(license, license_part) == content:
+                self.license_identifier = name
+                break
+
 
 class SourceDescriptor(FileDescriptor):
 
@@ -75,6 +84,16 @@ class SourceDescriptor(FileDescriptor):
                     break
             else:
                 self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
+
+    def identify_license(self, content, license_part):
+        for name, license in get_licenses().items():
+            for cr in self.copyrights:
+                part = getattr(license, license_part)
+                company_with_license = part.format(company=cr.name,
+                                                   copyright='{copyright}')
+                if company_with_license == content:
+                    self.license_identifier = name
+                    break
 
     def parse(self):
         self.read()
@@ -99,13 +118,7 @@ class SourceDescriptor(FileDescriptor):
 
         current_content = '{copyright}' + remaining_block
 
-        for name, license in get_licenses().items():
-            for cr in self.copyrights:
-                company_with_license = license.file_header.format(company=cr.name,
-                                                                  copyright='{copyright}')
-                if company_with_license == current_content:
-                    self.license_identifier = name
-                    break
+        self.identify_license(current_content, 'file_header')
 
 
 class ContributingDescriptor(FileDescriptor):
@@ -118,10 +131,7 @@ class ContributingDescriptor(FileDescriptor):
         if not self.content:
             return
 
-        for name, license in get_licenses().items():
-            if license.contributing_file == self.content:
-                self.license_identifier = name
-                break
+        self.identify_license(self.content, 'contributing_file')
 
 
 class LicenseDescriptor(FileDescriptor):
@@ -134,10 +144,7 @@ class LicenseDescriptor(FileDescriptor):
         if not self.content:
             return
 
-        for name, license in get_licenses().items():
-            if license.license_file == self.content:
-                self.license_identifier = name
-                break
+        self.identify_license(self.content, 'license_file')
 
 
 def parse_file(path):
