@@ -54,17 +54,6 @@ class FileDescriptor(object):
     def parse(self):
         raise NotImplemented()
 
-    def identify_copyright(self):
-        known_copyrights = get_copyright_names()
-        for c in self.copyrights:
-            found_name = c.name
-            for identifier, name in known_copyrights.items():
-                if name == found_name:
-                    self.copyright_identifiers.append(identifier)
-                    break
-            else:
-                self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
-
     def identify_license(self, content, license_part):
         for name, license in get_licenses().items():
             if content is not None and getattr(license, license_part) == content:
@@ -83,6 +72,17 @@ class SourceDescriptor(FileDescriptor):
 
         self.copyright_identifiers = []
         self.license_identifier = None
+
+    def identify_copyright(self):
+        known_copyrights = get_copyright_names()
+        for c in self.copyrights:
+            found_name = c.name
+            for identifier, name in known_copyrights.items():
+                if name == found_name:
+                    self.copyright_identifiers.append(identifier)
+                    break
+            else:
+                self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
 
     def parse(self):
         self.read()
