@@ -44,6 +44,7 @@ class FileDescriptor(object):
         self.path = path
         self.exists = os.path.exists(path)
         self.content = None
+        self.license_identifier = UNKNOWN_IDENTIFIER
 
     def read(self):
         if not self.exists:
@@ -53,6 +54,37 @@ class FileDescriptor(object):
 
     def parse(self):
         raise NotImplemented()
+
+    def identify_license(self, content, license_part):
+        if content is None:
+            return
+
+        for name, license in get_licenses().items():
+            template = getattr(license, license_part).replace('\n', ' ').strip()
+            last_index = -1
+            for license_section in template.split('{company}'):
+                # OK, now look for each section of the license in the incoming
+                # content.
+                index = content.replace('\n', ' ').strip().find(license_section.strip())
+                if index == -1 or index <= last_index:
+                    # Some part of the license is not in the content, or the license
+                    # is rearranged, this license doesn't match.
+                    break
+                last_index = index
+            else:
+                # We found the license, so set it
+                self.license_identifier = name
+                break
+
+
+class SourceDescriptor(FileDescriptor):
+
+    def __init__(self, path):
+        super(SourceDescriptor, self).__init__(SOURCE_FILETYPE, path)
+
+        self.copyrights = []
+
+        self.copyright_identifiers = []
 
     def identify_copyright(self):
         known_copyrights = get_copyright_names()
@@ -64,25 +96,6 @@ class FileDescriptor(object):
                     break
             else:
                 self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
-
-    def identify_license(self, content, license_part):
-        for name, license in get_licenses().items():
-            if content is not None and getattr(license, license_part) == content:
-                self.license_identifier = name
-                break
-        else:
-            self.license_identifier = UNKNOWN_IDENTIFIER
-
-
-class SourceDescriptor(FileDescriptor):
-
-    def __init__(self, path):
-        super(SourceDescriptor, self).__init__(SOURCE_FILETYPE, path)
-
-        self.copyrights = []
-
-        self.copyright_identifiers = []
-        self.license_identifier = None
 
     def parse(self):
         self.read()
@@ -114,8 +127,6 @@ class ContributingDescriptor(FileDescriptor):
     def __init__(self, path):
         super(ContributingDescriptor, self).__init__(CONTRIBUTING_FILETYPE, path)
 
-        self.license_identifier = None
-
     def parse(self):
         self.read()
         if not self.content:
@@ -128,8 +139,6 @@ class LicenseDescriptor(FileDescriptor):
 
     def __init__(self, path):
         super(LicenseDescriptor, self).__init__(LICENSE_FILETYPE, path)
-
-        self.license_identifier = None
 
     def parse(self):
         self.read()

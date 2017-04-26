@@ -33,6 +33,7 @@ The ability to check sources file for copyright and license information.''',
         ],
         'ament_copyright.license': [
             'apache2 = ament_copyright.licenses:apache2',
+            'bsd2 = ament_copyright.licenses:bsd2',
         ],
         'console_scripts': [
             'ament_copyright = ament_copyright.main:main',
