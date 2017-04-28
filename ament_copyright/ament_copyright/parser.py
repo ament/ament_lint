@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import difflib
 import os
 import re
 
@@ -60,7 +61,10 @@ class FileDescriptor(object):
             return
 
         for name, license in get_licenses().items():
-            if getattr(license, license_part) == content:
+            template = getattr(license, license_part).replace('\n', ' ')
+            tomatch = content.replace('\n', ' ')
+            x = difflib.SequenceMatcher(a=template, b=content)
+            if x.ratio() > 0.95:
                 self.license_identifier = name
                 break
 
@@ -85,16 +89,6 @@ class SourceDescriptor(FileDescriptor):
             else:
                 self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
 
-    def identify_license(self, content, license_part):
-        for name, license in get_licenses().items():
-            for cr in self.copyrights:
-                part = getattr(license, license_part)
-                company_with_license = part.format(company=cr.name,
-                                                   copyright='{copyright}')
-                if company_with_license == content:
-                    self.license_identifier = name
-                    break
-
     def parse(self):
         self.read()
         if not self.content:
@@ -116,9 +110,8 @@ class SourceDescriptor(FileDescriptor):
 
         self.identify_copyright()
 
-        current_content = '{copyright}' + remaining_block
-
-        self.identify_license(current_content, 'file_header')
+        content = '{copyright}' + remaining_block
+        self.identify_license(content, 'file_header')
 
 
 class ContributingDescriptor(FileDescriptor):
