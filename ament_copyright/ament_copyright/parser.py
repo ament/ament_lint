@@ -63,7 +63,7 @@ class FileDescriptor(object):
         for name, license in get_licenses().items():
             template = getattr(license, license_part).replace('\n', ' ')
             tomatch = content.replace('\n', ' ')
-            x = difflib.SequenceMatcher(a=template, b=content)
+            x = difflib.SequenceMatcher(a=template, b=tomatch)
             if x.ratio() > 0.95:
                 self.license_identifier = name
                 break
