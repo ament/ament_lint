@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import difflib
 import os
 import re
 
@@ -61,10 +60,19 @@ class FileDescriptor(object):
             return
 
         for name, license in get_licenses().items():
-            template = getattr(license, license_part).replace('\n', ' ')
-            tomatch = content.replace('\n', ' ')
-            x = difflib.SequenceMatcher(a=template, b=tomatch)
-            if x.ratio() > 0.95:
+            template = getattr(license, license_part).replace('\n', ' ').strip()
+            last_index = -1
+            for license_section in template.split('{company}'):
+                # OK, now look for each section of the license in the incoming
+                # content.
+                index = content.replace('\n', ' ').strip().find(license_section.strip())
+                if index == -1 or index <= last_index:
+                    # Some part of the license is not in the content, or the license
+                    # is rearranged, this license doesn't match.
+                    break
+                last_index = index
+            else:
+                # We found the license, so set it
                 self.license_identifier = name
                 break
 
