@@ -11,6 +11,8 @@
   <license>Apache License 2.0</license>
   <license>MIT</license>
 
+  <build_depend>python3-setuptools</build_depend>
+
   <exec_depend>pydocstyle</exec_depend>
 
   <test_depend>ament_pep8</test_depend>

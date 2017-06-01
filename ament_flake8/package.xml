@@ -9,6 +9,8 @@
   <maintainer email="dhood@osrfoundation.org">D. Hood</maintainer>
   <license>Apache License 2.0</license>
 
+  <build_depend>python3-setuptools</build_depend>
+
   <exec_depend>python3-flake8</exec_depend>
 
   <export>

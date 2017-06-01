@@ -10,6 +10,8 @@
   <license>Apache License 2.0</license>
   <license>BSD</license>
 
+  <build_depend>python3-setuptools</build_depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_pep8</test_depend>
   <test_depend>ament_pep257</test_depend>
