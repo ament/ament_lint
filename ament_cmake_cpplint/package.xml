@@ -9,8 +9,6 @@
   <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
   <license>Apache License 2.0</license>
 
-  <build_depend>python3-setuptools</build_depend>
-
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>
 
