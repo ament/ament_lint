@@ -14,8 +14,8 @@
 
   <buildtool_depend>python3</buildtool_depend>
 
-  <exec_depend>python3</exec_depend>
   <exec_depend>cppcheck</exec_depend>
+  <exec_depend>python3</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>
