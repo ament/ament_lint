@@ -28,6 +28,7 @@ import ament_lint_cmake.cmakelint as cmakelint
 def IsValidFile(filename):
     return True
 
+
 cmakelint.IsValidFile = IsValidFile
 
 
