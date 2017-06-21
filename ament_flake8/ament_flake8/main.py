@@ -139,8 +139,10 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
         return generate_flake8_report(config_file, paths, excludes, max_line_length)
 
     flake8_argv = []
-    flake8_argv.append('--config={0}'.format(config_file))
-    flake8_argv.append('--exclude={0}'.format(excludes))
+    if config_file is not None:
+        flake8_argv.append('--config={0}'.format(config_file))
+    if excludes is not None:
+        flake8_argv.append('--exclude={0}'.format(','.join(excludes)))
 
     if max_line_length is not None:
         flake8_argv.append('--max-line-length={0}'.format(max_line_length))
