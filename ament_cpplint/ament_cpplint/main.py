@@ -56,6 +56,7 @@ def CustomGetHeaderGuardCPPVariable(filename):
     file_path_from_root = file_path_from_root.replace('/', '//')
     return re.sub(r'[^a-zA-Z0-9]', '_', file_path_from_root).upper() + '_'
 
+
 cpplint.GetHeaderGuardCPPVariable = CustomGetHeaderGuardCPPVariable
 
 

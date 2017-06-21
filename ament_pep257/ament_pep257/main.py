@@ -15,14 +15,13 @@
 # limitations under the License.
 
 import argparse
+from distutils.version import LooseVersion
 import logging
 import os
 import sys
 import time
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
-
-from distutils.version import LooseVersion
 
 import pydocstyle
 from pydocstyle import check
