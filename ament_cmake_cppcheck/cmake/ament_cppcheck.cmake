@@ -17,13 +17,15 @@
 #
 # :param TESTNAME: the name of the test, default: "cppcheck"
 # :type TESTNAME: string
+# :param LANGUAGE: the language argument for cppcheck, either 'c' or 'c++'
+# :type LANGUAGE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "LANGUAGE;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -36,6 +38,9 @@ function(ament_cppcheck)
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_cppcheck_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+  if(ARG_LANGUAGE)
+    list(APPEND cmd "--language" "${ARG_LANGUAGE}")
+  endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")
   ament_add_test(
