@@ -25,7 +25,7 @@
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "TESTNAME LANGUAGE" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "LANGUAGE;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -39,7 +39,7 @@ function(ament_cppcheck)
   set(cmd "${ament_cppcheck_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
   if(ARG_LANGUAGE)
-    list(APPEND cmd "--languge" "${ARG_LANGUAGE}")
+    list(APPEND cmd "--language" "${ARG_LANGUAGE}")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")
