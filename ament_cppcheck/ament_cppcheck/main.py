@@ -39,6 +39,10 @@ def main(argv=sys.argv[1:]):
         help='Files and/or directories to be checked. Directories are searched recursively for '
              'files ending in one of %s.' %
              ', '.join(["'.%s'" % e for e in extensions]))
+    parser.add_argument(
+        '--language',
+        help="Passed to cppcheck as '--language=<language>', and it forces cppcheck to consider "
+             "as the given language ('c' or 'c++').")
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -80,6 +84,8 @@ def main(argv=sys.argv[1:]):
            '-rp',
            '--xml',
            '--xml-version=2']
+    if args.language:
+        cmd.extend(['--language={0}'.format(args.language)])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
