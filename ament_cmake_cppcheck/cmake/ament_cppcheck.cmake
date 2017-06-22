@@ -17,7 +17,7 @@
 #
 # :param TESTNAME: the name of the test, default: "cppcheck"
 # :type TESTNAME: string
-# :param LANGUAGE: the languge argument for cppcheck, either 'c' or 'c++'
+# :param LANGUAGE: the language argument for cppcheck, either 'c' or 'c++'
 # :type LANGUAGE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
