@@ -253,6 +253,9 @@ def get_files(paths, extensions):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
+                if 'AMENT_IGNORE' in filenames:
+                    dirnames[:] = []
+                    continue
                 # ignore folder starting with . or _
                 dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
                 dirnames.sort()
