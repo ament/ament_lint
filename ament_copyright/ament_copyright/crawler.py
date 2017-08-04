@@ -25,6 +25,9 @@ def get_files(paths, extensions, skip_package_level_setup_py=True):
             if is_repository_root(path):
                 add_files_for_all_filetypes(path, files)
             for dirpath, dirnames, filenames in os.walk(path):
+                if 'AMENT_IGNORE' in filenames:
+                    dirnames[:] = []
+                    continue
                 if is_repository_root(dirpath):
                     add_files_for_all_filetypes(dirpath, files)
 
