@@ -175,7 +175,7 @@ def search_copyright_information(content):
     year = '\d{4}'
     year_range = '%s-%s' % (year, year)
     year_or_year_range = '(?:%s|%s)' % (year, year_range)
-    pattern = '^[^\n\r]?\s*Copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
+    pattern = '^[^\n\r]?[\s\*\w]*Copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
         (year_or_year_range, year_or_year_range)
     regex = re.compile(pattern, re.DOTALL | re.MULTILINE)
 
@@ -198,7 +198,8 @@ def scan_past_coding_and_shebang_lines(content):
     while (
         is_comment_line(content, index) and
         (is_coding_line(content, index) or
-         is_shebang_line(content, index))
+         is_shebang_line(content, index) or
+         is_empty_line(content, index))
     ):
         index = get_index_of_next_line(content, index)
     return index
@@ -239,7 +240,7 @@ def is_shebang_line(content, index):
 
 def get_comment_block(content, index):
     # regex for matching the beginning of the first comment
-    pattern = '^(#|//)'
+    pattern = '^(#|//|/\*\*|/\*)'
     regex = re.compile(pattern, re.MULTILINE)
 
     match = regex.search(content, index)
@@ -248,6 +249,8 @@ def get_comment_block(content, index):
     comment_token = match.group(1)
     start_index = match.start(1)
 
+    if comment_token in ['/*', '/**']:
+        comment_token = ' *'
     end_index = start_index
     while True:
         end_index = get_index_of_next_line(content, end_index)
