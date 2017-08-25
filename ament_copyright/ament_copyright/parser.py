@@ -24,7 +24,7 @@ from ament_copyright import SOURCE_FILETYPE
 from ament_copyright import UNKNOWN_IDENTIFIER
 
 
-class CopyrightDescriptor(object):
+class CopyrightDescriptor:
 
     def __init__(self, name, year_range):
         self.name = name
@@ -37,7 +37,7 @@ class CopyrightDescriptor(object):
         return s
 
 
-class FileDescriptor(object):
+class FileDescriptor:
 
     def __init__(self, filetype, path):
         self.filetype = filetype

@@ -243,7 +243,7 @@ def get_error_type_counts(error_codes):
     return error_type_counts
 
 
-class CustomReport(object):
+class CustomReport:
 
     def __init__(self):
         self.files = []

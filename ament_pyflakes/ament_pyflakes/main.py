@@ -209,7 +209,7 @@ class CustomReporter(Reporter):
         self.errors.append(message)
 
 
-class Location(object):
+class Location:
 
     def __init__(self, lineno, col_offset=None):
         self.lineno = lineno
