@@ -78,7 +78,7 @@ _ERROR_CATEGORIES = """\
 """
 _DEFAULT_CMAKELINTRC = os.path.join(os.path.expanduser('~'), '.cmakelintrc')
 
-class _CMakeLintState:
+class _CMakeLintState(object):
     def __init__(self):
         self.filters = []
         self.config = 0
@@ -110,7 +110,7 @@ class _CMakeLintState:
     def SetSpaces(self, spaces):
         self.spaces = int(spaces.strip())
 
-class _CMakePackageState:
+class _CMakePackageState(object):
     def __init__(self):
         self.sets = []
         self.have_included_stdargs = False
@@ -170,7 +170,7 @@ _package_state = _CMakePackageState()
 def CleanComments(line):
     return _RE_CLEAN_COMMENT.sub('', line)
 
-class CleansedLines:
+class CleansedLines(object):
     def __init__(self, lines):
         self.have_seen_uppercase = None
         self.raw_lines = lines
