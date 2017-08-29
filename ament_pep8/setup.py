@@ -23,9 +23,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check Python code style using pep8.',
-    long_description='''\
+    long_description="""\
 The ability to check code against the style conventions in PEP 8 and
-generate xUnit test result files.''',
+generate xUnit test result files.""",
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={

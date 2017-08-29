@@ -25,11 +25,11 @@ import ament_lint_cmake.cmakelint as cmakelint
 
 
 # override filename check to allow any filename to be checked
-def IsValidFile(filename):
+def is_valid_file(filename):
     return True
 
 
-cmakelint.IsValidFile = IsValidFile
+cmakelint.IsValidFile = is_valid_file
 
 
 def main(argv=sys.argv[1:]):
@@ -40,14 +40,14 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help="The files or directories to check. For directories files named "
+        help='The files or directories to check. For directories files named '
              "'CMakeLists.txt' and ending in '.cmake' or '.cmake.in' will be "
-             "considered.")
+             'considered.')
     parser.add_argument(
         '--filters',
-        default="",
-        help="Filters for lint_cmake, for a list of filters see: "
-             "https://github.com/richq/cmake-lint/blob/master/README.md#usage")
+        default='',
+        help='Filters for lint_cmake, for a list of filters see: '
+             'https://github.com/richq/cmake-lint/blob/master/README.md#usage')
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -64,7 +64,7 @@ def main(argv=sys.argv[1:]):
         return 1
 
     # hook into error reporting
-    DefaultError = cmakelint.Error
+    DefaultError = cmakelint.Error  # noqa: N806
     report = []
 
     # invoke cmake lint
@@ -147,22 +147,22 @@ def get_files(paths):
 
 
 def get_xunit_content(report, testname, elapsed):
-    test_count = sum([max(len(r[1]), 1) for r in report])
-    error_count = sum([len(r[1]) for r in report])
+    test_count = sum(max(len(r[1]), 1) for r in report)
+    error_count = sum(len(r[1]) for r in report)
     data = {
         'testname': testname,
         'test_count': test_count,
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
     }
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
 >
-''' % data
+""" % data
 
     for (filename, errors) in report:
 
@@ -176,13 +176,13 @@ def get_xunit_content(report, testname, elapsed):
                     'testname': testname,
                     'quoted_message': quoteattr(error['message']),
                 }
-                xml += '''  <testcase
+                xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
-''' % data
+""" % data
 
         else:
             # if there are no lint_cmake errors report a single successful test
@@ -190,18 +190,18 @@ def get_xunit_content(report, testname, elapsed):
                 'quoted_location': quoteattr(filename),
                 'testname': testname,
             }
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
     status="No errors"/>
-''' % data
+""" % data
 
     # output list of checked files
     data = {
         'escaped_files': escape(''.join(['\n* %s' % r[0] for r in report])),
     }
-    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
-''' % data
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+""" % data
 
     xml += '</testsuite>\n'
     return xml

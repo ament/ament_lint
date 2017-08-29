@@ -77,6 +77,6 @@ if LooseVersion(flake8.__version__) < '3.0':
 
         # flake8 uses a wrapper StyleGuide to handle some particular OSErrors
         kwargs['styleguide'] = flake8style
-        wrapperStyleGuide = flake8.engine.StyleGuide(**kwargs)
+        wrapper_style_guide = flake8.engine.StyleGuide(**kwargs)
 
-        return wrapperStyleGuide.check_files(paths)
+        return wrapper_style_guide.check_files(paths)

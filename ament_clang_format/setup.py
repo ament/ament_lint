@@ -23,9 +23,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check C++ code style using clang-format.',
-    long_description='''\
+    long_description="""\
 The ability to check code against style conventions using clang-format
-and generate xUnit test result files.''',
+and generate xUnit test result files.""",
     license='Apache License, Version 2.0, BSD',
     test_suite='test',
     entry_points={

@@ -16,10 +16,11 @@
 
 import argparse
 import os
-import pep8
 import sys
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
+
+import pep8
 
 
 def main(argv=sys.argv[1:]):
@@ -42,7 +43,7 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help="The files or directories to check. For directories files ending "
+        help='The files or directories to check. For directories files ending '
              "in '.py' will be considered.")
     parser.add_argument(
         '--exclude',
@@ -126,14 +127,14 @@ def get_xunit_content(report, testname):
         'error_count': report.total_errors,
         'time': '%.3f' % round(report.elapsed, 3),
     }
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
 >
-''' % data
+""" % data
 
     if report.errors:
         # report each pep8 error/warning as a failing testcase
@@ -146,31 +147,31 @@ def get_xunit_content(report, testname):
                 'quoted_message': quoteattr(
                     '%(error_message)s:\n%(source_line)s' % error),
             }
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_name)s
     classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
-''' % data
+""" % data
 
     else:
         # if there are no pep8 errors/warnings report a single successful test
         data = {
             'testname': testname,
         }
-        xml += '''  <testcase
+        xml += """  <testcase
     name="pep8"
     classname="%(testname)s"
     status="No errors or warnings"/>
-''' % data
+""" % data
 
     # output list of checked files
     data = {
         'escaped_files': escape(''.join(['\n* %s' % f for f in report.files])),
     }
-    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
-''' % data
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+""" % data
 
     xml += '</testsuite>\n'
     return xml

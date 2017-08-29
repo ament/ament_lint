@@ -20,9 +20,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check CMake code style using cmakelint.',
-    long_description='''\
+    long_description="""\
 The ability to lint CMake code using cmakelint and generate xUnit test
-result files.''',
+result files.""",
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={

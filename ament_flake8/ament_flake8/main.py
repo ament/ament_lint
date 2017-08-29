@@ -48,7 +48,7 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help="The files or directories to check. For directories files ending "
+        help='The files or directories to check. For directories files ending '
              "in '.py' will be considered.")
     parser.add_argument(
         '--exclude',
@@ -179,14 +179,14 @@ def get_xunit_content(report, testname, elapsed):
         'error_count': report.total_errors,
         'time': '%.3f' % round(elapsed, 3),
     }
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
 >
-''' % data
+""" % data
 
     if report.errors:
         # report each flake8 error/warning as a failing testcase
@@ -200,31 +200,31 @@ def get_xunit_content(report, testname, elapsed):
                 'quoted_message': quoteattr(
                     '%s:\n%s' % (error.text, error.physical_line)),
             }
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_name)s
     classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
-''' % data
+""" % data
 
     else:
         # if there are no flake8 problems report a single successful test
         data = {
             'testname': testname,
         }
-        xml += '''  <testcase
+        xml += """  <testcase
     name="flake8"
     classname="%(testname)s"
     status="No errors or warnings"/>
-''' % data
+""" % data
 
     # output list of checked files
     data = {
         'escaped_files': escape(''.join(['\n* %s' % f for f in report.files])),
     }
-    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
-''' % data
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+""" % data
 
     xml += '</testsuite>\n'
     return xml
@@ -233,7 +233,7 @@ def get_xunit_content(report, testname, elapsed):
 def get_error_type_counts(error_codes):
     # Determine the type of error by the first character in its error code
     # e.g. 'E261' is type 'E'
-    error_types = sorted(set([e[0] for e in error_codes]))
+    error_types = sorted({e[0] for e in error_codes})
 
     # Create dictionary of error code types and their counts
     error_type_counts = {}

@@ -29,7 +29,7 @@ from ament_cpplint.cpplint import ProcessFile
 
 
 # use custom header guard with two underscore between the name parts
-def CustomGetHeaderGuardCPPVariable(filename):
+def custom_get_header_guard_cpp_variable(filename):
     from ament_cpplint.cpplint import _root
     from ament_cpplint.cpplint import FileInfo
     # Restores original filename in case that cpplint is invoked from Emacs's
@@ -57,7 +57,7 @@ def CustomGetHeaderGuardCPPVariable(filename):
     return re.sub(r'[^a-zA-Z0-9]', '_', file_path_from_root).upper() + '_'
 
 
-cpplint.GetHeaderGuardCPPVariable = CustomGetHeaderGuardCPPVariable
+cpplint.GetHeaderGuardCPPVariable = custom_get_header_guard_cpp_variable
 
 
 def main(argv=sys.argv[1:]):
@@ -78,7 +78,7 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help="The files or directories to check. For directories files ending "
+        help='The files or directories to check. For directories files ending '
              'in %s will be considered.' %
              ', '.join(["'.%s'" % e for e in extensions + headers]))
     # not using a file handle directly
@@ -121,7 +121,7 @@ def main(argv=sys.argv[1:]):
 
     # hook into error reporting
     import ament_cpplint.cpplint
-    DefaultError = ament_cpplint.cpplint.Error
+    DefaultError = ament_cpplint.cpplint.Error  # noqa: N806
     report = []
 
     # invoke cpplint for each root group of files
@@ -261,22 +261,22 @@ def append_file_to_group(groups, path):
 
 
 def get_xunit_content(report, testname, elapsed):
-    test_count = sum([max(len(r[1]), 1) for r in report])
-    error_count = sum([len(r[1]) for r in report])
+    test_count = sum(max(len(r[1]), 1) for r in report)
+    error_count = sum(len(r[1]) for r in report)
     data = {
         'testname': testname,
         'test_count': test_count,
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
     }
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
 >
-''' % data
+""" % data
 
     for (filename, errors) in report:
 
@@ -291,13 +291,13 @@ def get_xunit_content(report, testname, elapsed):
                     'testname': testname,
                     'quoted_message': quoteattr(error['message']),
                 }
-                xml += '''  <testcase
+                xml += """  <testcase
     name=%(quoted_name)s
     classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
-''' % data
+""" % data
 
         else:
             # if there are no cpplint errors report a single successful test
@@ -305,18 +305,18 @@ def get_xunit_content(report, testname, elapsed):
                 'quoted_location': quoteattr(filename),
                 'testname': testname,
             }
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
     status="No errors"/>
-''' % data
+""" % data
 
     # output list of checked files
     data = {
         'escaped_files': escape(''.join(['\n* %s' % r[0] for r in report])),
     }
-    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
-''' % data
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+""" % data
 
     xml += '</testsuite>\n'
     return xml
