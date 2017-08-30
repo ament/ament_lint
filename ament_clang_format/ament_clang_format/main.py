@@ -78,11 +78,11 @@ def main(argv=sys.argv[1:]):
         'clang-format-3.6',
         'clang-format-3.5',
         'clang-format-3.4',
-        'clang-format-3.3'
+        'clang-format-3.3',
     ]
     clang_format_bin = find_executable(bin_names)
     if not clang_format_bin:
-        print("Could not find %s executable" %
+        print('Could not find %s executable' %
               ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
         return 1
 
@@ -129,7 +129,7 @@ def main(argv=sys.argv[1:]):
                 print('', file=sys.stderr)
             else:
                 print("%d code style divergences in file '%s': reformatted "
-                      "file" % (len(replacements), filename))
+                      'file' % (len(replacements), filename))
             with open(filename, 'r') as h:
                 content = h.read()
             for replacement in replacements:
@@ -206,8 +206,8 @@ def main(argv=sys.argv[1:]):
             return 1
 
     # output summary
-    file_count = sum([1 if report[k] else 0 for k in report.keys()])
-    replacement_count = sum([len(r) for r in report.values()])
+    file_count = sum(1 if report[k] else 0 for k in report.keys())
+    replacement_count = sum(len(r) for r in report.values())
     if not file_count:
         print('No errors')
         rc = 0
@@ -291,22 +291,22 @@ def get_line_number(data, offset):
 
 
 def get_xunit_content(report, testname, elapsed):
-    test_count = sum([max(len(r), 1) for r in report.values()])
-    error_count = sum([len(r) for r in report.values()])
+    test_count = sum(max(len(r), 1) for r in report.values())
+    error_count = sum(len(r) for r in report.values())
     data = {
         'testname': testname,
         'test_count': test_count,
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
     }
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
 >
-''' % data
+""" % data
 
     for filename in sorted(report.keys()):
         replacements = report[filename]
@@ -322,8 +322,7 @@ def get_xunit_content(report, testname, elapsed):
                     'testname': testname,
                     'quoted_message': quoteattr(
                         'Replace [%s] with [%s]' %
-                        (replacement['original'], replacement['replacement'])
-                    ),
+                        (replacement['original'], replacement['replacement'])),
                     'cdata': '\n'.join([
                         '%s:%d:%d' % (
                             filename, replacement['line_no'],
@@ -332,13 +331,13 @@ def get_xunit_content(report, testname, elapsed):
                         replacement['addition'],
                     ]),
                 }
-                xml += '''  <testcase
+                xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
   >
       <failure message=%(quoted_message)s><![CDATA[%(cdata)s]]></failure>
   </testcase>
-''' % data
+""" % data
 
         else:
             # if there are no replacements report a single successful test
@@ -346,19 +345,19 @@ def get_xunit_content(report, testname, elapsed):
                 'quoted_location': quoteattr(filename),
                 'testname': testname,
             }
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
     status="No errors"/>
-''' % data
+""" % data
 
     # output list of checked files
     data = {
         'escaped_files': escape(''.join(['\n* %s' % r
                                          for r in sorted(report.keys())])),
     }
-    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
-''' % data
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+""" % data
 
     xml += '</testsuite>\n'
     return xml

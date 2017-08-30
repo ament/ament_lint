@@ -124,8 +124,8 @@ def main(argv=sys.argv[1:]):
             parser.error(
                 "'LICENSE' argument must be a known license name. "
                 "Use the '--list-licenses' options to see alist of valid license names.")
-        license = licenses[args.add_missing[1]]
-        add_missing_header(file_descriptors, name, license, args.verbose)
+        add_missing_header(
+            file_descriptors, name, licenses[args.add_missing[1]], args.verbose)
         return 0
 
     if args.add_copyright_year is not None:
@@ -216,9 +216,9 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def add_missing_header(file_descriptors, name, license, verbose):
-    copyright = 'Copyright %d %s' % (int(time.strftime('%Y')) - 1 + 1, name)
-    header = license.file_header.format(**{'copyright': copyright})
+def add_missing_header(file_descriptors, name, license_, verbose):
+    copyright_ = 'Copyright %d %s' % (int(time.strftime('%Y')) - 1 + 1, name)
+    header = license_.file_header.format(**{'copyright': copyright_})
     lines = header.splitlines()
 
     if verbose:
@@ -254,12 +254,12 @@ def add_missing_header(file_descriptors, name, license, verbose):
         elif file_descriptor.filetype == CONTRIBUTING_FILETYPE:
             print('+', file_descriptor.path)
             with open(file_descriptor.path, 'w') as h:
-                h.write(license.contributing_file)
+                h.write(license_.contributing_file)
 
         elif file_descriptor.filetype == LICENSE_FILETYPE:
             print('+', file_descriptor.path)
             with open(file_descriptor.path, 'w') as h:
-                h.write(license.license_file)
+                h.write(license_.license_file)
 
         else:
             assert False, 'Unknown filetype: ' + file_descriptor.filetype
@@ -294,7 +294,7 @@ def add_copyright_year(file_descriptors, new_years, verbose):
 
         # skip if all new years are already included
         years = get_years_from_string(block[years_span[0]:years_span[1]])
-        if all([(new_year in years) for new_year in new_years]):
+        if all((new_year in years) for new_year in new_years):
             if verbose:
                 print(' ', file_descriptor.path)
             continue
@@ -328,7 +328,7 @@ def get_years_from_string(content):
     # split items by comma
     items = content.split(',')
 
-    years = set([])
+    years = set()
     for item in items:
         # each item can be a plain year or a range of years
         parts = item.split('-', 1)
@@ -418,14 +418,14 @@ def get_xunit_content(report, testname, elapsed):
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
     }
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
 >
-''' % data
+""" % data
 
     for (filename, no_error, message) in report:
 
@@ -436,28 +436,28 @@ def get_xunit_content(report, testname, elapsed):
         }
         if not no_error:
             # report missing / unknown copyright / license as a failing testcase
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_filename)s
     classname="%(testname)s"
   >
       <failure message="%(escaped_message)s"/>
   </testcase>
-''' % data
+""" % data
 
         else:
             # if there is a known copyright / license report a single successful test
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_filename)s
     classname="%(testname)s"
     status="%(escaped_message)s"/>
-''' % data
+""" % data
 
     # output list of checked files
     data = {
         'escaped_files': escape(''.join(['\n* %s' % r[0] for r in report])),
     }
-    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
-''' % data
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+""" % data
 
     xml += '</testsuite>\n'
     return xml

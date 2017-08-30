@@ -20,9 +20,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check Python code style using pyflakes.',
-    long_description='''\
+    long_description="""\
 The ability to check code using pyflakes and generate xUnit test
-result files.''',
+result files.""",
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={

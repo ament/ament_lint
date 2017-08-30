@@ -20,9 +20,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check C++ code style using cpplint.',
-    long_description='''\
+    long_description="""\
 The ability to check code against the Google style conventions using
-cpplint and generate xUnit test result files.''',
+cpplint and generate xUnit test result files.""",
     license='Apache License, Version 2.0, BSD',
     test_suite='test',
     entry_points={

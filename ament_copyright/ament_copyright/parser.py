@@ -208,7 +208,7 @@ def get_index_of_next_line(content, index):
     index_n = content.find('\n', index)
     index_r = content.find('\r', index)
     index_rn = content.find('\r\n', index)
-    indices = set([])
+    indices = set()
     if index_n != -1:
         indices.add(index_n)
     if index_r != -1:

@@ -23,9 +23,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check code style using uncrustify.',
-    long_description='''\
+    long_description="""\
 The ability to check code against style conventions using uncrustify
-and generate xUnit test result files.''',
+and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={

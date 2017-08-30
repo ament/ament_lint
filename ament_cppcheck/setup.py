@@ -20,9 +20,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Static code analysis on C/C++ code using Cppcheck.',
-    long_description='''\
+    long_description="""\
 The ability to perform static code analysis on C/C++ code using Cppcheck
-and generate xUnit test result files.''',
+and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={

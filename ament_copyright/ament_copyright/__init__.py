@@ -50,6 +50,5 @@ def get_licenses():
             group=LICENSE_GROUP):
         assert entry_point.name != UNKNOWN_IDENTIFIER, \
             "Invalid entry point name '%s'" % entry_point.name
-        license = entry_point.load()
-        licenses[entry_point.name] = license
+        licenses[entry_point.name] = entry_point.load()
     return licenses

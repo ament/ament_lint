@@ -23,8 +23,8 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check Python code style using flake8.',
-    long_description='''\
-The ability to check code for syntax and style conventions with flake8.''',
+    long_description="""\
+The ability to check code for syntax and style conventions with flake8.""",
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={

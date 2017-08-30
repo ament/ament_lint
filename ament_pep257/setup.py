@@ -23,9 +23,9 @@ setup(
         'Topic :: Software Development',
     ],
     description='Check Python code style using pep257.',
-    long_description='''\
+    long_description="""\
 The ability to check code against the docstring conventions in PEP 257
-and generate xUnit test result files.''',
+and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={

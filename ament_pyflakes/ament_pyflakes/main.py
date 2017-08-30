@@ -34,7 +34,7 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help="The files or directories to check. For directories files ending "
+        help='The files or directories to check. For directories files ending '
              "in '.py' will be considered.")
     parser.add_argument(
         '--exclude',
@@ -76,7 +76,7 @@ def main(argv=sys.argv[1:]):
         print('')
 
     # output summary
-    error_count = sum([len(r[1]) for r in report])
+    error_count = sum(len(r[1]) for r in report)
     if not error_count:
         print('No errors')
         rc = 0
@@ -128,22 +128,22 @@ def get_files(paths):
 
 
 def get_xunit_content(report, testname, elapsed):
-    test_count = sum([max(len(r[1]), 1) for r in report])
-    error_count = sum([len(r[1]) for r in report])
+    test_count = sum(max(len(r[1]), 1) for r in report)
+    error_count = sum(len(r[1]) for r in report)
     data = {
         'testname': testname,
         'test_count': test_count,
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
     }
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
 >
-''' % data
+""" % data
 
     for (filename, errors) in report:
 
@@ -162,13 +162,13 @@ def get_xunit_content(report, testname, elapsed):
                     'testname': testname,
                     'quoted_message': quoteattr(msg),
                 }
-                xml += '''  <testcase
+                xml += """  <testcase
     name=%(quoted_name)s
     classname="%(testname)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
-''' % data
+""" % data
 
         else:
             # if there are no pyflakes errors report a single successful test
@@ -176,18 +176,18 @@ def get_xunit_content(report, testname, elapsed):
                 'quoted_location': quoteattr(filename),
                 'testname': testname,
             }
-            xml += '''  <testcase
+            xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
     status="No errors"/>
-''' % data
+""" % data
 
     # output list of checked files
     data = {
         'escaped_files': escape(''.join(['\n* %s' % r[0] for r in report])),
     }
-    xml += '''  <system-out>Checked files:%(escaped_files)s</system-out>
-''' % data
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+""" % data
 
     xml += '</testsuite>\n'
     return xml
@@ -199,10 +199,10 @@ class CustomReporter(Reporter):
         super(CustomReporter, self).__init__(sys.stdout, sys.stderr)
         self.errors = []
 
-    def unexpectedError(self, filename, msg):
+    def unexpectedError(self, filename, msg):  # noqa: N802
         self.errors.append(UnexpectedError(filename, msg))
 
-    def syntaxError(self, filename, msg, lineno, offset, text):
+    def syntaxError(self, filename, msg, lineno, offset, text):  # noqa: N802
         self.errors.append(SyntaxError(filename, msg, lineno, offset, text))
 
     def flake(self, message):
