@@ -69,6 +69,9 @@ def main(argv=sys.argv[1:]):
                     'cpplint.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
+        '--filters', metavar='FILTER,FILTER,...', type=str,
+        help='A comma separated list of category filters to apply')
+    parser.add_argument(
         '--linelength', metavar='N', type=int, default=100,
         help='The maximum line length')
     parser.add_argument(
@@ -110,6 +113,8 @@ def main(argv=sys.argv[1:]):
         # we allow the developer to decide about whitespace after a semicolon
         '-whitespace/semicolon',
     ]
+    if args.filters:
+        filters += args.filters.split(',')
     argv.append('--filter=%s' % ','.join(filters))
 
     argv.append('--linelength=%d' % args.linelength)
