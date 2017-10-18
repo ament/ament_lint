@@ -18,7 +18,7 @@
 # :param TESTNAME: the name of the test, default: "cpplint"
 # :type TESTNAME: string
 # :param FILTERS: list of category filters to apply
-# :type FILTERS: list of string
+# :type FILTERS: list of strings
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_cpplint
 # :type MAX_LINE_LENGTH: integer
