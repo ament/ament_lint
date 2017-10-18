@@ -69,7 +69,7 @@ def main(argv=sys.argv[1:]):
                     'cpplint.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '--filters', metavar='FILTER,FILTER,..', type=str,
+        '--filters', metavar='FILTER,FILTER,...', type=str,
         help='A comma separated list of category filters to apply')
     parser.add_argument(
         '--linelength', metavar='N', type=int, default=100,
