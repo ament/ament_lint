@@ -123,6 +123,10 @@ def main(argv=sys.argv[1:]):
 
 def get_flake8_style_guide(argv):
     application = flake8_app.Application()
+    application.parse_preliminary_options_and_args([])
+    flake8.configure_logging(
+        application.prelim_opts.verbose, application.prelim_opts.output_file)
+    application.make_config_finder()
     application.find_plugins()
     application.register_plugin_options()
     application.parse_configuration_and_cli(argv)
