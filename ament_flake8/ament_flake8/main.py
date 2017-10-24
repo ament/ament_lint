@@ -122,7 +122,16 @@ def main(argv=sys.argv[1:]):
 
 
 def get_flake8_style_guide(argv):
+    # This is a modified version of flake8.legacy.get_style_guide() in which we pass argv through
+    # to parse_configuration_and_cli(), as opposed to a dict of flake8 options.
+    # Since we are using config files and a mix plugins, it is not trivial to determine the
+    # appropriate options to pass into the standard flake8.legacy.get_style_guide();
+    # passing argv gets it to determine the options for us.
     application = flake8_app.Application()
+    application.parse_preliminary_options_and_args([])
+    flake8.configure_logging(
+        application.prelim_opts.verbose, application.prelim_opts.output_file)
+    application.make_config_finder()
     application.find_plugins()
     application.register_plugin_options()
     application.parse_configuration_and_cli(argv)
