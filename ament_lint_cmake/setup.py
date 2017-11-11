@@ -24,7 +24,7 @@ setup(
 The ability to lint CMake code using cmakelint and generate xUnit test
 result files.""",
     license='Apache License, Version 2.0',
-    test_suite='test',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'ament_lint_cmake = ament_lint_cmake.main:main',

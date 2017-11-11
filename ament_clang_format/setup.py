@@ -27,7 +27,7 @@ setup(
 The ability to check code against style conventions using clang-format
 and generate xUnit test result files.""",
     license='Apache License, Version 2.0, BSD',
-    test_suite='test',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'ament_clang_format = ament_clang_format.main:main',

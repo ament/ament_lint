@@ -27,7 +27,7 @@ setup(
 The ability to check code against the style conventions in PEP 8 and
 generate xUnit test result files.""",
     license='Apache License, Version 2.0',
-    test_suite='test',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'ament_pep8 = ament_pep8.main:main',

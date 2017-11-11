@@ -26,7 +26,7 @@ setup(
     long_description="""\
 The ability to check sources file for copyright and license information.""",
     license='Apache License, Version 2.0',
-    test_suite='test',
+    tests_require=['pytest'],
     entry_points={
         'ament_copyright.copyright_name': [
             'osrf = ament_copyright.copyright_names:osrf',

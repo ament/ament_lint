@@ -27,7 +27,7 @@ setup(
 The ability to check code against style conventions using uncrustify
 and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
-    test_suite='test',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'ament_uncrustify = ament_uncrustify.main:main',

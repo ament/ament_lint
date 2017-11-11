@@ -26,7 +26,7 @@ setup(
     long_description="""\
 The ability to check code for syntax and style conventions with flake8.""",
     license='Apache License, Version 2.0',
-    test_suite='test',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'ament_flake8 = ament_flake8.main:main',
