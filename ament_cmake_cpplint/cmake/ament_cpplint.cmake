@@ -24,7 +24,7 @@
 # :type MAX_LINE_LENGTH: integer
 # :param ROOT: override the --root option of cpplint
 # :type ROOT: string
-# :param TIMEOUT: the test timeout in seconds, default: 60
+# :param TIMEOUT: the test timeout in seconds, default: 120
 # :type TIMEOUT: integer
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
