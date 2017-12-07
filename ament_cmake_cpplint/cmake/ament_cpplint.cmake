@@ -61,6 +61,7 @@ function(ament_cpplint)
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_cpplint/${ARG_TESTNAME}.txt"
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    TIMEOUT 120
   )
   set_tests_properties(
     "${ARG_TESTNAME}"
