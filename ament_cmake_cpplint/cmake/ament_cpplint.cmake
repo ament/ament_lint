@@ -24,13 +24,15 @@
 # :type MAX_LINE_LENGTH: integer
 # :param ROOT: override the --root option of cpplint
 # :type ROOT: string
+# :param TIMEOUT: the test timeout in seconds, default: 120
+# :type TIMEOUT: integer
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cpplint)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME" "FILTERS" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cpplint")
   endif()
@@ -53,6 +55,9 @@ function(ament_cpplint)
     list(APPEND cmd "--root" "${ARG_ROOT}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+  if(NOT ARG_TIMEOUT)
+    set(ARG_TIMEOUT 120)
+  endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")
   ament_add_test(
@@ -61,6 +66,7 @@ function(ament_cpplint)
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_cpplint/${ARG_TESTNAME}.txt"
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    TIMEOUT "${ARG_TIMEOUT}"
   )
   set_tests_properties(
     "${ARG_TESTNAME}"
