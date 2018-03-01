@@ -226,6 +226,8 @@ def get_file_groups(paths, extensions):
 def append_file_to_group(groups, path):
     path = os.path.abspath(path)
 
+    root = None
+
     # try to determine root from path
     base_path = os.path.dirname(path)
     # find longest subpath which ends with one of the following subfolder names
@@ -240,6 +242,7 @@ def append_file_to_group(groups, path):
         match_groups = [{'group_len': len(x), 'group': x} for x in match_groups]
         sorted_groups = sorted(match_groups, key=lambda k: k['group_len'])
         base_path = sorted_groups[-1]['group']
+        root = base_path
 
     # try to find repository root
     repo_root = None
@@ -255,8 +258,7 @@ def append_file_to_group(groups, path):
                 break
 
     # compute relative --root argument
-    root = None
-    if repo_root:
+    if repo_root and repo_root > base_path:
         root = os.path.relpath(base_path, repo_root)
 
     # add the path to the appropriate group
