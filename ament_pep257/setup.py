@@ -9,6 +9,7 @@ setup(
     package_data={'': [
         'configuration/ament_pep257.ini',
     ]},
+    zip_safe=True,
     author='Dirk Thomas',
     author_email='dthomas@osrfoundation.org',
     maintainer='Dirk Thomas',

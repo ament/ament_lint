@@ -9,6 +9,7 @@ setup(
     package_data={'': [
         'configuration/ament_flake8.ini',
     ]},
+    zip_safe=False,
     author='D. Hood',
     author_email='dhood@osrfoundation.org',
     maintainer='D. Hood',
