@@ -9,6 +9,7 @@ setup(
     package_data={'': [
         'configuration/ament_code_style.cfg',
     ]},
+    zip_safe=False,
     author='Dirk Thomas',
     author_email='dthomas@osrfoundation.org',
     maintainer='Dirk Thomas',
