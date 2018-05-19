@@ -97,16 +97,29 @@ function(ament_pclint)
   list(APPEND cmd "--xunit-file" "${result_file}")
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pclint")
-  ament_add_test(
-    "${ARG_TESTNAME}"
-    COMMAND ${cmd}
-    OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_pclint/${ARG_TESTNAME}.txt"
-    RESULT_FILE "${result_file}"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-  )
-  set_tests_properties(
-    "${ARG_TESTNAME}"
-    PROPERTIES
-    LABELS "pclint;linter"
-  )
+
+  set(pclint_exec "pclp64")  # Windows executable name
+  if(APPLE)
+      set(pclint_exec "${pclint_exec}_osx")
+  elseif(UNIX)  # i.e. UNIX AND NOT APPLE
+      set(pclint_exec "${pclint_exec}_linux")
+  endif()
+  find_program(pclint_BIN NAMES "${pclint_exec}")
+
+  if(pclint_BIN)
+    ament_add_test(
+      "${ARG_TESTNAME}"
+      COMMAND ${cmd}
+      OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_pclint/${ARG_TESTNAME}.txt"
+      RESULT_FILE "${result_file}"
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+    set_tests_properties(
+      "${ARG_TESTNAME}"
+      PROPERTIES
+      LABELS "pclint;linter"
+    )
+  else()
+    message(WARNING "WARNING: ${pclint_exec} not found, skipping pclint test creation")
+  endif()
 endfunction()
