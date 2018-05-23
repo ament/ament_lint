@@ -30,7 +30,7 @@ setup(
     author_email='jp.samper@apex.ai',
     maintainer='Juan Pablo Samper',
     maintainer_email='jp.samper@apex.ai',
-    url='https://gitlab.com/ApexAI/ament_lint',
+    url='https://github.com/ament/ament_lint',
     download_url='',
     keywords=['ament'],
     classifiers=[
@@ -43,7 +43,7 @@ setup(
     long_description="""\
 The ability to perform static code analysis on C/C++ code using PCLint
 and generate xUnit test result files.""",
-    license='Apex AI',
+    license='Apache License, Version 2.0',
     test_suite='test',
     entry_points={
         'console_scripts': [
