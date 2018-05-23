@@ -1,11 +1,12 @@
-/* Date Stamp */ -d"_lint_au_misra3_lnt=au-misra3.lnt modified 11-Nov-2015"
+/* Date Stamp */ -d"_lint_au_misra3_lnt=au-misra3.lnt modified 12-Jun-2014"
+/* To document usage use: -message( "Using " _lint_au_misra3_lnt ) */
 
 // ---------------------------------------------------------------------
 // This file is provided by Gimpel Software (www.gimpel.com) for use with
-// a prerelease copy of PC-lint Plus.
+// its products PC-lint and FlexeLint.
 //
-// Redistribution of this prerelease file is not permitted without written
-// permission from Gimpel Software.
+// Redistribution and use of this file, with or without modification, is
+// permitted provided that any such redistribution retains this notice.
 // ---------------------------------------------------------------------
 
 // au-misra3.lnt -- Author options - MISRA C 2012
@@ -17,12 +18,12 @@
 
     You can use this file directly when linting your programs as in:
 
-    lint au-misra3.lnt hello.c
+    lin  au-misra3  files
 
     Gimpel Software relies on the document, "MISRA-C:2012
     Guidelines for the use of the C language in critical systems",
-    copyright 2012 by MISRA Limited, as the primary source for this
-    file. Gimpel Software makes no warranty as to the completeness
+    copyright 2012 by MIRA Limited, as the primary source for this
+    file.  Gimpel Software makes no warranty as to the completeness
     or applicability of this options file and reserves the right to
     amend or alter the official contents of such at any time.
 
@@ -37,12 +38,12 @@
 
 /**** Dir 2.1 (Req) ************/
 
-    -std(c99) 		       /* strict ISO C99 */
+    -A(C99) 		       /* strict ISO C99 */
     /* Note: if you code to the C90 standard instead, you may
        want to comment out the above option and uncomment the
        following option. You will also want to do likewise for
-       other uses of the '-std(c99)' option throughout this file. */
-    // -std(c90)
+       other uses of the '-A(C99)' option throughout this file. */
+    // -A(C90)                    /* strict ANSI */
     +e950                      /* flag non-standard word or construct */
     // +elib(950)
     -append(950,[MISRA 2012 Directive 2.1, required])
@@ -63,7 +64,7 @@
 
     +e586        /* to activate the deprecation message */
     // +elib(586)
-    -deprecate(keyword,asm,[MISRA 2012 Directive 4.3, required])
+    -deprecate(keyword,asm,[MISRA 2012 4.3, required])
 
 /**** Dir 4.4 (Adv) ************/
 
@@ -82,18 +83,23 @@
 
 /**** Dir 4.5 (Adv) ************/
 
-    +fta            /* enable typographical ambiguity checking */
-    +e9046	  	    /* typographical ambiguity */
-    // +elib(9046)
-    -append(9046,[MISRA 2012 Directive 4.5, advisory])
+    //  While Lint can enforce this directive with the following four
+    //  options, doing so can increase the run time of Lint depending
+    //  upon the number of identifiers in your program. If you want
+    //  this checking, uncomment each of the following four options.
+    //
+      +fta
+      +e9046	  	     /* typographical ambiguity */
+    //  +elib(9046)
+      -append(9046,[MISRA 2012 Directive 4.5, advisory])
 
 /**** Dir 4.6 (Adv) ************/
 
-    // +e970                flag modifiers used outside of typedefs */
-    // // +elib(970)
+    // +e970               /* flag modifiers used outside of typedefs */
+    // +elib(970)
     // -append(970,[MISRA 2012 Directive 4.6, advisory])
-    // //  For the duration, we are presuming MISRA does not want
-    // //  diagnostics for the bool type.
+    //  For the duration, we are presuming MISRA does not want
+    //  diagnostics for the bool type.
     // -esym(970,bool)
     // -esym(970,char)
 
@@ -112,7 +118,7 @@
 /**** Dir 4.9 (Adv) ************/
 
     // +e9026                function-like macro defined */
-    // // +elib(9026)
+    // +elib(9026)
     // -append(9026,[MISRA 2012 Directive 4.9, advisory])
 
 /**** Dir 4.10 (Req) ************/
@@ -139,19 +145,26 @@
 
 /**** Dir 4.13 (Adv) ************/
 
-    /* Not currently supported */
+    /* supported by uncommenting the next six options and use of the
+       -function_pair() option */
+    // +e480
+    // +elib(480)
+    // -append(480,[MISRA 2012 Directive 4.13, advisory])
+    // +e481
+    // +elib(481)
+    // -append(481,[MISRA 2012 Directive 4.13, advisory])
 
 /**** Rule 1.1 (Req) ************/
 
     /* While MISRA has declared this rule to be "undecidable", Gimpel
      * Software provides the following options to assist:
      */
-    -std(c99) 		       /* strict ISO C99 */
+    -A(C99) 		       /* strict ISO C99 */
     /* Note: if you code to the C90 standard instead, you may
        want to comment out the above option and uncomment the
        following option. You will also want to do likewise for
-       other uses of the '-std(c99)' option throughout this file. */
-    // -std(c90)
+       other uses of the '-A(C99)' option throughout this file. */
+    // -A(C90)                    /* strict ANSI */
     +e950                      /* flag non-standard word or construct */
     // +elib(950)
     -append(950,[MISRA 2012 Rule 1.1, required])
@@ -161,12 +174,12 @@
     /* While MISRA has declared this rule to be "undecidable", Gimpel
      * Software provides the following options to assist:
      */
-    -std(c99) 		       /* strict ISO C99 */
+    -A(C99) 		       /* strict ISO C99 */
     /* Note: if you code to the C90 standard instead, you may
        want to comment out the above option and uncomment the
        following option. You will also want to do likewise for
-       other uses of the '-std(c99)' option throughout this file. */
-    // -std(c90)
+       other uses of the '-A(C99)' option throughout this file. */
+    // -A(C90)                    /* strict ANSI */
     +e950                      /* flag non-ANSI word or construct */
     // +elib(950)
     -append(950,[MISRA 2012 Rule 1.2, advisory])
@@ -631,11 +644,17 @@
 
 /**** Rule 5.1 (Req) ************/
 
-    /* Not currently supported */
+    -idlen(31)  /* flag names identical in the first 31 characters */
+    +e621       /* Identifier clash - length set by -idlen */
+    +elib(621)
+    -append(621,[MISRA 2012 Rule 5.1, required])
 
 /**** Rule 5.2 (Req) ************/
 
-    /* Not currently supported */
+    -idlen(31)  /* flag names identical in the first 31 characters */
+    +e621       /* Identifier clash - length set by -idlen */
+    +elib(621)
+    -append(621,[MISRA 2012 Rule 5.2, required])
 
 /**** Rule 5.3 (Req) ************/
 
@@ -645,19 +664,23 @@
 
 /**** Rule 5.4 (Req) ************/
 
-    /* Not currently supported */
+    -idlen(31)  /* flag names identical in the first 31 characters */
+    +e621       /* Identifier clash - length set by -idlen */
+    +elib(621)
+    -append(621,[MISRA 2012 Rule 5.4, required])
 
 /**** Rule 5.5 (Req) ************/
 
-    /* 9095 - symbol has same name as previously defined macro */
-    +e9095
-    // +elib(9095)
-    -append(9095,[MISRA 2012 Rule 5.5, required])
-
-    /* 9096 - symbol has same name as subsequently defined macro */
-    +e9096
-    // +elib(9096)
-    -append(9096,[MISRA 2012 Rule 5.5, required])
+    +e123       /* macro defined with arguments */
+    // +elib(123)
+    -append(123,[MISRA 2012 Rule 5.5, required])
+    -idlen(31)  /* flag names identical in the first 31 characters */
+    +e621       /* Identifier clash - length set by -idlen */
+    // +elib(621)
+    -append(621,[MISRA 2012 Rule 5.5, required])
+    +e9061                       /* non-distinct identifier */
+    // +elib(9061)
+    -append(9061,[MISRA 2012 Rule 5.5, required])
 
 /**** Rule 5.6 (Req) ************/
 
@@ -667,6 +690,9 @@
     +e623               /* redefining the storage class of symbol */
     // +elib(623)
     -append(623,[MISRA 2012 Rule 5.6, required])
+    +estring(9062,typedef)  /* non-unique typedef */
+    +elib(9062)
+    -append(9062(typedef),[MISRA 2012 Rule 5.6, required])
 
 /**** Rule 5.7 (Req) ************/
 
@@ -685,6 +711,9 @@
     +e631               /* Tag defined differently */
     // +elib(631)
     -append(631,[MISRA 2012 Rule 5.7, required])
+    +e9062                       /* non-unique tag */
+    +elib(9062)
+    -append(9062(tag),[MISRA 2012 Rule 5.7, required])
 
 /**** Rule 5.8 (Req) ************/
 
@@ -709,11 +738,12 @@
 
 /**** Rule 6.1 (Req) ************/
 
-    /* 9149     bit field must be explicitly signed integer, unsigned integer,
-                or bool */
-    +e9149
-    // +elib(9149)
-    -append(9149,[MISRA 2012 Rule 6.1, required])
+    +e46                /* field type should be int */
+    // +elib(46)
+    -append(46,[MISRA 2012 Rule 6.1, required])
+    +e806               /* small bit field is signed rather than unsigned */
+    // +elib(806)
+    -append(806,[MISRA 2012 Rule 6.1, required])
 
 /**** Rule 6.2 (Req) ************/
 
@@ -784,6 +814,9 @@
     +e939                           /* return type defaults to int */
     // +elib(939)
     -append(939,[MISRA 2012 Rule 8.2, required])
+    -fvr                          /* varying return mode not allowed */
+    -strong()                     /* enable strong typing for
+                                     declarations */
     +e18                          /* symbol redeclared */
     // +elib(18)
     -append(18,[MISRA 2012 Rule 8.2, required])
@@ -798,48 +831,33 @@
 
 /**** Rule 8.3 (Req) ************/
 
+    -fvr                          /* varying return mode not allowed */
+    -strong()                     /* enable strong typing for declarations */
     +e18                          /* symbol redeclared */
     // +elib(18)
     -append(18,[MISRA 2012 Rule 8.3, required])
-
+    +e516                         /* argument type conflict */
+    // +elib(516)
+    -append(516,[MISRA 2012 Rule 8.3, required])
     +e532                         /* return mode of symbol inconsistent */
     // +elib(532)
     -append(532,[MISRA 2012 Rule 8.3, required])
-
-    /* 9072 parameter has different name than previous declaration  */
-    +e9072
+    +e9072                        /* parameter list differs */
     // +elib(9072)
     -append(9072,[MISRA 2012 Rule 8.3, required])
-
-    /* 9073 parameter has type alias name type difference with previous
-            declaration */
-    +e9073
-    // +elib(9073)
-    -append(9073,[MISRA 2012 Rule 8.3, required])
-
-    /* 9094 return type has type alias name difference with previous
-            declaration */
-    +e9094
-    // +elib(9094)
-    -append(9094,[MISRA 2012 Rule 8.3, required])
 
 /**** Rule 8.4 (Req) ************/
 
     +e15        /* symbol redeclared */
     // +elib(15)
     -append(15,[MISRA 2012 Rule 8.4, required])
-
     +e64        /* flag type mismatch */
     // +elib(64)
     -append(64,[MISRA 2012 Rule 8.4, required])
-
-    /* 957 - function defined without prototype in scope */
-    +e957
-    // +elib(957)
-    -append(957,[MISRA 2012 Rule 8.4, required])
-
-    /* 9075 external symbol defined without a prior declaration */
-    +e9075
+    +e516       /* argument type mismatch */
+    // +elib(516)
+    -append(516,[MISRA 2012 Rule 8.4, required])
+    +e9075                        /* extern defined without prior declaration */
     // +elib(9075)
     -append(9075,[MISRA 2012 Rule 8.4, required])
 
@@ -929,15 +947,11 @@
     // +elib(530)
     -append(530,[MISRA 2012 Rule 9.1, mandatory])
 
-    /* 603 - argument to parameter of type pointer to const may be a pointer to
-        uninitialized memory */
-    +e603
-    // +elib(603)
-    -append(603,[MISRA 2012 Rule 9.1, mandatory])
-
 /**** Rule 9.2 (Req) ************/
 
-    /* Not currently supported */
+    +e9069                  /* omitted braces within an initializer */
+    +elib(9069)
+    -append(9069,[MISRA 2012 Rule 9.2, required])
 
 /**** Rule 9.3 (Req) ************/
 
@@ -978,7 +992,6 @@
     // +elib(9034)
     // Note: the following -d options for true and false don't apply
     //       to C90 and should be commented out if not using C99
-    -estring(9052, true, false)
     +"dtrue=/*lint -save -e921 */(_Bool) 1/*lint -restore */"    // exception
     +"dfalse=/*lint -save -e921 */(_Bool) 0/*lint -restore */"   // exception
     -append(9034,[MISRA 2012 Rule 10.3, required])
@@ -1051,13 +1064,12 @@
 
 /**** Rule 11.7 (Req) ************/
 
-    +e177       /* type cannot be cast to object pointer */
-    // +elib(177)
-    -append(177,[MISRA 2012 Rule 11.7, required])
-
-    +e179       /* object pointer cannot be cast to type */
-    // +elib(179)
-    -append(179,[MISRA 2012 Rule 11.7, required])
+    +e68                        /* cast pointer/float */
+    // +elib(68)
+    -append(68,[MISRA 2012 Rule 11.7, required])
+    +e70                        /* cast pointer/float */
+    // +elib(70)
+    -append(70,[MISRA 2012 Rule 11.7, required])
 
 /**** Rule 11.8 (Req) ************/
 
@@ -1067,6 +1079,10 @@
 
 /**** Rule 11.9 (Req) ************/
 
+    +e910       /* conversion from 0 to pointer */
+    +elib(910)
+    --emacro((910),NULL)    /*  explicit exception  */
+    -append(910,[MISRA 2012 Rule 11.9, required])
     +e9080      /* integer null pointer constant */
     // +elib(9080)
     -append(9080,[MISRA 2012 Rule 11.9, required])
@@ -1126,6 +1142,9 @@
     +e564			/* variable depends on order of evaluation */
     // +elib(564)
     -append(564,[MISRA 2012 Rule 13.2, required])
+    +e864			/* variable possibly depends on order of evaluation */
+    +elib(864)
+    -append(864,[MISRA 2012 Rule 13.2, required])
     +e931	       	    	/* both sides have side effects */
     // +elib(931)
     -append(931,[MISRA 2012 Rule 13.2, required])
@@ -1178,7 +1197,12 @@
 
 /**** Rule 14.2 (Req) ************/
 
-    /* Not currently supported */
+    /* While MISRA has declared this rule to be "undecidable", Gimpel
+     * Software provides the following options to assist:
+     */
+    +e850           /* index variable modified in body of for loop */
+    +elib(850)
+    -append(850,[MISRA 2012 Rule 14.2, required])
 
 /**** Rule 14.3 (Req) ************/
 
@@ -1519,11 +1543,9 @@
     +e12                    /* Need < or " after #include */
     // +elib(12)
     -append(12,[MISRA 2012 Rule 20.3, required])
-
-    /* 544  directive not followed by EOL */
-    +estring(544,include)
-    // +elib(544)
-    -append(544(include),[MISRA 2012 Rule 20.3, required])
+    +e9086                    /* multiple arguments after #include */
+    // +elib(9086)
+    -append(9086,[MISRA 2012 Rule 20.3, required])
 
 /**** Rule 20.4 (Req) ************/
 
@@ -1575,25 +1597,21 @@
 
 /**** Rule 20.12 (Req) ************/
 
-    /* Not currently supported */
+    +e9015                              /* macro argument is used both with and without '#/##' and is subject to further replacement */
+    +elib(9015)
+    -append(9015,[MISRA 2012 Rule 20.12, required])
 
 /**** Rule 20.13 (Req) ************/
 
-    /* 544 - directive not followed by EOL */
-    +e544
+    +e544       /* endif or else not followed by EOL */
     // +elib(544)
     -append(544,[MISRA 2012 Rule 20.13, required])
-
-    /* 16 - unknown preprocessor directive */
-    +e16
+    +e16        /* # directive not followed by recognizable word */
     // +elib(16)
     -append(16,[MISRA 2012 Rule 20.13, required])
-
-    /* 9160 - unknown preprocessor directive in conditionally excluded
-            region */
-    +e9160
-    // +elib(9160)
-    -append(9160,[MISRA 2012 Rule 20.13, required])
+    /* other parts of this rule such as a syntax check of the disabled
+       portions of the code do not seem to be statically checkable
+     */
 
 /**** Rule 20.14 (Req) ************/
 
