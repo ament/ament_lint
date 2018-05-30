@@ -53,7 +53,7 @@ class FileDescriptor:
             self.content = h.read()
 
     def parse(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def identify_license(self, content, license_part):
         if content is None:
