@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from ament_flake8.main import main
+import pytest
 
 
+@pytest.mark.flake8
+@pytest.mark.linter
 def test_flake8():
     excluded = ['ament_cpplint/cpplint.py']
     rc = main(argv=['--exclude'] + excluded)

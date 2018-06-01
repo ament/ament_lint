@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from ament_pep8.main import main
+import pytest
 
 
+@pytest.mark.linter
+@pytest.mark.pep8
 def test_pep8():
     rc = main(argv=[])
     assert rc == 0, 'Found code style errors / warnings'
