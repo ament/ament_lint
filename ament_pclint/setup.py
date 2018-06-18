@@ -26,6 +26,7 @@ setup(
         'config/deprecate.lnt',
         'config/env-xml.lnt'
     ]},
+    zip_safe=False,
     author='Juan Pablo Samper',
     author_email='jp.samper@apex.ai',
     maintainer='Juan Pablo Samper',
@@ -44,6 +45,7 @@ setup(
 The ability to perform static code analysis on C/C++ code using PCLint
 and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
+    tests_require=['pytest'],
     test_suite='test',
     entry_points={
         'console_scripts': [

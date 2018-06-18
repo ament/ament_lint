@@ -1,25 +1,19 @@
 #!/usr/bin/env python3
 
 # Copyright 2017 Apex.AI, Inc.
+# Copyright 2014-2015 Open Source Robotics Foundation, Inc.
 #
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This file contains modified code from the following open source projects
-# published under the licenses listed below:
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#
-# # Copyright 2014-2015 Open Source Robotics Foundation, Inc.
-# #
-# # Licensed under the Apache License, Version 2.0 (the "License");
-# # you may not use this file except in compliance with the License.
-# # You may obtain a copy of the License at
-# #
-# #     http://www.apache.org/licenses/LICENSE-2.0
-# #
-# # Unless required by applicable law or agreed to in writing, software
-# # distributed under the License is distributed on an "AS IS" BASIS,
-# # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# # See the License for the specific language governing permissions and
-# # limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import argparse
 import concurrent.futures
@@ -116,7 +110,7 @@ def main(argv=sys.argv[1:]):
     # Prepare pclint command
     base_cmd = [pclint_bin,
                 '-i"%s"' % pclint_config_dir,
-                '-i"%s"' % os.path.join(os.path.dirname(os.path.realpath(__file__)), "config"),
+                '-i"%s"' % os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config'),
                 'env-xml.lnt']
 
     # Add include directories from arguments
@@ -164,7 +158,7 @@ def main(argv=sys.argv[1:]):
 
             # For debug: prints full command to be copied and pasted.
             if args.debug:
-                print(str(cmd).replace("'", "").replace(",", "").replace("[", "").replace("]", ""))
+                print(str(cmd).replace("'", '').replace(',', '').replace('[', '').replace(']', ''))
 
             # We start one thread per file
             threads.append(executor.submit(execute_analysis, cmd, result, retvals, idx))
@@ -238,7 +232,7 @@ def main(argv=sys.argv[1:]):
 def execute_analysis(cmd, result, retvals, idx):
     try:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        xml = p.communicate()[0].decode("utf-8")  # Read xml from stdout
+        xml = p.communicate()[0].decode('utf-8')  # Read xml from stdout
     except subprocess.CalledProcessError as e:
         print("The invocation of 'pclint' failed with error code %d: %s" %
               (e.returncode, e), file=sys.stderr)
@@ -257,26 +251,26 @@ def find_executable(file_name, additional_paths=None):
 
 def _format_pclint_xml_out(xml_arr):
     aggregate_xml = \
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
-<docs> \n"  # noqa: E122
+'<?xml version="1.0" encoding="UTF-8"?>\n\
+<docs> \n'  # noqa: E122
 
     for xml in xml_arr:
         aggregate_xml += xml
 
-    aggregate_xml += "</docs>"
+    aggregate_xml += '</docs>'
     return aggregate_xml
 
 
 def get_lnt_file(filename, args_language):
     if os.name == 'nt':
-        cc_config = "co-cl.lnt"
-        cpp_config = "co-cl++.lnt"
+        cc_config = 'co-cl.lnt'
+        cpp_config = 'co-cl++.lnt'
     elif sys.platform == 'darwin':
-        cc_config = "co-osx-gcc.lnt"
-        cpp_config = "co-osx-g++.lnt"
+        cc_config = 'co-osx-gcc.lnt'
+        cpp_config = 'co-osx-g++.lnt'
     else:
-        cc_config = "co-gcc.lnt"
-        cpp_config = "co-g++.lnt"
+        cc_config = 'co-gcc.lnt'
+        cpp_config = 'co-g++.lnt'
 
     if (filename.endswith('.cpp') or filename.endswith('.c++') or filename.endswith('.cxx')):
         pclint_config_file = cpp_config
@@ -285,9 +279,9 @@ def get_lnt_file(filename, args_language):
 
     # Allow user to force cpp files to be analyzed as c files.
     # and c files to be analyzed as cpp files.
-    if args_language is "c":
+    if args_language is 'c':
         pclint_config_file = cc_config
-    elif args_language is "cpp":
+    elif args_language is 'cpp':
         pclint_config_file = cpp_config
     return pclint_config_file
 
