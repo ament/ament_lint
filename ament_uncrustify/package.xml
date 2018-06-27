@@ -10,7 +10,7 @@
   <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
   <license>Apache License 2.0</license>
 
-  <exec_depend>uncrustify</exec_depend>
+  <exec_depend>uncrustify_vendor</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>
