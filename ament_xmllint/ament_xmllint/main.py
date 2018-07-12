@@ -72,7 +72,8 @@ def main(argv=sys.argv[1:]):
     for filename in files:
         # parse file to extract desired validation information
         parser = make_parser()
-        parser.setContentHandler(CustomHandler())
+        handler = CustomHandler()
+        parser.setContentHandler(handler)
         try:
             parser.parse(filename)
         except SAXParseException:
@@ -80,7 +81,7 @@ def main(argv=sys.argv[1:]):
 
         cmd = [xmllint_bin, '--noout', filename]
         # choose validation options based on handler information
-        for attributes in parser.getContentHandler().xml_model_attributes:
+        for attributes in handler.xml_model_attributes:
             schematypens = attributes.get('schematypens')
             href = attributes.get('href')
             if schematypens is None or href is None:
@@ -94,6 +95,10 @@ def main(argv=sys.argv[1:]):
             # check for Schematron
             elif schematypens == 'http://purl.oclc.org/dsdl/schematron':
                 cmd += ['--schematron', href]
+        if 'xsi:noNamespaceSchemaLocation' in handler.root_attributes:
+            cmd += [
+                '--schema',
+                handler.root_attributes['xsi:noNamespaceSchemaLocation']]
 
         try:
             subprocess.check_output(
@@ -179,6 +184,8 @@ class CustomHandler(ContentHandler):
     def __init__(self):
         super().__init__()
         self.xml_model_attributes = []
+        self.root_attributes = {}
+        self._first_node = False
 
     def processingInstruction(self, target, data):
         if target != 'xml-model':
@@ -186,6 +193,16 @@ class CustomHandler(ContentHandler):
 
         root = ElementTree.fromstring('<data ' + data + '/>')
         self.xml_model_attributes.append(root.attrib)
+
+    def startDocument(self):
+        self._first_node = True
+
+    def startElement(self, name, attrs):
+        if not self._first_node:
+            return
+        self._first_node = False
+        for attr_name in attrs.getNames():
+            self.root_attributes[attr_name] = attrs.getValue(attr_name)
 
 
 def get_xunit_content(report, testname, elapsed):
