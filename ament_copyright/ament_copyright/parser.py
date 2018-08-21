@@ -62,7 +62,7 @@ class FileDescriptor:
         for name, license_ in get_licenses().items():
             template = getattr(license_, license_part).replace('\n', ' ').strip()
             last_index = -1
-            for license_section in template.split('{company}'):
+            for license_section in template.split('{copyright_holder}'):
                 # OK, now look for each section of the license in the incoming
                 # content.
                 index = content.replace('\n', ' ').strip().find(license_section.strip())
