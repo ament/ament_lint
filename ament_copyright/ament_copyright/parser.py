@@ -175,7 +175,8 @@ def search_copyright_information(content):
     year = '\d{4}'
     year_range = '%s-%s' % (year, year)
     year_or_year_range = '(?:%s|%s)' % (year, year_range)
-    pattern = '^[^\n\r]?\s*Copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
+    pattern = '^[^\n\r]?\s*(?:\\\copyright\s*)?' \
+              'Copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
         (year_or_year_range, year_or_year_range)
     regex = re.compile(pattern, re.DOTALL | re.MULTILINE)
 
@@ -239,7 +240,8 @@ def is_shebang_line(content, index):
 
 def get_comment_block(content, index):
     # regex for matching the beginning of the first comment
-    pattern = '^(#|//)'
+    # check for doxygen comments (///) before regular comments (//)
+    pattern = '^(#|///|//)'
     regex = re.compile(pattern, re.MULTILINE)
 
     match = regex.search(content, index)
