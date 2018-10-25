@@ -172,11 +172,11 @@ def determine_filetype(path):
 
 def search_copyright_information(content):
     # regex for matching years or year ranges (yyyy-yyyy) separated by colons
-    year = '\d{4}'
+    year = r'\d{4}'
     year_range = '%s-%s' % (year, year)
     year_or_year_range = '(?:%s|%s)' % (year, year_range)
-    pattern = '^[^\n\r]?\s*(?:\\\copyright\s*)?' \
-              'Copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
+    pattern = r'^[^\n\r]?\s*(?:\\copyright\s*)?' \
+              r'Copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
         (year_or_year_range, year_or_year_range)
     regex = re.compile(pattern, re.DOTALL | re.MULTILINE)
 
