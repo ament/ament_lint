@@ -324,7 +324,7 @@ def add_copyright_year(file_descriptors, new_years, verbose):
 
 def get_years_from_string(content):
     # remove all whitespaces
-    content = re.sub('\s', '', content)
+    content = re.sub(r'\s', '', content)
     # split items by comma
     items = content.split(',')
 
