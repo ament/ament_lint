@@ -1,34 +1,34 @@
-/* Compiler configuration for vs2015 19.00.24215.
+/* Compiler configuration for vs2017_64 19.11.25547.
    Using the options:  
-   Generated on 2018-01-03 07:17:41 with pclp_config version 1.0.0.
+   Generated on 2018-09-21 10:28:26 with pclp_config version 1.0.0.
  */
 
 // Base Options
 //     Extensions
--std=c++14  //Enable C++14 support
--$  //Enable $ as an identifier character
-+fan  //Enable support for anonymous unions
-+fdi  //Search including directory
-+fsi  //Search include stack for headers
-+frc  //Enable MSVC behavior with regards to handling of commas in macro expansions involving __VA_ARGS__
-+fbl  //Search dependent base classes for unqualified lookup in a class template
-+fei  //Enumerations are always int
-+fur  //Allow unions to contain reference members
-+frd  //Allow redefinition of default parameters for member functions of a class template
-+fum  //A user-declared move operation will only delete the corresponding copy operation
-+ffv  //Implicit conversion from function pointers to void pointers
-+flp  //Support the C++98 definition of null pointer constant
-+fnf  //Fall back on operator new when operator new[] cannot be found
-+fes  //Search enclosing scopes for friend tag declarations
-+ffw  //A friend declaration may act as a forward declaration
-+fma  //Microsoft Asm blocks
-+fdt  //Enable delayed template parsing
-+fms  //Other Microsoft extensions
--fon  //Disable alternative C++ tokens for logical operators
-+fwc  //internal wchar_t
-+fwu  //wchar_t is unsigned
-+ppw(using)  //Enable support for the #using directive
-+ppw(import)  //Enable support for the #import directive
+-std=c++14  // Enable C++14 support
+-$  // Enable $ as an identifier character
++fan  // Enable support for anonymous unions
++fdi  // Search including directory
++fsi  // Search include stack for headers
++frc  // Enable MSVC behavior with regards to handling of commas in macro expansions involving __VA_ARGS__
++fbl  // Search dependent base classes for unqualified lookup in a class template
++fei  // Enumerations are always int
++fur  // Allow unions to contain reference members
++frd  // Allow redefinition of default parameters for member functions of a class template
++fum  // A user-declared move operation will only delete the corresponding copy operation
++ffv  // Implicit conversion from function pointers to void pointers
++flp  // Support the C++98 definition of null pointer constant
++fnf  // Fall back on operator new when operator new[] cannot be found
++fes  // Search enclosing scopes for friend tag declarations
++ffw  // A friend declaration may act as a forward declaration
++fma  // Microsoft Asm blocks
++fdt  // Enable delayed template parsing
++fms  // Other Microsoft extensions
+-fon  // Disable alternative C++ tokens for logical operators
++fwc  // internal wchar_t
++fwu  // wchar_t is unsigned
++ppw(using)  // Enable support for the #using directive
++ppw(import)  // Enable support for the #import directive
 +rw(___identifier)
 +rw(__alignof)
 +rw(__asm)
@@ -87,6 +87,9 @@
 +rw(_uuidof)
 +rw(char16_t)
 +rw(char32_t)
++fzl  // long sizeof
+++fzl  // long long sizeof
++d"_EMIT_VECTORCALL(...)="
 ++doffsetof(s,m)=__builtin_offsetof(s,m)
 
 //     Suppressions
@@ -95,6 +98,7 @@
 -estring(9022,_identifier)
 -estring(9051 9052,_inline,_declspec,_stdcall)
 -emacro(413, offsetof)
+-e4374  // Visual Studio allows certain calling convention differences in overridden functions
 
 
 
@@ -104,10 +108,10 @@
 -si4 -sl4 -sll8 -ss2 -sw2 -sp8 -sf4 -sd8 -sld8
 
 // Include Options
---i"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE"
---i"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE"
---i"C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\ucrt"
+--i"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.11.25503\ATLMFC\include"
+--i"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.11.25503\include"
 --i"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um"
+--i"C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\ucrt"
 --i"C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\shared"
 --i"C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\um"
 --i"C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\winrt"
