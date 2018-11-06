@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright 2014-2015 Open Source Robotics Foundation, Inc.
-# Copyright 2017 Apex.AI, Inc.
+# Copyright 2017-2018 Apex.AI, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -124,7 +124,9 @@ def main(argv=sys.argv[1:]):
         else:
             paths = os.environ['AMENT_PREFIX_PATH'].split(':')
         for path in paths:
-            base_cmd.extend(['-i"{}/include"'.format(path)])
+            include_folder = os.path.join(path, 'include')
+            if os.path.exists(include_folder):
+                base_cmd.extend(['-i"{}"'.format(include_folder)])
 
     # Add compiler definitions from arguments
     for definition in (args.compiler_definitions or []):

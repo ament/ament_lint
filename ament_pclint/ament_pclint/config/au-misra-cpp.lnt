@@ -137,12 +137,12 @@
     +e550
     // +elib(550)
     -append(550,[MISRA C++ Rule 0-1-4])
-    
+
     /* 551 - static variable not accessed */
     +e551
     // +elib(551)
     -append(551,[MISRA C++ Rule 0-1-4])
-    
+
     /* 552 - external variable not accessed */
     +e552
     // +elib(552)
@@ -154,17 +154,17 @@
     +e751
     // +elib(751)
     -append(751,[MISRA C++ Rule 0-1-5])
-    
+
     /* 753 - local tag not referenced */
     +e753
     // +elib(753)
     -append(753,[MISRA C++ Rule 0-1-5])
-    
+
     /* 756 - global typedef not referenced */
     +e756
     // +elib(756)
     -append(756,[MISRA C++ Rule 0-1-5])
-    
+
     /* 758 - global tag not referenced */
     +e758
     // +elib(758)
@@ -207,27 +207,27 @@
     +e587
     // +elib(587)
     -append(587,[MISRA C++ Rule 0-1-9])
-    
+
     /* 685 - relational operator always evaluates to true/false */
     +e685
     // +elib(685)
     -append(685,[MISRA C++ Rule 0-1-9])
-    
+
     /* 774 - boolean condition always evaluates to true/false */
     +e774
     // +elib(774)
     -append(774,[MISRA C++ Rule 0-1-9])
-    
+
     /* 838 - previous value assigned to symbol not used */
     +e838
     // +elib(838)
     -append(838,[MISRA C++ Rule 0-1-9])
-    
+
     /* 944 - left/right operand always evaluates to true/false */
     +e944
     // +elib(944)
     -append(944,[MISRA C++ Rule 0-1-9])
-    
+
     /* 948 - operator always evaluates to true/false */
     +e948
     // +elib(948)
@@ -239,17 +239,17 @@
     +e528
     // +elib(528)
     -append(528,[MISRA C++ Rule 0-1-10])
-    
+
     /* 714 - external symbol was defined but not referenced */
     +e714
     // +elib(714)
     -append(714,[MISRA C++ Rule 0-1-10])
-    
+
     /*1714 - member function not referenced */
     +e1714
     // +elib(1714)
     -append(1714,[MISRA C++ Rule 0-1-10])
-    
+
     /* default constructor not referenced */
     +e1914
     // +elib(1914)
@@ -320,7 +320,7 @@
     +e584
     // +elib(584)
     -append(584,[MISRA C++ Rule 2-3-1])
-    
+
     /* 739 - trigraph sequence in string literal */
     +e739
     // +elib(739)
@@ -365,17 +365,17 @@
     +e578
     // +elib(578)
     -append(578,[MISRA C++ Rule 2-10-2])
-    
+
     /* 1411 - member with different signature hides virtual member */
     +e1411
     // +elib(1411)
     -append(1411,[MISRA C++ Rule 2-10-2])
-    
+
     /* 1511 - member hides non-virtual member */
     +e1511
     // +elib(1511)
     -append(1511,[MISRA C++ Rule 2-10-2])
-    
+
     /* 1516 - data member hides inherited member */
     +e1516
     // +elib(1516)
@@ -466,7 +466,7 @@
     +e18
     // +elib(18)
     -append(18,[MISRA C++ Rule 3-2-1])
-    
+
     /* 31 - redefinition of symbol */
     +e31
     // +elib(31)
@@ -478,7 +478,7 @@
     +e15
     // +elib(15)
     -append(15,[MISRA C++ Rule 3-2-2])
-    
+
     /* 31 - redefinition of symbol */
     +e31
     // +elib(31)
@@ -497,7 +497,7 @@
     +e15
     // +elib(15)
     -append(15,[MISRA C++ Rule 3-2-4])
-    
+
     /* 31 - redefinition of symbol */
     +e31
     // +elib(31)
@@ -509,7 +509,7 @@
     +e759
     // +elib(759)
     -append(759,[MISRA C++ Rule 3-3-1])
-    
+
     /* 765 - external symbol could be made static */
     +e765
     // +elib(765)
@@ -622,7 +622,7 @@
     +e9114
     // +elib(9114)
     -append(9114,[MISRA C++ Rule 5-0-3])
-    
+
     /* 9116 - implicit conversion of floating point cvalue expression */
     +e9116
     // +elib(9116)
@@ -641,7 +641,7 @@
     +e9115
     // +elib(9115)
     -append(9115,[MISRA C++ Rule 5-0-5])
-    
+
     /* 9118 - implicit conversion from floating point to integer type */
     +e9118
     // +elib(9118)
@@ -653,7 +653,7 @@
     +e9119
     // +elib(9119)
     -append(9119,[MISRA C++ Rule 5-0-6])
-    
+
     /* 9120 - implicit conversion of floating point to smaller type */
     +e9120
     // +elib(9120)
@@ -677,7 +677,7 @@
     +e9123
     // +elib(9123)
     -append(9123,[MISRA C++ Rule 5-0-8])
-    
+
     /* 9124 - cast of floating point cvalue expression to larger type */
     +e9124
     // +elib(9124)
@@ -728,7 +728,7 @@
     +e947
     // +elib(947)
     -append(947,[MISRA C++ Rule 5-0-15])
-    
+
     /* 9016 - performing pointer arithmetic via addition/subtraction */
     +e9016
     // +elib(9016)
@@ -740,22 +740,22 @@
     +e415
     // +elib(415)
     -append(415,[MISRA C++ Rule 5-0-16])
-    
+
     /* 416 - likely creating out-of-bounds pointer */
     +e416
     // +elib(416)
     -append(416,[MISRA C++ Rule 5-0-16])
-    
+
     /* 661 - potential out of bounds pointer access */
     +e661
     // +elib(661)
     -append(661,[MISRA C++ Rule 5-0-16])
-    
+
     /* 662 - possibly creating out-of-bounds pointer */
     +e662
     // +elib(662)
     -append(662,[MISRA C++ Rule 5-0-16])
-    
+
 /* Rule 5-0-17    (req) *********************************/
 
     /* 947 - pointer subtraction */
@@ -769,7 +769,7 @@
     +e946
     // +elib(946)
     -append(946,[MISRA C++ Rule 5-0-18])
-    
+
 /* Rule 5-0-19    (req) *********************************/
 
     /* 9025 - more than two levels of pointer indirection */
@@ -805,7 +805,7 @@
     +e1774
     // +elib(1774)
     -append(1774,[MISRA C++ Rule 5-2-2])
-    
+
     /* 1939 - casting from base class to derived class */
     +e1939
     // +elib(1939)
@@ -838,25 +838,25 @@
     +e611
     // +elib(611)
     -append(611,[MISRA C++ Rule 5-2-6])
-    
+
 /* Rule 5-2-7  (req) *********************************/
 
     +e9176
     // +elib(9176)
     -append(9176,[MISRA C++ Rule 5-2-7])
-    
+
 /* Rule 5-2-8  (adv) *********************************/
 
     /* 923 - explicit cast from 'Type' to 'Type' (pointer to non-pointer) */
     +e923
     // +elib(923)
     -append(923,[MISRA C++ Rule 5-2-8])
-    
+
     /* 925 - explicit cast from 'Type' to 'Type' (pointer to void pointer) */
     +e925
     // +elib(925)
     -append(925,[MISRA C++ Rule 5-2-8])
-    
+
 /* Rule 5-2-9  (adv) *********************************/
 
     /* 9091 - cast from pointer to integer type */
@@ -921,7 +921,7 @@
     +e9136
     // +elib(9136)
     -append(9136,[MISRA C++ Rule 5-8-1])
-    
+
 /* Rule 5-14-1   (req) *********************************/
 
     /* side effects on right hand of logical operator */
@@ -953,7 +953,7 @@
     +e720
     // +elib(720)
     -append(720,[MISRA C++ Rule 6-2-1])
-    
+
     /* 820 - boolean test of parenthesized assignment */
     +e820
     // +elib(820)
@@ -1016,7 +1016,7 @@
 
 /* Rule 6-4-5  (req) *********************************/
 
-    /* 9090 - switch case lacks unconditional break or throw */  
+    /* 9090 - switch case lacks unconditional break or throw */
     +e9090
     // +elib(9090)
     -append(9090,[MISRA C++ Rule 6-4-5])
@@ -1027,6 +1027,11 @@
     +e744
     // +elib(744)
     -append(744,[MISRA C++ Rule 6-4-6])
+    
+    /* 787 - enum constant not used within switch */
+    +e787
+    // +elib(787)
+    -append(787,[MISRA C++ Rule 6-4-6])
     
     /* 9139 - case label follows default in switch statement */
     +e9139
@@ -1088,7 +1093,7 @@
     +e107
     // +elib(107)
     -append(107,[MISRA C++ Rule 6-6-2])
-    
+
     /* 9064 - goto references earlier label */
     +e9064
     // +elib(9064)
@@ -1208,14 +1213,14 @@
     +e789
     // +elib(789)
     -append(789,[MISRA C++ Rule 7-5-2])
-    
+
 /* Rule 7-5-3  (req) *********************************/
 
     /* 1780 - returning address of reference to a const parameter */
     +e1780
     // +elib(1780)
     -append(1780,[MISRA C++ Rule 7-5-3])
-    
+
     /* 1940 - address of non-const reference parameter transferred outside of
               function */
     +e1940
@@ -1284,7 +1289,7 @@
     +e530
     // +elib(530)
     -append(530,[MISRA C++ Rule 8-5-1])
-    
+
 /* Rule 8-5-2  (req) *********************************/
 
     /* 940 - omitted braces within initializer */
@@ -1384,11 +1389,11 @@
     /* not currently supported */
 
 /* Rule 10-3-2  (req) *********************************/
-
+    // Disabled by #1411
     /* 1909 - virtual' assumed */
-    +e1909
+    // +e1909
     // +elib(1909)
-    -append(1909,[MISRA C++ Rule 10-3-2])
+    // -append(1909,[MISRA C++ Rule 10-3-2])
 
 /* Rule 10-3-3  (req) *********************************/
 
@@ -1484,7 +1489,7 @@
     +e1576
     // +elib(1576)
     -append(1576,[MISRA C++ Rule 14-7-3])
-    
+
     /* 1577 - partial or explicit specialization is not in the same file as
               specialized class template */
     +e1577
@@ -1569,7 +1574,10 @@
 
 /* Rule 15-3-6  (req) *********************************/
 
-    /* not currently supported */
+    /* 1775 - catch block does not catch any declared exceptions */
+    +e1775
+    // +elib(1775)
+    -append(1775,[MISRA C++ Rule 15-3-6])
 
 /* Rule 15-3-7  (req) *********************************/
 
@@ -1620,7 +1628,7 @@
     +e9158
     // +elib(9158)
     -append(9158,[MISRA C++ Rule 16-0-2])
-    
+
     /* 9159 - #undef used within block scope */
     +e9159
     // +elib(9159)
@@ -1757,7 +1765,7 @@
     /* 9071 - defined macro is reserved to the compiler */
     +e9071
     // +elib(9071)
-    -append(9071,[MISRA C++ Rule 17-0-2])
+    -append(9071,[MISRA C++ Rule 17-0-1])
 
 /* Rule 17-0-2  (req) *********************************/
 

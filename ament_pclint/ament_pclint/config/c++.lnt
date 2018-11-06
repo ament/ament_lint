@@ -12,3 +12,4 @@
 ../deprecate.lnt
 -std=c++14
 -e1731  // public virtual function symbol
+-e1790  // public base 'rclcpp::Node' of 'my_cool_pkg::MyCoolPkg' has no non-destructor virtual functions

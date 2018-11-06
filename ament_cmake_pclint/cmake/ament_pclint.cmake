@@ -1,5 +1,5 @@
 # Copyright 2014-2015 Open Source Robotics Foundation, Inc.
-# Copyright 2017 Apex.AI, Inc.
+# Copyright 2017-2018 Apex.AI, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ function(ament_pclint)
       OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_pclint/${ARG_TESTNAME}.txt"
       RESULT_FILE "${result_file}"
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    )
+      TIMEOUT 120)
     set_tests_properties(
       "${ARG_TESTNAME}"
       PROPERTIES

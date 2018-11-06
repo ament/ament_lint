@@ -16,10 +16,14 @@
 #define __ORDER_LITTLE_ENDIAN__ 1234
 #define __SIZE_MAX__ 0xffffffffffffffffUL
 #define __WCHAR_MAX__ 0x7fffffff
+//lint -e621
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 1
+//lint -e621
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 1
+//lint -e621
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1
 #define __DBL_DENORM_MIN__ ((double)4.94065645841246544177e-324L)
+//lint -e621
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 1
 #define __GCC_ATOMIC_CHAR_LOCK_FREE 2
 #define __GCC_IEC_559 2

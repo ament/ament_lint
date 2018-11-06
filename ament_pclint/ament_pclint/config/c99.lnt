@@ -12,4 +12,5 @@
 -e801  // goto statement used
 -emacro(*, INVALID_SOCKET)
 ../au-misra3.lnt
+../au-misra3-amd1.lnt
 ../deprecate.lnt
