@@ -12,7 +12,7 @@ setup(
     zip_safe=False,
     author='D. Hood',
     author_email='dhood@osrfoundation.org',
-    maintainer='Steven! Ragnarök',
+    maintainer='Steven! Ragnarok',
     maintainer_email='steven@osrfoundation.org',
     url='https://github.com/ament/ament_lint',
     download_url='https://github.com/ament/ament_lint/releases',
