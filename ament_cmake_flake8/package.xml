@@ -7,8 +7,9 @@
     The CMake API for ament_flake8 to check code syntax and style conventions
     with flake8.
   </description>
-  <maintainer email="dhood@osrfoundation.org">D. Hood</maintainer>
+  <maintainer email="steven@osrfoundation.org">Steven! Ragnarök</maintainer>
   <license>Apache License 2.0</license>
+  <author email="dhood@osrfoundation.org">D. Hood</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>
