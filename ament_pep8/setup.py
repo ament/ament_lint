@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='ament_pep8',
-    version='0.6.1',
+    version='0.6.2',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
     package_data={'': [
