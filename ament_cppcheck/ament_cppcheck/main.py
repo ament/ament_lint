@@ -40,6 +40,11 @@ def main(argv=sys.argv[1:]):
              'files ending in one of %s.' %
              ', '.join(["'.%s'" % e for e in extensions]))
     parser.add_argument(
+        '--include_dirs',
+        nargs='*',
+        help="Include directories for C/C++ files being checked."
+              "Each directory is passed to cppcheck as '-I <include_dir>'")
+    parser.add_argument(
         '--language',
         help="Passed to cppcheck as '--language=<language>', and it forces cppcheck to consider "
              "as the given language ('c' or 'c++').")
@@ -86,6 +91,9 @@ def main(argv=sys.argv[1:]):
            '--xml-version=2']
     if args.language:
         cmd.extend(['--language={0}'.format(args.language)])
+    if len(args.include_dirs) > 0:
+        for include_dir in args.include_dirs:
+            cmd.extend(['-I {0}'.format(include_dir)])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)

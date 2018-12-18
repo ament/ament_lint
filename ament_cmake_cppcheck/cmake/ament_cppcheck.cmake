@@ -19,13 +19,15 @@
 # :type TESTNAME: string
 # :param LANGUAGE: the language argument for cppcheck, either 'c' or 'c++'
 # :type LANGUAGE: string
+# :param INCLUDE_DIRS: an optional list of include paths for cppcheck
+# :type INCLUDE_DIRS: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "LANGUAGE;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "INCLUDE_DIRS;LANGUAGE;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -38,6 +40,9 @@ function(ament_cppcheck)
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_cppcheck_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+  if(ARG_INCLUDE_DIRS)
+    list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
+  endif()
   if(ARG_LANGUAGE)
     list(APPEND cmd "--language" "${ARG_LANGUAGE}")
   endif()
