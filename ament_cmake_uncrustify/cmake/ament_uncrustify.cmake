@@ -38,7 +38,7 @@ function(ament_uncrustify)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_uncrustify_BIN}" "--xunit-file" "${result_file}")
-  if(ARG_MAX_LINE_LENGTH)
+  if(DEFINED ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
