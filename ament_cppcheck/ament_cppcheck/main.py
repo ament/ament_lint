@@ -91,7 +91,7 @@ def main(argv=sys.argv[1:]):
            '--xml-version=2']
     if args.language:
         cmd.extend(['--language={0}'.format(args.language)])
-    if len(args.include_dirs) > 0:
+    if args.include_dirs:
         for include_dir in args.include_dirs:
             cmd.extend(['-I', '{0}'.format(include_dir)])
     if jobs:
