@@ -25,13 +25,7 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
 if(_source_files)
   message(STATUS "Added test 'cppcheck' to perform static code analysis on C / C++ code")
   # Get include paths for sources
-  set(_include_dirs "")
-  foreach(_src ${_source_files})
-    get_filename_component(_src_dir ${_src} DIRECTORY)
-    # Get parent directory since includes typically have the pattern 'package/source.hpp'
-    get_filename_component(_parent_dir ${_src_dir} DIRECTORY)
-    list(APPEND _include_dirs "${_parent_dir}")
-  endforeach()
-  list(REMOVE_DUPLICATES _include_dirs)
+  # This command returns the list of directoriess given so far to the include_directories command
+  get_property(_include_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
   ament_cppcheck(INCLUDE_DIRS "${_include_dirs}")
 endif()
