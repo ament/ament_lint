@@ -25,7 +25,9 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
 if(_source_files)
   message(STATUS "Added test 'cppcheck' to perform static code analysis on C / C++ code")
   # Get include paths for sources
-  # This command returns the list of directoriess given so far to the include_directories command
-  get_property(_include_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+  # Returns the directories given so far to the include_directories command
+  get_property(_include_dirs
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    PROPERTY INCLUDE_DIRECTORIES)
   ament_cppcheck(INCLUDE_DIRS "${_include_dirs}")
 endif()
