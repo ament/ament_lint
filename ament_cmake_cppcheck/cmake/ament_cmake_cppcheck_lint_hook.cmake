@@ -24,10 +24,19 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
 )
 if(_source_files)
   message(STATUS "Added test 'cppcheck' to perform static code analysis on C / C++ code")
-  # Get include paths for sources
-  # Returns the directories given so far to the include_directories command
-  get_property(_include_dirs
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    PROPERTY INCLUDE_DIRECTORIES)
-  ament_cppcheck(INCLUDE_DIRS "${_include_dirs}")
+
+  # Get include paths for added targets
+  set(_all_include_dirs "")
+  # BUILDSYSTEM_TARGETS only supported in cmake >= 3.7
+  if(CMAKE_VERSION VERSION_EQUAL "3.7.0" OR CMAKE_VERSION VERSION_GREATER "3.7.0")
+    foreach(target ${BUILDSYSTEM_TARGETS})
+      get_property(_include_dirs
+        TARGET ${target}
+        PROPERTY INCLUDE_DIRECTORIES
+      )
+      list(APPEND _all_include_dirs "${_include_dirs}")
+    endforeach()
+  endif()
+
+  ament_cppcheck(INCLUDE_DIRS "${_all_include_dirs}")
 endif()
