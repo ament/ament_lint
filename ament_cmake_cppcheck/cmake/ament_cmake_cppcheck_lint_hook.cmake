@@ -27,7 +27,7 @@ if(_source_files)
 
   # Get include paths for added targets
   set(_all_include_dirs "")
-  # BUILDSYSTEM_TARGETS only supported in cmake >= 3.7
+  # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
   if(CMAKE_VERSION VERSION_EQUAL "3.7.0" OR CMAKE_VERSION VERSION_GREATER "3.7.0")
     foreach(target ${BUILDSYSTEM_TARGETS})
       get_property(_include_dirs
