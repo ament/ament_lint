@@ -28,15 +28,17 @@ if(_source_files)
   # Get include paths for added targets
   set(_all_include_dirs "")
   # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
-  if(CMAKE_VERSION VERSION_EQUAL "3.7.0" OR CMAKE_VERSION VERSION_GREATER "3.7.0")
-    foreach(target ${BUILDSYSTEM_TARGETS})
+  if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
+    get_directory_property(_build_targets DIRECTORY ${CMAKE_SOURCE_DIR} BUILDSYSTEM_TARGETS)
+    foreach(target ${_build_targets})
       get_property(_include_dirs
         TARGET ${target}
         PROPERTY INCLUDE_DIRECTORIES
       )
-      list(APPEND _all_include_dirs "${_include_dirs}")
+      list(APPEND _all_include_dirs ${_include_dirs})
     endforeach()
+    list(REMOVE_DUPLICATES _all_include_dirs)
   endif()
 
-  ament_cppcheck(INCLUDE_DIRS "${_all_include_dirs}")
+  ament_cppcheck(INCLUDE_DIRS ${_all_include_dirs})
 endif()
