@@ -118,12 +118,6 @@ def main(argv=sys.argv[1:]):
     for error in root.find('errors'):
         location = error.find('location')
         filename = location.get('file')
-
-        # Ignore errors that are not from one of the original input files
-        # This can occur when including files from outside the package being tested
-        if not filename in report:
-            continue
-
         data = {
             'line': int(location.get('line')),
             'id': error.get('id'),

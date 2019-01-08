@@ -30,12 +30,22 @@ if(_source_files)
   # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
   if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
     get_directory_property(_build_targets DIRECTORY ${CMAKE_SOURCE_DIR} BUILDSYSTEM_TARGETS)
-    foreach(target ${_build_targets})
+    foreach(_target ${_build_targets})
       get_property(_include_dirs
-        TARGET ${target}
+        TARGET ${_target}
         PROPERTY INCLUDE_DIRECTORIES
       )
-      list(APPEND _all_include_dirs ${_include_dirs})
+
+      # Only append include directories that are from the package being tested
+      # This accomplishes two things:
+      #     1. Reduces execution time (less include directories to search)
+      #     2. cppcheck will not check for errors in external packages
+      foreach(_include_dir ${_include_dirs})
+        string(REGEX MATCH "^${CMAKE_SOURCE_DIR}.*" _is_match ${_include_dir})
+        if(_is_match)
+          list(APPEND _all_include_dirs ${_include_dir})
+        endif()
+      endforeach()
     endforeach()
     list(REMOVE_DUPLICATES _all_include_dirs)
   endif()
