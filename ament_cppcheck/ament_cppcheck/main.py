@@ -113,8 +113,6 @@ def main(argv=sys.argv[1:]):
 
     # output errors
     report = {}
-    for filename in files:
-        report[filename] = []
     for error in root.find('errors'):
         location = error.find('location')
         filename = location.get('file')
@@ -124,7 +122,10 @@ def main(argv=sys.argv[1:]):
             'severity': error.get('severity'),
             'msg': error.get('verbose'),
         }
-        report[filename].append(data)
+
+        file_report = report.get(filename, [])
+        file_report.append(data)
+        report.setdefault(filename, file_report)
 
         data = dict(data)
         data['filename'] = filename
