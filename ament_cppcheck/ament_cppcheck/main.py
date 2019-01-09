@@ -123,9 +123,8 @@ def main(argv=sys.argv[1:]):
             'msg': error.get('verbose'),
         }
 
-        file_report = report.get(filename, [])
+        file_report = report.setdefault(filename, [])
         file_report.append(data)
-        report.setdefault(filename, file_report)
 
         data = dict(data)
         data['filename'] = filename
