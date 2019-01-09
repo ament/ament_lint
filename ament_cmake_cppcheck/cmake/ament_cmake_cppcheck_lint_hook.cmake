@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(ament_cmake_core REQUIRED)
+
 file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
   "*.c"
   "*.cc"
