@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+from collections import defaultdict
 import multiprocessing
 import os
 from shutil import which
@@ -39,6 +40,11 @@ def main(argv=sys.argv[1:]):
         help='Files and/or directories to be checked. Directories are searched recursively for '
              'files ending in one of %s.' %
              ', '.join(["'.%s'" % e for e in extensions]))
+    parser.add_argument(
+        '--include_dirs',
+        nargs='*',
+        help="Include directories for C/C++ files being checked."
+             "Each directory is passed to cppcheck as '-I <include_dir>'")
     parser.add_argument(
         '--language',
         help="Passed to cppcheck as '--language=<language>', and it forces cppcheck to consider "
@@ -86,6 +92,8 @@ def main(argv=sys.argv[1:]):
            '--xml-version=2']
     if args.language:
         cmd.extend(['--language={0}'.format(args.language)])
+    for include_dir in (args.include_dirs or []):
+        cmd.extend(['-I', include_dir])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
@@ -105,9 +113,7 @@ def main(argv=sys.argv[1:]):
         return 1
 
     # output errors
-    report = {}
-    for filename in files:
-        report[filename] = []
+    report = defaultdict(list)
     for error in root.find('errors'):
         location = error.find('location')
         filename = location.get('file')

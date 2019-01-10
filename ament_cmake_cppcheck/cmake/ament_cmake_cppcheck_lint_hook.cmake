@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(ament_cmake_core REQUIRED)
+
 file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
   "*.c"
   "*.cc"
@@ -24,5 +26,30 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
 )
 if(_source_files)
   message(STATUS "Added test 'cppcheck' to perform static code analysis on C / C++ code")
-  ament_cppcheck()
+
+  # Get include paths for added targets
+  set(_all_include_dirs "")
+  # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
+  if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
+    get_directory_property(_build_targets DIRECTORY ${CMAKE_SOURCE_DIR} BUILDSYSTEM_TARGETS)
+    foreach(_target ${_build_targets})
+      get_property(_include_dirs
+        TARGET ${_target}
+        PROPERTY INCLUDE_DIRECTORIES
+      )
+
+      # Only append include directories that are from the package being tested
+      # This accomplishes two things:
+      #     1. Reduces execution time (less include directories to search)
+      #     2. cppcheck will not check for errors in external packages
+      foreach(_include_dir ${_include_dirs})
+        string(REGEX MATCH "^${CMAKE_SOURCE_DIR}.*" _is_match ${_include_dir})
+        if(_is_match)
+          list_append_unique(_all_include_dirs ${_include_dir})
+        endif()
+      endforeach()
+    endforeach()
+  endif()
+
+  ament_cppcheck(INCLUDE_DIRS ${_all_include_dirs})
 endif()
