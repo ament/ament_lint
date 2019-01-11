@@ -33,24 +33,12 @@ if(_source_files)
   if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
     get_directory_property(_build_targets DIRECTORY ${CMAKE_SOURCE_DIR} BUILDSYSTEM_TARGETS)
     foreach(_target ${_build_targets})
-      # Check if INCLUDE_DIRECTORIES is defined first in case the target is an INTERFACE
-      get_property(_include_dirs_defined
-        TARGET ${_target}
-        PROPERTY INCLUDE_DIRECTORIES
-        DEFINED
-      )
-
-      if(_include_dirs_defined)
-        get_property(_include_dirs
-          TARGET ${_target}
-          PROPERTY INCLUDE_DIRECTORIES
-        )
+      # Include directories property is different for INTERFACE libraries
+      get_target_property(_target_type ${_target} TYPE)
+      if(${_target_type} STREQUAL "INTERFACE_LIBRARY")
+        get_target_property(_include_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
       else()
-        # Target might be an interface
-        get_property(_include_dirs
-          TARGET ${_target}
-          PROPERTY INTERFACE_INCLUDE_DIRECTORIES
-        )
+        get_target_property(_include_dirs ${_target} INCLUDE_DIRECTORIES)
       endif()
 
       # Only append include directories that are from the package being tested
