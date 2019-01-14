@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='ament_cpplint',
-    version='0.6.2',
+    version='0.6.3',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
     zip_safe=True,
