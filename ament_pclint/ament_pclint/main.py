@@ -281,9 +281,9 @@ def get_lnt_file(filename, args_language):
 
     # Allow user to force cpp files to be analyzed as c files.
     # and c files to be analyzed as cpp files.
-    if args_language is 'c':
+    if args_language == 'c':
         pclint_config_file = cc_config
-    elif args_language is 'cpp':
+    elif args_language == 'cpp':
         pclint_config_file = cpp_config
     return pclint_config_file
 
