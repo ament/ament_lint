@@ -136,7 +136,6 @@ def get_flake8_style_guide(argv):
     application.register_plugin_options()
     application.parse_configuration_and_cli(argv)
     application.make_formatter()
-    application.make_notifier()
     application.make_guide()
     application.make_file_checker_manager()
     return StyleGuide(application)
