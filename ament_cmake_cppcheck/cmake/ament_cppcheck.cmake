@@ -15,6 +15,10 @@
 #
 # Add a test to perform static code analysis with cppcheck.
 #
+# The include dirs for cppcheck to consider can either be set by the function
+# parameter 'INCLUDE_DIRS` or by a global variable called
+# 'ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS'.
+#
 # :param TESTNAME: the name of the test, default: "cppcheck"
 # :type TESTNAME: string
 # :param LANGUAGE: the language argument for cppcheck, either 'c' or 'c++'
