@@ -29,6 +29,10 @@ if(_source_files)
 
   # Get include paths for added targets
   set(_all_include_dirs "")
+  if(DEFINED ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS)
+    list(APPEND _all_include_dirs ${ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS})
+  endif()
+
   # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
   if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
     get_directory_property(_build_targets DIRECTORY ${CMAKE_SOURCE_DIR} BUILDSYSTEM_TARGETS)
@@ -59,5 +63,6 @@ if(_source_files)
     endforeach()
   endif()
 
+  message(STATUS "Configured cppcheck include dirs: ${_all_include_dirs}")
   ament_cppcheck(INCLUDE_DIRS ${_all_include_dirs})
 endif()
