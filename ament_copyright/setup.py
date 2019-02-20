@@ -36,6 +36,7 @@ The ability to check sources file for copyright and license information.""",
             'apache2 = ament_copyright.licenses:apache2',
             'bsd2 = ament_copyright.licenses:bsd2',
             'mit = ament_copyright.licenses:mit',
+            'gplv3 = ament_copyright.licenses:gplv3',
         ],
         'console_scripts': [
             'ament_copyright = ament_copyright.main:main',
