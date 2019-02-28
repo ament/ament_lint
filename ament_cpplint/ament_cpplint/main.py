@@ -226,7 +226,7 @@ def get_file_groups(paths, extensions):
 def append_file_to_group(groups, path):
     path = os.path.abspath(path)
 
-    root = None
+    root = ''
 
     # try to determine root from path
     base_path = os.path.dirname(path)
