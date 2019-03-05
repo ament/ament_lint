@@ -28,15 +28,13 @@ function(ament_clang_format)
     set(ARG_TESTNAME "clang_format")
   endif()
 
-  if(NOT PYTHON_EXECUTABLE)
-    message(FATAL_ERROR "ament_clang_format() variable 'PYTHON_EXECUTABLE' must not be empty")
-  endif()
+  find_program(ament_clang_format_BIN NAMES "ament_clang_format")
   if(NOT ament_clang_format_BIN)
     message(FATAL_ERROR "ament_clang_format() variable 'ament_clang_format_BIN' must not be empty")
   endif()
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
-  set(cmd "${PYTHON_EXECUTABLE}" "${ament_clang_format_BIN}" "--xunit-file" "${result_file}")
+  set(cmd "${ament_clang_format_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_clang_format")
