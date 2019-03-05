@@ -16,7 +16,7 @@
 
 find_package(ament_cmake_test QUIET REQUIRED)
 
-include("${ament_cmake_clang_format_DIR}/ament_cmake_clang_format.cmake")
+include("${ament_cmake_clang_format_DIR}/ament_clang_format.cmake")
 
 ament_register_extension("ament_lint_auto" "ament_cmake_clang_format"
 "ament_cmake_clang_format_lint_hook.cmake")
