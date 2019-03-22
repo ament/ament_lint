@@ -113,7 +113,9 @@ def main(argv=sys.argv[1:]):
         return 1
 
     # output errors
-    report = defaultdict(list)
+    report = {}
+    for filename in files:
+        report[filename] = []
     for error in root.find('errors'):
         location = error.find('location')
         filename = location.get('file')
