@@ -91,7 +91,7 @@ def main(argv=sys.argv[1:]):
     # invoke clang_format
     with open(args.config_file, 'r') as h:
         content = h.read()
-    data = yaml.load(content)
+    data = yaml.safe_load(content)
     style = yaml.dump(data, default_flow_style=True, width=float('inf'))
     cmd = [clang_format_bin,
            '-output-replacements-xml',
