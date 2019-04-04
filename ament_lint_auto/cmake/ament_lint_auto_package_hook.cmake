@@ -12,4 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ament_execute_extensions(ament_lint_auto)
+# Use the AMENT_LINT_AUTO_EXCLUDE variable to exclude linter packages from
+# running using the ament_lint_auto hook.
+# It is still possible, however, to use the linter by calling it explicitly.
+#
+# :variable AMENT_LINT_AUTO_EXCLUDE: List of strings (package names)
+
+ament_execute_extensions(ament_lint_auto EXCLUDE "${AMENT_LINT_AUTO_EXCLUDE}")
