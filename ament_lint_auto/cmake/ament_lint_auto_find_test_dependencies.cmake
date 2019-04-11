@@ -21,9 +21,10 @@
 # @public
 #
 macro(ament_lint_auto_find_test_dependencies)
-  if(ARGN)
+  set(_ARGN "${ARGN}")
+  if(_ARGN)
     message(FATAL_ERROR "ament_lint_auto_find_test_dependencies() called with "
-      "unused arguments: ${ARGN}")
+      "unused arguments: ${_ARGN}")
   endif()
 
   if(NOT _AMENT_PACKAGE_NAME)
