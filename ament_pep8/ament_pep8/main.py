@@ -74,7 +74,7 @@ def main(argv=sys.argv[1:]):
     # print summary
     print('')
     if not report.total_errors:
-        print('No errors or warnings')
+        print('No problems found')
         rc = 0
     else:
         errors = report.get_count('E')
@@ -163,7 +163,7 @@ def get_xunit_content(report, testname):
         xml += """  <testcase
     name="pep8"
     classname="%(testname)s"
-    status="No errors or warnings"/>
+    status="No problems found"/>
 """ % data
 
     # output list of checked files

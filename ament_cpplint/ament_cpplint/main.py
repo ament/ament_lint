@@ -175,7 +175,7 @@ def main(argv=sys.argv[1:]):
         print('Total errors found: %d' % _cpplint_state.error_count,
               file=sys.stderr)
     else:
-        print('No errors found')
+        print('No problems found')
 
     # generate xunit file
     if args.xunit_file:
@@ -315,7 +315,7 @@ def get_xunit_content(report, testname, elapsed):
             xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
-    status="No errors"/>
+    status="No problems found"/>
 """ % data
 
     # output list of checked files

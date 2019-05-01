@@ -124,7 +124,7 @@ def main(argv=sys.argv[1:]):
     # output summary
     error_count = sum(1 if r[1] else 0 for r in report)
     if not error_count:
-        print('No errors')
+        print('No problems found')
         rc = 0
     else:
         print('%d files are invalid' % error_count, file=sys.stderr)
@@ -252,7 +252,7 @@ def get_xunit_content(report, testname, elapsed):
             xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
-    status="No errors"/>
+    status="No problems found"/>
 """ % data
 
     # output list of checked files

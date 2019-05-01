@@ -92,7 +92,7 @@ def main(argv=sys.argv[1:]):
     # print summary
     print('')
     if not cmakelint._lint_state.errors:
-        print('No errors')
+        print('No problems found')
         rc = 0
     else:
         print('%d errors' % cmakelint._lint_state.errors)
@@ -193,7 +193,7 @@ def get_xunit_content(report, testname, elapsed):
             xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
-    status="No errors"/>
+    status="No problems found"/>
 """ % data
 
     # output list of checked files

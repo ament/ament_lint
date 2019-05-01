@@ -188,7 +188,7 @@ def main(argv=sys.argv[1:]):
     # output summary
     error_count = len([r for r in report if not r[1]])
     if not error_count:
-        print('No errors, checked %d files' % len(report))
+        print('No problems found, checked %d files' % len(report))
         rc = 0
     else:
         print('%d errors, checked %d files' % (error_count, len(report)), file=sys.stderr)
