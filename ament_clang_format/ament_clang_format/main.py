@@ -209,7 +209,7 @@ def main(argv=sys.argv[1:]):
     file_count = sum(1 if report[k] else 0 for k in report.keys())
     replacement_count = sum(len(r) for r in report.values())
     if not file_count:
-        print('No errors')
+        print('No problems found')
         rc = 0
     else:
         print('%d files with %d code style divergences' %
@@ -348,7 +348,7 @@ def get_xunit_content(report, testname, elapsed):
             xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
-    status="No errors"/>
+    status="No problems found"/>
 """ % data
 
     # output list of checked files

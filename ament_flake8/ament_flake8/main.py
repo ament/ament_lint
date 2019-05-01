@@ -83,7 +83,7 @@ def main(argv=sys.argv[1:]):
     print('')
     print('%d files checked' % len(report.files))
     if not report.total_errors:
-        print('No errors or warnings')
+        print('No problems found')
         rc = 0
     else:
         print('%d errors' % (report.total_errors))
@@ -224,7 +224,7 @@ def get_xunit_content(report, testname, elapsed):
         xml += """  <testcase
     name="flake8"
     classname="%(testname)s"
-    status="No errors or warnings"/>
+    status="No problems found"/>
 """ % data
 
     # output list of checked files
