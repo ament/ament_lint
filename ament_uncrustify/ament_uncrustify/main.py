@@ -206,8 +206,8 @@ def main(argv=sys.argv[1:]):
         # compute diff
         for index, filename in enumerate(files):
             modified_filename = output_files[index]
-            with open(filename, 'r') as original_file:
-                with open(modified_filename, 'r') as modified_file:
+            with open(filename, 'r', encoding='utf-8') as original_file:
+                with open(modified_filename, 'r', encoding='utf-8') as modified_file:
                     diff_lines = list(difflib.unified_diff(
                         original_file.readlines(), modified_file.readlines(),
                         fromfile=filename, tofile=filename + suffix,

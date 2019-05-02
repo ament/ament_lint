@@ -49,7 +49,7 @@ class FileDescriptor:
     def read(self):
         if not self.exists:
             return
-        with open(self.path, 'r') as h:
+        with open(self.path, 'r', encoding='utf-8') as h:
             self.content = h.read()
 
     def parse(self):
