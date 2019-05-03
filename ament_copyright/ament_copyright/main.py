@@ -210,7 +210,7 @@ def main(argv=sys.argv[1:]):
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
-        with open(args.xunit_file, 'w') as f:
+        with open(args.xunit_file, 'w', encoding='utf-8') as f:
             f.write(xml)
 
     return rc
@@ -253,12 +253,12 @@ def add_missing_header(file_descriptors, name, license_, verbose):
 
         elif file_descriptor.filetype == CONTRIBUTING_FILETYPE:
             print('+', file_descriptor.path)
-            with open(file_descriptor.path, 'w') as h:
+            with open(file_descriptor.path, 'w', encoding='utf-8') as h:
                 h.write(license_.contributing_file)
 
         elif file_descriptor.filetype == LICENSE_FILETYPE:
             print('+', file_descriptor.path)
-            with open(file_descriptor.path, 'w') as h:
+            with open(file_descriptor.path, 'w', encoding='utf-8') as h:
                 h.write(license_.license_file)
 
         else:
@@ -318,7 +318,7 @@ def add_copyright_year(file_descriptors, new_years, verbose):
         # print(content[:index - 1])
         # print('>>>')
 
-        with open(file_descriptor.path, 'w') as h:
+        with open(file_descriptor.path, 'w', encoding='utf-8') as h:
             h.write(content)
 
 
@@ -384,7 +384,7 @@ def add_header(file_descriptor, header):
     # print(content[:index - 1])
     # print('>>>')
 
-    with open(file_descriptor.path, 'w') as h:
+    with open(file_descriptor.path, 'w', encoding='utf-8') as h:
         h.write(content)
 
 
