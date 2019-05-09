@@ -102,7 +102,7 @@ class SourceDescriptor(FileDescriptor):
         if not self.content:
             return
 
-        # skip over  coding and shebang lines
+        # skip over coding and shebang lines
         index = scan_past_coding_and_shebang_lines(self.content)
         index = scan_past_empty_lines(self.content, index)
 
@@ -225,6 +225,9 @@ def get_index_of_next_line(content, index):
 
 
 def is_comment_line(content, index):
+    # skip over optional BOM
+    if index == 0 and content[0] == '\ufeff':
+        index = 1
     return content[index] == '#' or content[index:index + 1] == '//'
 
 
@@ -235,6 +238,9 @@ def is_coding_line(content, index):
 
 
 def is_shebang_line(content, index):
+    # skip over optional BOM
+    if index == 0 and content[0] == '\ufeff':
+        index = 1
     return content[index:index + 2] == '#!'
 
 
@@ -242,6 +248,9 @@ def get_comment_block(content, index):
     # regex for matching the beginning of the first comment
     # check for doxygen comments (///) before regular comments (//)
     pattern = '^(#|///|//)'
+    # also accept BOM if present
+    if index == 0 and content[0] == '\ufeff':
+        pattern = pattern[0] + '\ufeff' + pattern[1:]
     regex = re.compile(pattern, re.MULTILINE)
 
     match = regex.search(content, index)
