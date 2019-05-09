@@ -136,6 +136,11 @@ def get_flake8_style_guide(argv):
     application.register_plugin_options()
     application.parse_configuration_and_cli(argv)
     application.make_formatter()
+    try:
+        # needed in older flake8 versions to populate the listener
+        application.make_notifier()
+    except AttributeError:
+        pass
     application.make_guide()
     application.make_file_checker_manager()
     return StyleGuide(application)
