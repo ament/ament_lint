@@ -5,7 +5,12 @@ ColumnLimit: 100
 AccessModifierOffset: -2
 DerivePointerAlignment: False
 PointerAlignment: Middle
-BreakBeforeBraces: Linux
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterStruct: true
+  AfterClass: true
+  AfterNamespace: true
 AlignAfterOpenBracket: AlwaysBreak
 ContinuationIndentWidth: 2
 ReflowComments: false
