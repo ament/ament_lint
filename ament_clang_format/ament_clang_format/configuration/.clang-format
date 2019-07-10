@@ -3,7 +3,7 @@ Language: Cpp
 BasedOnStyle: Google
 ColumnLimit: 100
 AccessModifierOffset: -2
-DerivePointerAlignment: False
+DerivePointerAlignment: false
 PointerAlignment: Middle
 BreakBeforeBraces: Custom
 BraceWrapping:
