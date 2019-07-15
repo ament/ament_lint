@@ -1,18 +1,19 @@
 ---
 Language: Cpp
 BasedOnStyle: Google
-ColumnLimit: 100
+
 AccessModifierOffset: -2
+AlignAfterOpenBracket: AlwaysBreak
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+BreakBeforeBraces: Custom
+ColumnLimit: 100
+ConstructorInitializerIndentWidth: 0
+ContinuationIndentWidth: 2
 DerivePointerAlignment: false
 PointerAlignment: Middle
-BreakBeforeBraces: Custom
-BraceWrapping:
-  AfterFunction: true
-  AfterStruct: true
-  AfterClass: true
-  AfterNamespace: true
-AlignAfterOpenBracket: AlwaysBreak
-ContinuationIndentWidth: 2
 ReflowComments: false
-ConstructorInitializerIndentWidth: 0
 ...
