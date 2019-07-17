@@ -31,6 +31,13 @@ def main(argv=sys.argv[1:]):
         os.path.dirname(__file__), 'configuration', '.clang-format')
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
+    custom_config_file = os.path.join(
+        os.getcwd(), '.clang-format')
+
+    if os.path.exists(custom_config_file):
+        print('Found custom clang-format file')
+        config_file = custom_config_file
+
     parser = argparse.ArgumentParser(
         description='Check code style using clang_format.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
