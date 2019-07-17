@@ -31,6 +31,13 @@ def main(argv=sys.argv[1:]):
         os.path.dirname(__file__), 'configuration', '.clang-tidy')
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
+    custom_config_file = os.path.join(
+        os.getcwd(), '.clang-tidy')
+
+    if os.path.exists(custom_config_file):
+        print('Found custom clang-tidy file')
+        config_file = custom_config_file
+
     parser = argparse.ArgumentParser(
         description='Check code style using clang_tidy.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -53,6 +60,17 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argument(
+        '--export-fixes',
+        help='Generate a DAT file of recorded fixes')
+    parser.add_argument(
+        '--explain-config',
+        action='store_true',
+        help='Explain the enabled checks')
+    parser.add_argument(
+        '--fix-errors',
+        action='store_true',
+        help='Fix the suggested changes')
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
@@ -78,28 +96,37 @@ def main(argv=sys.argv[1:]):
               ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
         return 1
 
-    report = []
-    
-    for filename in files:
-        report[filename] = []
-
-    xmls = output.split(b"<?xml version='1.0'?>")[1:]
     
     # invoke clang_tidy
     with open(args.config_file, 'r') as h:
         content = h.read()
     data = yaml.safe_load(content)
     style = yaml.dump(data, default_flow_style=True, width=float('inf'))
-    cmd = [clang_tidy_bin]
+    cmd = [clang_tidy_bin,
+           '--config=%s' % style]
+    if args.explain_config:
+        cmd.append('--explain-config')
+    if args.fix_errors:
+        cmd.append('--fix-errors')
+    if args.export_fixes:
+        cmd.append('--export-fixes')
+        cmd.append(args.export_fixes)
     cmd.extend(files)
     cmd.append('--')
     try:
-        output = subprocess.check_output(cmd)
+        output = subprocess.check_output(cmd).strip().decode()
+        print(output)
     except subprocess.CalledProcessError as e:
         print("The invocation of '%s' failed with error code %d: %s" %
               (os.path.basename(clang_tidy_bin), e.returncode, e),
               file=sys.stderr)
         return 1
+    '''    
+    report = {}
+    xmls = output.split(str("<?xml version='1.0'?>"))[1:]
+    for filename in files:
+        report[filename] = []
+
     
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
@@ -111,14 +138,14 @@ def main(argv=sys.argv[1:]):
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
         testname = '%s.%s' % (folder_name, file_name)
-
+    
         xml = get_xunit_content(report, testname, time.time() - start_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
-    
+    '''
     return
 
 
