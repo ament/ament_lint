@@ -19,6 +19,9 @@ import os
 import subprocess
 import sys
 import time
+import re
+import copy
+
 from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
@@ -30,13 +33,6 @@ def main(argv=sys.argv[1:]):
     config_file = os.path.join(
         os.path.dirname(__file__), 'configuration', '.clang-tidy')
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
-
-    custom_config_file = os.path.join(
-        os.getcwd(), '.clang-tidy')
-
-    if os.path.exists(custom_config_file):
-        print('Found custom clang-tidy file')
-        config_file = custom_config_file
 
     parser = argparse.ArgumentParser(
         description='Check code style using clang_tidy.',
@@ -96,7 +92,6 @@ def main(argv=sys.argv[1:]):
               ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
         return 1
 
-    
     # invoke clang_tidy
     with open(args.config_file, 'r') as h:
         content = h.read()
@@ -115,18 +110,48 @@ def main(argv=sys.argv[1:]):
     cmd.append('--')
     try:
         output = subprocess.check_output(cmd).strip().decode()
-        print(output)
     except subprocess.CalledProcessError as e:
         print("The invocation of '%s' failed with error code %d: %s" %
               (os.path.basename(clang_tidy_bin), e.returncode, e),
               file=sys.stderr)
         return 1
-    '''    
+    
+    # output errors
     report = {}
-    xmls = output.split(str("<?xml version='1.0'?>"))[1:]
+    complete_filenames = []
+    
     for filename in files:
         report[filename] = []
+        complete_filename = os.path.join(
+            os.getcwd(), filename)
+        complete_filenames.append(complete_filename)
+    
+    error_re = re.compile(r'\[.*?\]')
+    file_pairs = dict(zip(complete_filenames, files))
 
+    current_file = None
+    new_file = None
+    data = {}
+    
+    for line in output.splitlines():
+        #error found
+        if line[0] == '/' and error_re.search(line):
+            for filename in complete_filenames:
+                if filename in line:
+                    new_file = file_pairs[filename]
+                    if current_file is not None:
+                        report[current_file].append(copy.deepcopy(data))
+                        data.clear()
+                    current_file = new_file
+            error_msg = find_error_message(line)
+            line_num, col_num = find_line_and_col_num(line)
+            data['line_no'] = line_num
+            data['offset_in_line'] = col_num
+            data['error_msg'] = error_msg
+        else:
+            data['code_correct_rec'] = data.get('code_correct_rec', '') + line + '\n'
+    
+    report[current_file].append(copy.deepcopy(data))
     
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
@@ -138,14 +163,12 @@ def main(argv=sys.argv[1:]):
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
         testname = '%s.%s' % (folder_name, file_name)
-    
         xml = get_xunit_content(report, testname, time.time() - start_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
-    '''
     return
 
 
@@ -180,25 +203,14 @@ def get_files(paths, extensions):
             files.append(path)
     return [os.path.normpath(f) for f in files]
 
+def find_error_message(data):
+    return data[data.rfind(':')+2:]
 
-def find_index_of_line_start(data, offset):
-    index_1 = data.rfind('\n', 0, offset) + 1
-    index_2 = data.rfind('\r', 0, offset) + 1
-    return max(index_1, index_2)
-
-
-def find_index_of_line_end(data, offset):
-    index_1 = data.find('\n', offset)
-    if index_1 == -1:
-        index_1 = len(data)
-    index_2 = data.find('\r', offset)
-    if index_2 == -1:
-        index_2 = len(data)
-    return min(index_1, index_2)
-
-
-def get_line_number(data, offset):
-    return data[0:offset].count('\n') + data[0:offset].count('\r') + 1
+def find_line_and_col_num(data):
+    first_col = data.find(':')
+    second_col = data.find(':', first_col+1)
+    third_col = data.find(':', second_col+1)
+    return data[first_col+1:second_col], data[second_col+1:third_col]
 
 
 def get_xunit_content(report, testname, elapsed):
@@ -220,26 +232,27 @@ def get_xunit_content(report, testname, elapsed):
 """ % data
 
     for filename in sorted(report.keys()):
-        replacements = report[filename]
+        errors = report[filename]
+        print('errors')
+        print(errors)
 
-        if replacements:
+        if errors:
             # report each replacement as a failing testcase
-            for replacement in replacements:
+            for error in errors:
                 data = {
                     'quoted_location': quoteattr(
                         '%s:%d:%d' % (
-                            filename, replacement['line_no'],
-                            replacement['offset_in_line'])),
+                            filename, int(error['line_no']),
+                            int(error['offset_in_line']))),
                     'testname': testname,
                     'quoted_message': quoteattr(
-                        'Replace [%s] with [%s]' %
-                        (replacement['original'], replacement['replacement'])),
+                        '%s' %
+                        error['error_msg']),
                     'cdata': '\n'.join([
                         '%s:%d:%d' % (
-                            filename, replacement['line_no'],
-                            replacement['offset_in_line']),
-                        replacement['deletion'],
-                        replacement['addition'],
+                            filename, int(error['line_no']),
+                            int(error['offset_in_line'])),
+                            error['code_correct_rec'],
                     ]),
                 }
                 xml += """  <testcase
@@ -251,7 +264,7 @@ def get_xunit_content(report, testname, elapsed):
 """ % data
 
         else:
-            # if there are no replacements report a single successful test
+            # if there are no errors report a single successful test
             data = {
                 'quoted_location': quoteattr(filename),
                 'testname': testname,
