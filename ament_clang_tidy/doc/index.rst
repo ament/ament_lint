@@ -14,7 +14,10 @@ How to run the check from the command line?
 
     ament_clang_tidy [<path> ...]
 
-When using the option ``--reformat`` the proposed changes are applied in place.
+When using the option ``--fix-errors`` the proposed changes are
+applied in place.
+The ``--explain-config`` option will explain the origin of the enabled
+configuration checks.
 
 
 How to run the check from within a CMake ament package as part of the tests?
