@@ -233,8 +233,6 @@ def get_xunit_content(report, testname, elapsed):
 
     for filename in sorted(report.keys()):
         errors = report[filename]
-        print('errors')
-        print(errors)
 
         if errors:
             # report each replacement as a failing testcase
