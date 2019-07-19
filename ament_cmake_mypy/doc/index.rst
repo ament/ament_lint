@@ -1,4 +1,4 @@
-ament_cmake_flake8
+ament_cmake_mypy
 ==================
 
 Checks the code syntax and style of Python source files using `mypy
