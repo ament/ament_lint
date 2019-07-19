@@ -16,6 +16,7 @@ How to run the check from the command line?
 
 When using the option ``--fix-errors`` the proposed changes are
 applied in place.
+
 The ``--explain-config`` option will explain the origin of the enabled
 configuration checks.
 
