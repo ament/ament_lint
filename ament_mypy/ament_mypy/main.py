@@ -19,12 +19,14 @@ from distutils.version import LooseVersion
 import os
 import re
 import sys
+import textwrap
 import time
 from typing import List, Match, Optional, Tuple
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 import mypy.api
+
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
     parser = argparse.ArgumentParser(
@@ -104,7 +106,6 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
     else:
         print('{} errors'.format(len(errors_parsed)))
 
-
     print(normal_report)
 
     print('\nChecked files:')
@@ -170,14 +171,15 @@ def generate_mypy_report(config_file: str,
 
 
 def get_xunit_content(errors: List[Match], testname: str, filenames: List[str], elapsed: float) -> str:
-    xml = """<?xml version="1.0" encoding="UTF-8"?>
+    xml = textwrap.dedent("""\
+        <?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="{test_name:s}"
   tests="{test_count:d}"
   failures="{error_count:d}"
   time="{time:s}"
 >
-""".format(
+    """).format(
         test_name = testname,
         test_count = max(len(errors), 1),
         error_count = len(errors),
@@ -187,13 +189,14 @@ def get_xunit_content(errors: List[Match], testname: str, filenames: List[str], 
     if len(errors):
         # report each mypy error/warning as a failing testcase
         for error in errors:
-            xml += """  <testcase
+            xml += dedent_to("""\
+                  <testcase
     name={quoted_name}
     classname="{test_name}"
   >
       <failure message={quoted_message}/>
   </testcase>
-""".format(
+                """, '  ').format(
         quoted_name = quoteattr(
                         '{0[type]} ({0[filename]}'.format(error) +
                         (':{0[lineno]}:{0[colno]})'.format(error)
@@ -205,15 +208,17 @@ def get_xunit_content(errors: List[Match], testname: str, filenames: List[str], 
         )
     else:
         # if there are no mypy problems report a single successful test
-        xml += """  <testcase
+        xml += textwrap.dedent("""\
+              <testcase
     name="mypy"
     classname="{test_name}"
     status="No problems found"/>
-""".format(test_name = testname)
+            """.format(test_name = testname))
 
     # output list of checked files
-    xml += """  <system-out>Checked files:{escaped_files}</system-out>
-""".format(escaped_files = escape(''.join(['\n* %s' % f for f in filenames])))
+    xml += "  <system-out>Checked files:{escaped_files}\n  </system-out>\n".format(
+        escaped_files = escape(''.join(['\n* %s' % f for f in filenames]))
+    )
 
     xml += '</testsuite>\n'
     return xml
@@ -242,6 +247,10 @@ def get_files(paths: List[str]) -> List[str]:
 
 def get_errors(report_string: str) -> List[Match]:
     return list(re.finditer(r"^(?P<filename>[^:]+):(?P<lineno>\d+):(?P<colno>\d+):\ (?P<type>error|warning):\ (?P<msg>.*)$", report_string, re.MULTILINE))
+
+
+def dedent_to(text: str, prefix: str) -> str:
+    return textwrap.indent(textwrap.dedent(text), prefix)
 
 
 if __name__ == '__main__':
