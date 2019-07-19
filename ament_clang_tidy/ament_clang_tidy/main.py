@@ -15,14 +15,13 @@
 # limitations under the License.
 
 import argparse
+import copy
 import os
+import re
 import subprocess
 import sys
 import time
-import re
-import copy
 
-from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -50,7 +49,7 @@ def main(argv=sys.argv[1:]):
         help='The files or directories to check. For directories files ending '
              'in %s will be considered.' %
              ', '.join(["'.%s'" % e for e in extensions]))
-    
+
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -115,26 +114,26 @@ def main(argv=sys.argv[1:]):
               (os.path.basename(clang_tidy_bin), e.returncode, e),
               file=sys.stderr)
         return 1
-    
+
     # output errors
     report = {}
     complete_filenames = []
-    
+
     for filename in files:
         report[filename] = []
         complete_filename = os.path.join(
             os.getcwd(), filename)
         complete_filenames.append(complete_filename)
-    
+
     error_re = re.compile(r'\[.*?\]')
     file_pairs = dict(zip(complete_filenames, files))
 
     current_file = None
     new_file = None
     data = {}
-    
+
     for line in output.splitlines():
-        #error found
+        # error found
         if line[0] == '/' and error_re.search(line):
             for filename in complete_filenames:
                 if filename in line:
@@ -150,9 +149,9 @@ def main(argv=sys.argv[1:]):
             data['error_msg'] = error_msg
         else:
             data['code_correct_rec'] = data.get('code_correct_rec', '') + line + '\n'
-    
+
     report[current_file].append(copy.deepcopy(data))
-    
+
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
         file_name = os.path.basename(args.xunit_file)
@@ -203,8 +202,10 @@ def get_files(paths, extensions):
             files.append(path)
     return [os.path.normpath(f) for f in files]
 
+
 def find_error_message(data):
     return data[data.rfind(':')+2:]
+
 
 def find_line_and_col_num(data):
     first_col = data.find(':')
@@ -250,7 +251,7 @@ def get_xunit_content(report, testname, elapsed):
                         '%s:%d:%d' % (
                             filename, int(error['line_no']),
                             int(error['offset_in_line'])),
-                            error['code_correct_rec'],
+                        error['code_correct_rec'],
                     ]),
                 }
                 xml += """  <testcase
