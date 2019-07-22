@@ -22,7 +22,7 @@ How to run the check from within a CMake ament package as part of the tests?
 .. code:: xml
 
     <buildtool_depend>ament_cmake</buildtool_depend>
-    <test_depend>ament_clang_format</test_depend>
+    <test_depend>ament_cmake_clang_format</test_depend>
 
 ``CMakeLists.txt``:
 
@@ -30,7 +30,7 @@ How to run the check from within a CMake ament package as part of the tests?
 
     find_package(ament_cmake REQUIRED)
     if(BUILD_TESTING)
-      find_package(ament_clang_format REQUIRED)
+      find_package(ament_cmake_clang_format REQUIRED)
       ament_clang_format()
     endif()
 
