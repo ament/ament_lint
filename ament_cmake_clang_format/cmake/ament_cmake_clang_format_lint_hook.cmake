@@ -23,6 +23,10 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
   "*.hxx"
 )
 if(_source_files)
+  if(DEFINED ament_cmake_clang_format_CONFIG_FILE)
+    set(config_file_path ${ament_cmake_clang_format_CONFIG_FILE})
+  endif()
+
   message(STATUS "Added test 'clang_format' to check C / C++ code style")
-  ament_clang_format()
+  ament_clang_format(CONFIG_FILE ${config_file_path})
 endif()

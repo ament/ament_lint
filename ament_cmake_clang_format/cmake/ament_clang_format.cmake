@@ -15,15 +15,21 @@
 #
 # Add a test to check the code for compliance with clang_format.
 #
+# The configuration file for clang-format to use can be either set by
+# the function parameter 'CONFIG_PATH' or by a global variabled called
+# 'ament_cmake_clang_format_CONFIG_FILE'
+# 
 # :param TESTNAME: the name of the test, default: "clang_format"
 # :type TESTNAME: string
+# :param CONFIG_FILE: the name of the configuration file for clang-format to consider
+# :type CONFIG_FILE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_clang_format)
-  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "clang_format")
   endif()
@@ -36,7 +42,10 @@ function(ament_clang_format)
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_clang_format_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
-
+  if(ARG_CONFIG_FILE)
+    set(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
+  endif()
+  
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_clang_format")
   ament_add_test(
     "${ARG_TESTNAME}"
