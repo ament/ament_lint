@@ -1,7 +1,7 @@
 ament_cmake_clang_tidy
 ========================
 
-Diagnose and fix typical programming errors with `ClangTidy
+Diagnose and fix typical programming errors with `Clang-Tidy
 <http://clang.llvm.org/extra/clang-tidy/>`_.
 Files with the following extensions are being considered:
 ``.c``, ``.cc``, ``.cpp``, ``.cxx``, ``.h``, ``.hh``, ``.hpp``, ``.hxx``.

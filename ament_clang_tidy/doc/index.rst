@@ -1,9 +1,9 @@
 ament_clang_tidy
 ==================
 
-Checks the code style of C / C++ source files using `ClangTidy
+Checks the code style of C / C++ source files using `Clang-Tidy
 <http://clang.llvm.org/extra/clang-tidy/>`_.
-Files with the following extensions are being considered:
+Files with the following extensions are considered:
 ``.c``, ``.cc``, ``.cpp``, ``.cxx``, ``.h``, ``.hh``, ``.hpp``, ``.hxx``.
 
 
