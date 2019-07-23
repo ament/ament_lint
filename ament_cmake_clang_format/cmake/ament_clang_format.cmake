@@ -15,9 +15,13 @@
 #
 # Add a test to check the code for compliance with clang_format.
 #
-# The configuration file for clang-format to use can be either set by
-# the function parameter 'CONFIG_PATH' or by a global variabled called
+# The default configuration file used for clang-format is located at 
+# configuration/.clang-format within the ament_clang_format directory
+# The default configuration file can be either overridden by the
+# argument 'CONFIG_FILE' or by a global variable named
 # 'ament_cmake_clang_format_CONFIG_FILE'
+# The 'CONFIG_FILE' argument takes priority over 
+# 'ament_cmake_clang_format_CONFIG_FILE' if both are defined
 # 
 # :param TESTNAME: the name of the test, default: "clang_format"
 # :type TESTNAME: string
@@ -44,6 +48,8 @@ function(ament_clang_format)
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
   if(ARG_CONFIG_FILE)
     set(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
+  elseif(DEFINED ament_cmake_clang_format_CONFIG_FILE)
+    set(APPEND cmd "--config" "${ament_cmake_clang_format_CONFIG_FILE}")
   endif()
   
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_clang_format")
