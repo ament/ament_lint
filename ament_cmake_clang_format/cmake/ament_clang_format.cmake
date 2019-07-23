@@ -25,7 +25,7 @@
 # 
 # :param TESTNAME: the name of the test, default: "clang_format"
 # :type TESTNAME: string
-# :param CONFIG_FILE: the name of the configuration file for clang-format to consider
+# :param CONFIG_FILE: the path of the configuration file for clang-format to consider
 # :type CONFIG_FILE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
