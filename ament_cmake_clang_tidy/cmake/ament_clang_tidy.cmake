@@ -15,15 +15,25 @@
 #
 # Add a test to check the code for compliance with clang_tidy.
 #
+# The default configuration file for clang-tidy is located at
+# configuration/.clang-tidy within the ament_clang_tidy directory
+# The default configuration file can be either overridden by the
+# argument 'CONFIG_FILE' or by a global variable named
+# 'ament_cmake_clang_tidy_CONFIG_FILE'
+# The 'CONFIG_FILE' argument takes priority over
+# 'ament_cmake_clang_tidy_CONFIG_FILE' if both are defined
+# 
 # :param TESTNAME: the name of the test, default: "clang_tidy"
 # :type TESTNAME: string
+# :param CONFIG_FILE: the path of the configuration file for clang-tidy to consider 
+# :type CONFIG_FILE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_clang_tidy)
-  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "clang_tidy")
   endif()
@@ -36,6 +46,12 @@ function(ament_clang_tidy)
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_clang_tidy_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
+  if(ARG_CONFIG_FILE)
+    set(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
+  elseif(DEFINED ament_cmake_clang_tidy_CONFIG_FILE)
+    set(APPEND cmd "--config" "${ament_cmake_clang_tidy_CONFIG_FILE}")
+  endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_clang_tidy")
   ament_add_test(
