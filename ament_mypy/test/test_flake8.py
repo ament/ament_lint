@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(ament_cmake_test QUIET REQUIRED)
+from ament_flake8.main import main  # type: ignore  # noqa
+import pytest  # type: ignore
 
-include("${ament_cmake_mypy_DIR}/ament_mypy.cmake")
 
-ament_register_extension("ament_lint_auto" "ament_cmake_mypy"
-  "ament_cmake_mypy_lint_hook.cmake")
+@pytest.mark.flake8
+@pytest.mark.linter
+def test_flake8():
+    rc = main(argv=[])
+    assert rc == 0, 'Found errors'

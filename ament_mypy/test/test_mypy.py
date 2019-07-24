@@ -21,5 +21,5 @@ from ament_mypy.main import main  # noqa
 
 
 def test_mypy():
-    rc = main(argv=[])
+    rc = main(argv=['--exclude', 'test'])
     assert rc == 0, 'Found code style errors / warnings'

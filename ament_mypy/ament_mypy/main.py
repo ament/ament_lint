@@ -15,8 +15,8 @@
 # limitations under the License.
 
 import argparse
-from distutils.version import LooseVersion
 import os
+from pathlib import Path
 import re
 import sys
 import textwrap
@@ -25,10 +25,11 @@ from typing import List, Match, Optional, Tuple
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import mypy.api
+import mypy.api  # type: ignore
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
+    """Command line tool for linting files with mypy."""
     parser = argparse.ArgumentParser(
         description='Check code using mypy',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -73,32 +74,32 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
     if args.xunit_file:
         start_time = time.time()
 
-    filenames = get_files(args.paths)
+    if args.config_file and not os.path.exists(args.config_file):
+        print("Could not find config file '{}'".format(args.config_file), file=sys.stderr)
+        return 1
+
+    filenames = _get_files(args.paths)
     if args.excludes:
+        print('excluding: ', args.excludes)
         filenames = [f for f in filenames
-            if os.path.basename(f) not in args.excludes]
+                     if os.path.basename(f) not in args.excludes]
     if not filenames:
         print('No files found', file=sys.stderr)
         return 1
 
-    if args.config_file and not os.path.exists(args.config_file):
-        print("Could not find config file '{}'".format(args.config_file),
-            file=sys.stderr
-        )
-        return 1
-
-    normal_report, error_messages, exit_code = generate_mypy_report(
-        args.config_file,
+    normal_report, error_messages, exit_code = _generate_mypy_report(
         filenames,
+        args.config_file,
         args.cache_dir
     )
 
-    if error_messages:
+    if error_messages or exit_code:
         print('mypy error encountered', file=sys.stderr)
+        print(normal_report, file=sys.stderr)
         print(error_messages, file=sys.stderr)
         return exit_code
 
-    errors_parsed = get_errors(normal_report)
+    errors_parsed = _get_errors(normal_report)
 
     print('\n{} files checked'.format(len(filenames)))
     if not normal_report:
@@ -123,19 +124,19 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
                 file_name = file_name[:-len(suffix)]
         testname = '{}.{}'.format(folder_name, file_name)
 
-        xml = get_xunit_content(errors_parsed, testname, filenames, time.time() - start_time)
+        xml = _get_xunit_content(errors_parsed, testname, filenames, time.time() - start_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
 
-    return exit_code
+    return 1 if normal_report else 0
 
 
-def generate_mypy_report(config_file: str,
-                         paths: List[str],
-                         cache_dir: str) -> Tuple[str, str, int]:
+def _generate_mypy_report(paths: List[str],
+                          config_file: Optional[str] = None,
+                          cache_dir: str = os.devnull) -> Tuple[str, str, int]:
     mypy_argv = []
     mypy_argv.append('--cache-dir')
     mypy_argv.append(str(cache_dir))
@@ -144,24 +145,27 @@ def generate_mypy_report(config_file: str,
     if config_file is not None:
         mypy_argv.append('--config-file')
         mypy_argv.append(str(config_file))
-    if not os.environ.get('MYPYPATH') and os.environ.get('PYTHONPATH') and os.environ.get('COLCON_PREFIX_PATH'):
+    if not os.environ.get('MYPYPATH') and os.environ.get('PYTHONPATH') \
+            and os.environ.get('COLCON_PREFIX_PATH'):
         # Filter PYTHONPATHs by colcon prefixes
-        python_paths = os.environ['PYTHONPATH'].split(':')
-        colcon_paths = os.environ['COLCON_PREFIX_PATH'].split(':')
+        python_paths = os.environ['PYTHONPATH'].split(os.pathsep)
+        colcon_paths = os.environ['COLCON_PREFIX_PATH'].split(os.pathsep)
         intersecting_paths = []
-        for python_path in python_paths:
-            for colcon_path in colcon_paths:
+        for python_path_str in python_paths:
+            for colcon_path_str in colcon_paths:
                 # The colcon prefix is pointing at the install space, but ideally we could extract
-                # both install-space and build-space paths from PYTHONPATH. There doesn't seem to be
-                # a way to extract these programatically, so we'll assume that the defaults are being
-                # used and the install- and build-space share a parent directory. This assumption will
+                # install-space and build-space paths from PYTHONPATH. There doesn't seem to be
+                # a way to extract these programatically, so we assume that the defaults are being
+                # used and the install-/build-space share a parent directory. This assumption will
                 # not be valid if the `--build-base` or `--install-base` options were used for
                 # `colcon build`.
-                if python_path and python_path.startswith(os.path.dirname(colcon_path)):
-                    intersecting_paths.append(python_path)
+                python_path = Path(python_path_str)
+                colcon_path = Path(colcon_path_str)
+                if python_path and colcon_path in python_path.parents:
+                    intersecting_paths.append(str(python_path))
                     break
 
-        os.environ['MYPYPATH'] = ':'.join(intersecting_paths)
+        os.environ['MYPYPATH'] = os.pathsep.join(intersecting_paths)
     mypy_argv.append('--show-error-context')
     mypy_argv.append('--show-column-numbers')
     mypy_argv.append('--show-traceback')
@@ -170,61 +174,65 @@ def generate_mypy_report(config_file: str,
     return res
 
 
-def get_xunit_content(errors: List[Match], testname: str, filenames: List[str], elapsed: float) -> str:
+def _get_xunit_content(errors: List[Match],
+                       testname: str,
+                       filenames: List[str],
+                       elapsed: float) -> str:
     xml = textwrap.dedent("""\
         <?xml version="1.0" encoding="UTF-8"?>
-<testsuite
-  name="{test_name:s}"
-  tests="{test_count:d}"
-  failures="{error_count:d}"
-  time="{time:s}"
->
+        <testsuite
+        name="{test_name:s}"
+        tests="{test_count:d}"
+        failures="{error_count:d}"
+        time="{time:s}"
+        >
     """).format(
-        test_name = testname,
-        test_count = max(len(errors), 1),
-        error_count = len(errors),
-        time = '{:.3f}'.format(round(elapsed, 3))
+                test_name=testname,
+                test_count=max(len(errors), 1),
+                error_count=len(errors),
+                time='{:.3f}'.format(round(elapsed, 3))
     )
 
-    if len(errors):
+    if errors:
         # report each mypy error/warning as a failing testcase
         for error in errors:
-            xml += dedent_to("""\
-                  <testcase
-    name={quoted_name}
-    classname="{test_name}"
-  >
-      <failure message={quoted_message}/>
-  </testcase>
+            pos = ''
+            if error.group('lineno'):
+                pos += ':' + str(error.group('lineno'))
+                if error.group('colno'):
+                    pos += ':' + str(error.group('colno'))
+            xml += _dedent_to("""\
+                <testcase
+                    name={quoted_name}
+                    classname="{test_name}"
+                >
+                    <failure message={quoted_message}/>
+                </testcase>
                 """, '  ').format(
-        quoted_name = quoteattr(
-                        '{0[type]} ({0[filename]}'.format(error) +
-                        (':{0[lineno]}:{0[colno]})'.format(error)
-                        if error.group('filename') else ')')),
-        test_name = testname,
-        quoted_message = quoteattr('{0[msg]}'.format(error) +
-                    (':\n{0[lineno]}'.format(error) if error.group('lineno')
-                        else ''))
-        )
+                    quoted_name=quoteattr(
+                        '{0[type]} ({0[filename]}'.format(error) + pos + ')'),
+                    test_name=testname,
+                    quoted_message=quoteattr('{0[msg]}'.format(error) + pos)
+                )
     else:
         # if there are no mypy problems report a single successful test
-        xml += textwrap.dedent("""\
-              <testcase
-    name="mypy"
-    classname="{test_name}"
-    status="No problems found"/>
-            """.format(test_name = testname))
+        xml += _dedent_to("""\
+            <testcase
+              name="mypy"
+              classname="{}"
+              status="No problems found"/>
+            """, '  ').format(testname)
 
     # output list of checked files
     xml += "  <system-out>Checked files:{escaped_files}\n  </system-out>\n".format(
-        escaped_files = escape(''.join(['\n* %s' % f for f in filenames]))
+        escaped_files=escape(''.join(['\n* %s' % f for f in filenames]))
     )
 
     xml += '</testsuite>\n'
     return xml
 
 
-def get_files(paths: List[str]) -> List[str]:
+def _get_files(paths: List[str]) -> List[str]:
     files = []
     for path in paths:
         if os.path.isdir(path):
@@ -240,18 +248,18 @@ def get_files(paths: List[str]) -> List[str]:
                 for filename in sorted(filenames):
                     if filename.endswith('.py'):
                         files.append(os.path.join(dirpath, filename))
-        if os.path.isfile(path):
+        elif os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
 
 
-def get_errors(report_string: str) -> List[Match]:
-    return list(re.finditer(r"^(?P<filename>[^:]+):(?P<lineno>\d+):(?P<colno>\d+):\ (?P<type>error|warning):\ (?P<msg>.*)$", report_string, re.MULTILINE))
+def _get_errors(report_string: str) -> List[Match]:
+    return list(re.finditer(r"^(?P<filename>[^:]+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning):\ (?P<msg>.*)$", report_string, re.MULTILINE))  # noqa
 
 
-def dedent_to(text: str, prefix: str) -> str:
+def _dedent_to(text: str, prefix: str) -> str:
     return textwrap.indent(textwrap.dedent(text), prefix)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main())

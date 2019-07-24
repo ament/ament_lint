@@ -14,6 +14,6 @@
 
 file(GLOB_RECURSE _python_files FOLLOW_SYMLINKS "*.py")
 if(_python_files)
-  message(STATUS "Added test 'mypy' to statically type check Python code ")
+  message(STATUS "Added test 'mypy' to statically type check Python code.")
   ament_mypy()
 endif()

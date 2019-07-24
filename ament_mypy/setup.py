@@ -1,14 +1,11 @@
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages  # type: ignore
+from setuptools import setup  # type: ignore
 
 setup(
     name='ament_mypy',
-    version='0.7.1',
+    version='0.7.3',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
-    package_data={'': [
-        'configuration/ament_mypy.ini',
-    ]},
     zip_safe=False,
     author='Ted Kern',
     author_email='ted.kern@canonical.com',
