@@ -25,7 +25,7 @@
 # @public
 #
 function(ament_mypy)
-  cmake_parse_arguments(ARG "" "CONFIG_FILE,TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "CONFIG_FILE;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "mypy")
   endif()
