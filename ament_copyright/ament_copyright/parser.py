@@ -60,12 +60,12 @@ class FileDescriptor:
             return
 
         for name, license_ in get_licenses().items():
-            template = getattr(license_, license_part).replace('\n', ' ').strip()
+            template = remove_formatting(getattr(license_, license_part))
             last_index = -1
             for license_section in template.split('{copyright_holder}'):
                 # OK, now look for each section of the license in the incoming
                 # content.
-                index = content.replace('\n', ' ').strip().find(license_section.strip())
+                index = remove_formatting(content).find(license_section.strip())
                 if index == -1 or index <= last_index:
                     # Some part of the license is not in the content, or the license
                     # is rearranged, this license doesn't match.
@@ -280,3 +280,7 @@ def scan_past_empty_lines(content, index):
 
 def is_empty_line(content, index):
     return get_index_of_next_line(content, index) == index + 1
+
+
+def remove_formatting(text):
+    return ' '.join(filter(None, text.split()))
