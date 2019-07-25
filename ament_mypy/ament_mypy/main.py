@@ -25,7 +25,7 @@ from typing import List, Match, Optional, Tuple
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import mypy.api  # type: ignore
+import mypy.api
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
@@ -75,7 +75,7 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
     if args.xunit_file:
         start_time = time.time()
 
-    if not os.path.exists(args.config_file):
+    if args.config_file and not os.path.exists(args.config_file):
         print("Could not find config file '{}'".format(args.config_file), file=sys.stderr)
         return 1
 
@@ -94,10 +94,11 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
         args.cache_dir
     )
 
-    if error_messages or exit_code:
+    if error_messages:
         print('mypy error encountered', file=sys.stderr)
-        print(normal_report, file=sys.stderr)
         print(error_messages, file=sys.stderr)
+        print('\nRegular report continues:')
+        print(normal_report, file=sys.stderr)
         return exit_code
 
     errors_parsed = _get_errors(normal_report)
@@ -136,15 +137,16 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
 
 
 def _generate_mypy_report(paths: List[str],
-                          config_file: str,
+                          config_file: Optional[str] = None,
                           cache_dir: str = os.devnull) -> Tuple[str, str, int]:
     mypy_argv = []
     mypy_argv.append('--cache-dir')
     mypy_argv.append(str(cache_dir))
     if cache_dir == os.devnull:
         mypy_argv.append('--no-incremental')
-    mypy_argv.append('--config-file')
-    mypy_argv.append(str(config_file))
+    if config_file:
+        mypy_argv.append('--config-file')
+        mypy_argv.append(str(config_file))
     mypy_argv.append('--show-error-context')
     mypy_argv.append('--show-column-numbers')
     mypy_argv.append('--show-traceback')

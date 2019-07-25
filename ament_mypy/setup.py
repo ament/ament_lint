@@ -1,5 +1,5 @@
-from setuptools import find_packages  # type: ignore
-from setuptools import setup  # type: ignore
+from setuptools import find_packages
+from setuptools import setup
 
 setup(
     name='ament_mypy',

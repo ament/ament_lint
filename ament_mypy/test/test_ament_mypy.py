@@ -90,7 +90,7 @@ def test__generate_mypy_report(mock_mypy_succ):
     args, _ = mock_mypy_succ.call_args
     assert all(file_name in args[0] for file_name in file_names)
 
-    # Test if cache dir is forwarded to mypy
+    # Test if config file is forwarded to mypy
     assert ament_mypy.main._generate_mypy_report(file_names, 'a.ini') == mock_mypy_succ.return_value
     args, _ = mock_mypy_succ.call_args
     assert len(args[0]) > 1
@@ -109,14 +109,6 @@ def test__generate_mypy_report(mock_mypy_succ):
     assert len(args[0]) > 1
     assert any(args[0][i] == '--cache-dir' and args[0][i + 1] == '/tmp' for i in range(len(args[0]) - 1))
     assert '--no-incremental' not in args[0]
-
-
-def test__generate_mypy_report_mypypath(mock_mypy_succ, mocker):
-    sample_colcon_path = '/home/ubuntu/ros2/install'
-    sample_python_path = '/home/ubuntu/ros2/install/ament_cppcheck/lib/python3.6/site-packages:/home/ubuntu/ros2/build/ament_copyright:/home/ubuntu/ros2/install/ament_copyright/lib/python3.6/site-packages:/home/ubuntu/conda/packages'
-    mocker.patch.dict('ament_mypy.main.os.environ', {'PYTHONPATH': sample_python_path, 'COLCON_PREFIX_PATH': sample_colcon_path})
-    assert ament_mypy.main._generate_mypy_report([]) == mock_mypy_succ.return_value
-    assert all(path in ament_mypy.main.os.environ['MYPYPATH'].split(':') for path in '/home/ubuntu/ros2/install/ament_cppcheck/lib/python3.6/site-packages:/home/ubuntu/ros2/install/ament_copyright/lib/python3.6/site-packages'.split(':'))
 
 
 def test_main_success(mock_generate_report, use_dir):
