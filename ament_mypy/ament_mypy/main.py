@@ -38,6 +38,7 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
         '--config',
         metavar='path',
         dest='config_file',
+        default=os.path.join(os.path.dirname(__file__), 'configuration', 'ament_mypy.ini'),
         help='The config file'
     )
     parser.add_argument(
@@ -74,7 +75,7 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
     if args.xunit_file:
         start_time = time.time()
 
-    if args.config_file and not os.path.exists(args.config_file):
+    if not os.path.exists(args.config_file):
         print("Could not find config file '{}'".format(args.config_file), file=sys.stderr)
         return 1
 
@@ -135,16 +136,15 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
 
 
 def _generate_mypy_report(paths: List[str],
-                          config_file: Optional[str] = None,
+                          config_file: str,
                           cache_dir: str = os.devnull) -> Tuple[str, str, int]:
     mypy_argv = []
     mypy_argv.append('--cache-dir')
     mypy_argv.append(str(cache_dir))
     if cache_dir == os.devnull:
         mypy_argv.append('--no-incremental')
-    if config_file is not None:
-        mypy_argv.append('--config-file')
-        mypy_argv.append(str(config_file))
+    mypy_argv.append('--config-file')
+    mypy_argv.append(str(config_file))
     mypy_argv.append('--show-error-context')
     mypy_argv.append('--show-column-numbers')
     mypy_argv.append('--show-traceback')
