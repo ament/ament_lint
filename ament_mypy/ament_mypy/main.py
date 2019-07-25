@@ -160,7 +160,7 @@ def _generate_mypy_report(paths: List[str],
                 # not be valid if the `--build-base` or `--install-base` options were used for
                 # `colcon build`.
                 python_path = Path(python_path_str)
-                colcon_path = Path(colcon_path_str)
+                colcon_path = Path(os.path.dirname(colcon_path_str))
                 if python_path and colcon_path in python_path.parents:
                     intersecting_paths.append(str(python_path))
                     break
