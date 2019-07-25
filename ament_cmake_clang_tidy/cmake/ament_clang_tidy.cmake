@@ -22,10 +22,11 @@
 # 'ament_cmake_clang_tidy_CONFIG_FILE'
 # The 'CONFIG_FILE' argument takes priority over
 # 'ament_cmake_clang_tidy_CONFIG_FILE' if both are defined
-# 
+#
 # :param TESTNAME: the name of the test, default: "clang_tidy"
 # :type TESTNAME: string
-# :param CONFIG_FILE: the path of the configuration file for clang-tidy to consider 
+# :param CONFIG_FILE: the path of the configuration file
+#                     for clang-tidy to consider
 # :type CONFIG_FILE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
