@@ -145,27 +145,6 @@ def _generate_mypy_report(paths: List[str],
     if config_file is not None:
         mypy_argv.append('--config-file')
         mypy_argv.append(str(config_file))
-    if not os.environ.get('MYPYPATH') and os.environ.get('PYTHONPATH') \
-            and os.environ.get('COLCON_PREFIX_PATH'):
-        # Filter PYTHONPATHs by colcon prefixes
-        python_paths = os.environ['PYTHONPATH'].split(os.pathsep)
-        colcon_paths = os.environ['COLCON_PREFIX_PATH'].split(os.pathsep)
-        intersecting_paths = []
-        for python_path_str in python_paths:
-            for colcon_path_str in colcon_paths:
-                # The colcon prefix is pointing at the install space, but ideally we could extract
-                # install-space and build-space paths from PYTHONPATH. There doesn't seem to be
-                # a way to extract these programatically, so we assume that the defaults are being
-                # used and the install-/build-space share a parent directory. This assumption will
-                # not be valid if the `--build-base` or `--install-base` options were used for
-                # `colcon build`.
-                python_path = Path(python_path_str)
-                colcon_path = Path(os.path.dirname(colcon_path_str))
-                if python_path and colcon_path in python_path.parents:
-                    intersecting_paths.append(str(python_path))
-                    break
-
-        os.environ['MYPYPATH'] = os.pathsep.join(intersecting_paths)
     mypy_argv.append('--show-error-context')
     mypy_argv.append('--show-column-numbers')
     mypy_argv.append('--show-traceback')
