@@ -20,6 +20,8 @@ applied in place.
 The ``--explain-config`` option will explain the origin of the enabled
 configuration checks.
 
+The ``--add-headers`` option will display errors from all non-system
+headers.
 
 How to run the check from within a CMake ament package as part of the tests?
 ----------------------------------------------------------------------------
