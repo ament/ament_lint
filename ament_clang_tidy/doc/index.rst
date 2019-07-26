@@ -23,6 +23,9 @@ configuration checks.
 The ``--add-headers`` option will display errors from all non-system
 headers.
 
+The ``--quiet`` option will suppress printing statistics about ignored
+warnings and warnings treated as errors.
+
 How to run the check from within a CMake ament package as part of the tests?
 ----------------------------------------------------------------------------
 

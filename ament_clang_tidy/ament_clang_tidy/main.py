@@ -67,6 +67,11 @@ def main(argv=sys.argv[1:]):
         action='store_true',
         help='Fix the suggested changes')
     parser.add_argument(
+        '--quiet',
+        action='store_true',
+        help='Suppresses printing statistics about ignored warnings '
+             'and warnings treated as errors')
+    parser.add_argument(
         '--add-headers',
         action='store_true',
         help='Display errors from all non-system headers')
@@ -102,15 +107,17 @@ def main(argv=sys.argv[1:]):
     style = yaml.dump(data, default_flow_style=True, width=float('inf'))
     cmd = [clang_tidy_bin,
            '--config=%s' % style]
-    if args.explain_config:
-        cmd.append('--explain-config')
-    if args.add_headers:
-        cmd.append('--header-filter=.*')
-    if args.fix_errors:
-        cmd.append('--fix-errors')
     if args.export_fixes:
         cmd.append('--export-fixes')
         cmd.append(args.export_fixes)
+    if args.explain_config:
+        cmd.append('--explain-config')
+    if args.fix_errors:
+        cmd.append('--fix-errors')
+    if args.quiet:
+        cmd.append('--quiet')
+    if args.add_headers:
+        cmd.append('--header-filter=.*')
     cmd.extend(files)
     cmd.append('--')
     try:
