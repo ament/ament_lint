@@ -181,7 +181,7 @@ def test_main_config_file(mock_generate_report, mocker, use_dir):
     # Test program handles no config file being passed correctly
     assert ament_mypy.main.main([str(use_dir.join("01.py"))]) ==  0
     args, _ = mock_generate_report.call_args
-    assert args[1] == None
+    assert args[1] is not None
 
     # Test program raises error when invalid config file is presented
     assert ament_mypy.main.main([str(use_dir.join("01.py")), '--config', str(use_dir.join('aeiou.ini'))]) == 1
