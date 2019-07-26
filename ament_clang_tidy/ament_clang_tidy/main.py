@@ -211,14 +211,14 @@ def get_files(paths, extensions):
 
 
 def find_error_message(data):
-    return data[data.rfind(':')+2:]
+    return data[data.rfind(':') + 2:]
 
 
 def find_line_and_col_num(data):
     first_col = data.find(':')
-    second_col = data.find(':', first_col+1)
-    third_col = data.find(':', second_col+1)
-    return data[first_col+1:second_col], data[second_col+1:third_col]
+    second_col = data.find(':', first_col + 1)
+    third_col = data.find(':', second_col + 1)
+    return data[first_col + 1:second_col], data[second_col + 1:third_col]
 
 
 def get_xunit_content(report, testname, elapsed):
