@@ -1,11 +1,8 @@
 import os
+from pathlib import Path
 import sys
 from typing import List, Tuple
 import xml.etree.ElementTree as ET
-
-from pathlib import Path
-PROJECT_DIR = Path(__file__).parents[1]
-sys.path.insert(0, str(PROJECT_DIR))
 
 import pytest
 
