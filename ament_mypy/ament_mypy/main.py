@@ -16,7 +16,6 @@
 
 import argparse
 import os
-from pathlib import Path
 import re
 import sys
 import textwrap
@@ -25,7 +24,7 @@ from typing import List, Match, Optional, Tuple
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import mypy.api
+import mypy.api  # type: ignore
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
@@ -81,7 +80,6 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
 
     filenames = _get_files(args.paths)
     if args.excludes:
-        print('excluding: ', args.excludes)
         filenames = [f for f in filenames
                      if os.path.basename(f) not in args.excludes]
     if not filenames:
@@ -133,7 +131,7 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
 
-    return 1 if normal_report else 0
+    return exit_code
 
 
 def _generate_mypy_report(paths: List[str],
@@ -149,7 +147,6 @@ def _generate_mypy_report(paths: List[str],
         mypy_argv.append(str(config_file))
     mypy_argv.append('--show-error-context')
     mypy_argv.append('--show-column-numbers')
-    mypy_argv.append('--show-traceback')
     mypy_argv += paths
     res = mypy.api.run(mypy_argv)  # type: Tuple[str, str, int]
     return res
@@ -235,7 +232,7 @@ def _get_files(paths: List[str]) -> List[str]:
 
 
 def _get_errors(report_string: str) -> List[Match]:
-    return list(re.finditer(r"^(?P<filename>[^:]+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning):\ (?P<msg>.*)$", report_string, re.MULTILINE))  # noqa
+    return list(re.finditer(r"^(?P<filename>[^:]+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning):\ (?P<msg>.*)$", report_string, re.MULTILINE))  # noqa: E501
 
 
 def _dedent_to(text: str, prefix: str) -> str:
