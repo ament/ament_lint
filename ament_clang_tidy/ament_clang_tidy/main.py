@@ -53,31 +53,31 @@ def main(argv=sys.argv[1:]):
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
-        '--xunit-file',
-        help='Generate a xunit compliant XML file')
-    parser.add_argument(
-        '--header-filter',
-        help='Accepts a regex and displays errors from the specified non-system headers')
-    parser.add_argument(
-        '--system-headers',
-        action='store_true',
-        help='Displays errors from all system headers')
-    parser.add_argument(
-        '--export-fixes',
-        help='Generate a DAT file of recorded fixes')
-    parser.add_argument(
         '--explain-config',
         action='store_true',
         help='Explain the enabled checks')
+    parser.add_argument(
+        '--export-fixes',
+        help='Generate a DAT file of recorded fixes')
     parser.add_argument(
         '--fix-errors',
         action='store_true',
         help='Fix the suggested changes')
     parser.add_argument(
+        '--header-filter',
+        help='Accepts a regex and displays errors from the specified non-system headers')
+    parser.add_argument(
         '--quiet',
         action='store_true',
         help='Suppresses printing statistics about ignored warnings '
              'and warnings treated as errors')
+    parser.add_argument(
+        '--system-headers',
+        action='store_true',
+        help='Displays errors from all system headers')
+    parser.add_argument(
+        '--xunit-file',
+        help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
@@ -110,20 +110,20 @@ def main(argv=sys.argv[1:]):
     style = yaml.dump(data, default_flow_style=True, width=float('inf'))
     cmd = [clang_tidy_bin,
            '--config=%s' % style]
-    if args.header_filter:
-        cmd.append('--header-filter')
-        cmd.append(args.header_filter)
-    if args.system_headers:
-        cmd.append('--system-headers')
+    if args.explain_config:
+        cmd.append('--explain-config')
     if args.export_fixes:
         cmd.append('--export-fixes')
         cmd.append(args.export_fixes)
-    if args.explain_config:
-        cmd.append('--explain-config')
     if args.fix_errors:
         cmd.append('--fix-errors')
+    if args.header_filter:
+        cmd.append('--header-filter')
+        cmd.append(args.header_filter)
     if args.quiet:
         cmd.append('--quiet')
+    if args.system_headers:
+        cmd.append('--system-headers')
     cmd.extend(files)
     cmd.append('--')
     try:
