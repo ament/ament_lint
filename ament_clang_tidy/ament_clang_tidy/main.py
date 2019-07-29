@@ -53,19 +53,31 @@ def main(argv=sys.argv[1:]):
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
-        '--xunit-file',
-        help='Generate a xunit compliant XML file')
-    parser.add_argument(
-        '--export-fixes',
-        help='Generate a DAT file of recorded fixes')
-    parser.add_argument(
         '--explain-config',
         action='store_true',
         help='Explain the enabled checks')
     parser.add_argument(
+        '--export-fixes',
+        help='Generate a DAT file of recorded fixes')
+    parser.add_argument(
         '--fix-errors',
         action='store_true',
         help='Fix the suggested changes')
+    parser.add_argument(
+        '--header-filter',
+        help='Accepts a regex and displays errors from the specified non-system headers')
+    parser.add_argument(
+        '--quiet',
+        action='store_true',
+        help='Suppresses printing statistics about ignored warnings '
+             'and warnings treated as errors')
+    parser.add_argument(
+        '--system-headers',
+        action='store_true',
+        help='Displays errors from all system headers')
+    parser.add_argument(
+        '--xunit-file',
+        help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
@@ -100,15 +112,23 @@ def main(argv=sys.argv[1:]):
            '--config=%s' % style]
     if args.explain_config:
         cmd.append('--explain-config')
-    if args.fix_errors:
-        cmd.append('--fix-errors')
     if args.export_fixes:
         cmd.append('--export-fixes')
         cmd.append(args.export_fixes)
+    if args.fix_errors:
+        cmd.append('--fix-errors')
+    if args.header_filter:
+        cmd.append('--header-filter')
+        cmd.append(args.header_filter)
+    if args.quiet:
+        cmd.append('--quiet')
+    if args.system_headers:
+        cmd.append('--system-headers')
     cmd.extend(files)
     cmd.append('--')
     try:
         output = subprocess.check_output(cmd).strip().decode()
+        print(output)
     except subprocess.CalledProcessError as e:
         print("The invocation of '%s' failed with error code %d: %s" %
               (os.path.basename(clang_tidy_bin), e.returncode, e),
@@ -149,8 +169,8 @@ def main(argv=sys.argv[1:]):
             data['error_msg'] = error_msg
         else:
             data['code_correct_rec'] = data.get('code_correct_rec', '') + line + '\n'
-
-    report[current_file].append(copy.deepcopy(data))
+    if current_file is not None:
+        report[current_file].append(copy.deepcopy(data))
 
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
@@ -204,14 +224,14 @@ def get_files(paths, extensions):
 
 
 def find_error_message(data):
-    return data[data.rfind(':')+2:]
+    return data[data.rfind(':') + 2:]
 
 
 def find_line_and_col_num(data):
     first_col = data.find(':')
-    second_col = data.find(':', first_col+1)
-    third_col = data.find(':', second_col+1)
-    return data[first_col+1:second_col], data[second_col+1:third_col]
+    second_col = data.find(':', first_col + 1)
+    third_col = data.find(':', second_col + 1)
+    return data[first_col + 1:second_col], data[second_col + 1:third_col]
 
 
 def get_xunit_content(report, testname, elapsed):
