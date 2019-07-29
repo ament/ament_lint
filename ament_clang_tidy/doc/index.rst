@@ -20,11 +20,21 @@ applied in place.
 The ``--explain-config`` option will explain the origin of the enabled
 configuration checks.
 
-The ``--add-headers`` option will display errors from all non-system
-headers.
+The ``--header-filter`` option will accept a regex and display errors from
+the specified non-system header files.  To display errors from all non-system
+header, use ``--header-filter='.*'``.
+
+The ``--system-headers`` option will display errors from all system header
+files.
 
 The ``--quiet`` option will suppress printing statistics about ignored
 warnings and warnings treated as errors.
+
+The ``--export-fixes`` option will generate a DAT file of the recorded
+fixes when supplied with a file name.
+
+The ``--xunit-file`` option will generate a xunit compliant XML file when
+supplied with a file name.
 
 How to run the check from within a CMake ament package as part of the tests?
 ----------------------------------------------------------------------------

@@ -56,6 +56,13 @@ def main(argv=sys.argv[1:]):
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     parser.add_argument(
+        '--header-filter',
+        help='Accepts a regex and displays errors from the specified non-system headers')
+    parser.add_argument(
+        '--system-headers',
+        action='store_true',
+        help='Displays errors from all system headers')
+    parser.add_argument(
         '--export-fixes',
         help='Generate a DAT file of recorded fixes')
     parser.add_argument(
@@ -71,10 +78,6 @@ def main(argv=sys.argv[1:]):
         action='store_true',
         help='Suppresses printing statistics about ignored warnings '
              'and warnings treated as errors')
-    parser.add_argument(
-        '--add-headers',
-        action='store_true',
-        help='Display errors from all non-system headers')
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
@@ -107,6 +110,11 @@ def main(argv=sys.argv[1:]):
     style = yaml.dump(data, default_flow_style=True, width=float('inf'))
     cmd = [clang_tidy_bin,
            '--config=%s' % style]
+    if args.header_filter:
+        cmd.append('--header-filter')
+        cmd.append(args.header_filter)
+    if args.system_headers:
+        cmd.append('--system-headers')
     if args.export_fixes:
         cmd.append('--export-fixes')
         cmd.append(args.export_fixes)
@@ -116,8 +124,6 @@ def main(argv=sys.argv[1:]):
         cmd.append('--fix-errors')
     if args.quiet:
         cmd.append('--quiet')
-    if args.add_headers:
-        cmd.append('--header-filter=.*')
     cmd.extend(files)
     cmd.append('--')
     try:
