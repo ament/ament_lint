@@ -32,5 +32,8 @@ The ability to check code for syntax and style conventions with flake8.""",
         'console_scripts': [
             'ament_flake8 = ament_flake8.main:main',
         ],
+        'pytest11': [
+            'ament_flake8 = ament_flake8.pytest_marker',
+        ],
     },
 )

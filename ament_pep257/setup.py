@@ -33,5 +33,8 @@ and generate xUnit test result files.""",
         'console_scripts': [
             'ament_pep257 = ament_pep257.main:main',
         ],
+        'pytest11': [
+            'ament_pep257 = ament_pep257.pytest_marker',
+        ],
     },
 )

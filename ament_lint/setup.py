@@ -2,7 +2,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(
-    name='ament_xmllint',
+    name='ament_lint',
     version='0.7.1',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
@@ -20,18 +20,14 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    description='Check XML markup using xmllint.',
+    description='Providing common API for ament linter packages.',
     long_description="""\
-The ability to check XML files like the package manifest using xmllint
-and generate xUnit test result files.""",
+Providing common API for ament linter packages, e.g. the `linter` marker for
+pytest.""",
     license='Apache License, Version 2.0',
-    tests_require=['pytest'],
     entry_points={
-        'console_scripts': [
-            'ament_xmllint = ament_xmllint.main:main',
-        ],
         'pytest11': [
-            'ament_xmllint = ament_xmllint.pytest_marker',
+            'ament_lint = ament_lint.pytest_marker',
         ],
     },
 )
