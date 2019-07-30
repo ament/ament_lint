@@ -1,8 +1,8 @@
-ament_cmake_clang_format
+ament_cmake_clang_tidy
 ========================
 
-Checks the code style of C / C++ source files using `ClangFormat
-<http://clang.llvm.org/docs/ClangFormat.html>`_.
+Diagnose and fix typical programming errors with `Clang-Tidy
+<http://clang.llvm.org/extra/clang-tidy/>`_.
 Files with the following extensions are being considered:
 ``.c``, ``.cc``, ``.cpp``, ``.cxx``, ``.h``, ``.hh``, ``.hpp``, ``.hxx``.
 
@@ -10,7 +10,7 @@ Files with the following extensions are being considered:
 How to run the check from the command line?
 -------------------------------------------
 
-The command line tool is provided by the package `ament_clang_format
+The command line tool is provided by the package `ament_clang_tidy
 <https://github.com/ament/ament_lint>`_.
 
 
@@ -22,7 +22,7 @@ How to run the check from within a CMake ament package as part of the tests?
 .. code:: xml
 
     <buildtool_depend>ament_cmake</buildtool_depend>
-    <test_depend>ament_cmake_clang_format</test_depend>
+    <test_depend>ament_clang_tidy</test_depend>
 
 ``CMakeLists.txt``:
 
@@ -30,8 +30,8 @@ How to run the check from within a CMake ament package as part of the tests?
 
     find_package(ament_cmake REQUIRED)
     if(BUILD_TESTING)
-      find_package(ament_cmake_clang_format REQUIRED)
-      ament_clang_format()
+      find_package(ament_clang_tidy REQUIRED)
+      ament_clang_tidy()
     endif()
 
 When running multiple linters as part of the CMake tests the documentation of
