@@ -58,7 +58,7 @@ function(ament_cppcheck)
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
   if(${cppcheck_version} STREQUAL "1.88")
-    message(WARNING "[ament_cmake_cppcheck] cppcheck 1.88 has known performance issues, skipping")
+    message(STATUS "[ament_cmake_cppcheck] cppcheck 1.88 has known performance issues, skipping")
     set(SHOULD_SKIP "SKIP_TEST")
   endif()
 
