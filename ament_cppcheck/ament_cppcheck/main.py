@@ -27,6 +27,26 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 
+def find_cppcheck_executable():
+    additional_paths = None
+    if os.name == 'nt':
+        # search in location where cppcheck is installed via chocolatey
+        program_files_32 = os.environ.get('ProgramFiles(x86)', 'C:\\Program Files (x86)')
+        additional_paths = [os.path.join(program_files_32, 'Cppcheck')]
+    return find_executable('cppcheck', additional_paths=additional_paths)
+
+
+def get_cppcheck_version(cppcheck_bin):
+    version_cmd = [cppcheck_bin, '--version']
+    output = subprocess.check_output(version_cmd)
+    # expecting something like b'Cppcheck 1.88\n'
+    output = output.decode().strip()
+    tokens = output.split()
+    if len(tokens) != 2:
+        raise RuntimeError("unexpected cppcheck version string '{}'".format(output))
+    return tokens[1]
+
+
 def main(argv=sys.argv[1:]):
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
@@ -54,7 +74,23 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    # option to just get the cppcheck version and print that
+    parser.add_argument(
+        '--cppcheck-version',
+        action='store_true',
+        help='Get the cppcheck version, print it, and then exit.')
     args = parser.parse_args(argv)
+
+    cppcheck_bin = find_cppcheck_executable()
+    if not cppcheck_bin:
+        print("Could not find 'cppcheck' executable", file=sys.stderr)
+        return 1
+
+    cppcheck_version = get_cppcheck_version(cppcheck_bin)
+
+    if args.cppcheck_version:
+        print(cppcheck_version)
+        return 0
 
     if args.xunit_file:
         start_time = time.time()
@@ -64,16 +100,6 @@ def main(argv=sys.argv[1:]):
         print('No files found', file=sys.stderr)
         return 1
 
-    additional_paths = None
-    if os.name == 'nt':
-        # search in location where cppcheck is installed via chocolatey
-        program_files_32 = os.environ.get('ProgramFiles(x86)', 'C:\\Program Files (x86)')
-        additional_paths = [os.path.join(program_files_32, 'Cppcheck')]
-    cppcheck_bin = find_executable('cppcheck', additional_paths=additional_paths)
-    if not cppcheck_bin:
-        print("Could not find 'cppcheck' executable", file=sys.stderr)
-        return 1
-
     # try to determine the number of CPU cores
     jobs = None
     try:
@@ -81,6 +107,16 @@ def main(argv=sys.argv[1:]):
     except NotImplementedError:
         # the number of cores cannot be determined, do not extend args
         pass
+
+    # detect cppcheck 1.88 which caused issues
+    if 'AMENT_CPPCHECK_ALLOW_1_88' not in os.environ:
+        if cppcheck_version == '1.88':
+            print(
+                'cppcheck 1.88 has known performance issues and therefore will not be used, '
+                'set the AMENT_CPPCHECK_ALLOW_1_88 environment variable to override this.',
+                file=sys.stderr,
+            )
+            return 188
 
     # invoke cppcheck
     cmd = [cppcheck_bin,
