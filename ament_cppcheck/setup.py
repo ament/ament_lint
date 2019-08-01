@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='ament_cppcheck',
-    version='0.7.5',
+    version='0.7.6',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
     zip_safe=True,
