@@ -51,17 +51,6 @@ function(ament_cppcheck)
     list(APPEND cmd "--language" "${ARG_LANGUAGE}")
   endif()
 
-  set(SHOULD_SKIP "")
-  execute_process(
-    COMMAND "${ament_cppcheck_BIN}" "--cppcheck-version"
-    OUTPUT_VARIABLE cppcheck_version
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  if(${cppcheck_version} STREQUAL "1.88")
-    message(STATUS "[ament_cmake_cppcheck] cppcheck 1.88 has known performance issues, skipping")
-    set(SHOULD_SKIP "SKIP_TEST")
-  endif()
-
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")
   ament_add_test(
     "${ARG_TESTNAME}"
@@ -70,7 +59,6 @@ function(ament_cppcheck)
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_cppcheck/${ARG_TESTNAME}.txt"
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    ${SHOULD_SKIP}
   )
   set_tests_properties(
     "${ARG_TESTNAME}"
