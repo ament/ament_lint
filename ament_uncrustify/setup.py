@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='ament_uncrustify',
-    version='0.7.6',
+    version='0.7.7',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
     package_data={'': [
