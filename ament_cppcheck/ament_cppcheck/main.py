@@ -116,6 +116,15 @@ def main(argv=sys.argv[1:]):
                 'set the AMENT_CPPCHECK_ALLOW_1_88 environment variable to override this.',
                 file=sys.stderr,
             )
+
+            if args.xunit_file:
+                report = {input_file: [] for input_file in files}
+                write_xunit_file(
+                    args.xunit_file, report, time.time() - start_time,
+                    skip='cppcheck 1.88 performance issues'
+                )
+                return 0
+
             return 188
 
     # invoke cppcheck
@@ -179,22 +188,7 @@ def main(argv=sys.argv[1:]):
 
     # generate xunit file
     if args.xunit_file:
-        folder_name = os.path.basename(os.path.dirname(args.xunit_file))
-        file_name = os.path.basename(args.xunit_file)
-        suffix = '.xml'
-        if file_name.endswith(suffix):
-            file_name = file_name[0:-len(suffix)]
-            suffix = '.xunit'
-            if file_name.endswith(suffix):
-                file_name = file_name[0:-len(suffix)]
-        testname = '%s.%s' % (folder_name, file_name)
-
-        xml = get_xunit_content(report, testname, time.time() - start_time)
-        path = os.path.dirname(os.path.abspath(args.xunit_file))
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(args.xunit_file, 'w') as f:
-            f.write(xml)
+        write_xunit_file(args.xunit_file, report, time.time() - start_time)
 
     return rc
 
@@ -229,7 +223,7 @@ def get_files(paths, extensions):
     return [os.path.normpath(f) for f in files]
 
 
-def get_xunit_content(report, testname, elapsed):
+def get_xunit_content(report, testname, elapsed, skip=None):
     test_count = sum(max(len(r), 1) for r in report.values())
     error_count = sum(len(r) for r in report.values())
     data = {
@@ -237,6 +231,7 @@ def get_xunit_content(report, testname, elapsed):
         'test_count': test_count,
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
+        'skip': test_count if skip else 0,
     }
     xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
@@ -244,13 +239,31 @@ def get_xunit_content(report, testname, elapsed):
   tests="%(test_count)d"
   failures="%(error_count)d"
   time="%(time)s"
+  skip="%(skip)d"
 >
 """ % data
 
     for filename in sorted(report.keys()):
         errors = report[filename]
 
-        if errors:
+        if skip:
+            data = {
+              'quoted_name': quoteattr(filename),
+              'testname': testname,
+              'quoted_message': quoteattr(''),
+              'skip': skip,
+            }
+            xml += """  <testcase
+    name=%(quoted_name)s
+    classname="%(testname)s"
+    status="notrun"
+  >
+    <skipped type="skip" message=%(quoted_message)s>
+      ![CDATA[Test Skipped due to %(skip)s]]
+    </skipped>
+  </testcase>
+""" % data
+        elif errors:
             # report each cppcheck error as a failing testcase
             for error in errors:
                 data = {
@@ -282,15 +295,42 @@ def get_xunit_content(report, testname, elapsed):
 """ % data
 
     # output list of checked files
-    data = {
-        'escaped_files': escape(''.join(['\n* %s' % r
-                                         for r in sorted(report.keys())])),
-    }
-    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+    if skip:
+        data = {
+            'skip': skip,
+        }
+        xml += """  <system-err>Tests Skipped due to %(skip)s</system-err>
+""" % data
+    else:
+        data = {
+            'escaped_files': escape(
+                ''.join(['\n* %s' % r for r in sorted(report.keys())])
+            ),
+        }
+        xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
 """ % data
 
     xml += '</testsuite>\n'
     return xml
+
+
+def write_xunit_file(xunit_file, report, duration, skip=None):
+    folder_name = os.path.basename(os.path.dirname(xunit_file))
+    file_name = os.path.basename(xunit_file)
+    suffix = '.xml'
+    if file_name.endswith(suffix):
+        file_name = file_name[0:-len(suffix)]
+        suffix = '.xunit'
+        if file_name.endswith(suffix):
+            file_name = file_name[0:-len(suffix)]
+    testname = '%s.%s' % (folder_name, file_name)
+
+    xml = get_xunit_content(report, testname, duration, skip)
+    path = os.path.dirname(os.path.abspath(xunit_file))
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open(xunit_file, 'w') as f:
+        f.write(xml)
 
 
 if __name__ == '__main__':
