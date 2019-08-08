@@ -2,26 +2,26 @@ import os
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-import pytest
-
 import ament_mypy.main
+
+import pytest
 
 
 @pytest.fixture()
 def use_dir(tmpdir_factory):
-    """Creates a sample data directory for testing.
+    """Create a sample data directory for testing.
 
-        Directory layout::
-        use_me
-         |-- me_too
-         |    +-- 03.py
-         |-- 01.py
-         |-- 02.py
-         +-- 03.txt
+    Directory layout::
+    use_me
+        |-- me_too
+        |    +-- 03.py
+        |-- 01.py
+        |-- 02.py
+        +-- 03.txt
 
     """
     use_me = tmpdir_factory.mktemp('use_me')
-    files = [use_me.join(arg) for arg in ["01.py", "02.py", "03.txt"]]
+    files = [use_me.join(arg) for arg in ['01.py', '02.py', '03.txt']]
     files.append(use_me.join('me_too', '03.py'))
 
     for tmp_file in files:
@@ -31,20 +31,20 @@ def use_dir(tmpdir_factory):
 
 @pytest.fixture()
 def ignore_dir(tmpdir_factory):
-    """Creates a sample data directory for testing.
+    """Create a sample data directory for testing.
 
-        Directory layout::
-        ignore_me
-         |-- me_too
-         |    +-- 03.py
-         |-- 01.py
-         |-- 02.py
-         |-- 03.txt
-         +-- AMENT_IGNORE
+    Directory layout::
+    ignore_me
+        |-- me_too
+        |    +-- 03.py
+        |-- 01.py
+        |-- 02.py
+        |-- 03.txt
+        +-- AMENT_IGNORE
 
     """
     ignore_me = tmpdir_factory.mktemp('ignore_me')
-    files = [ignore_me.join(arg) for arg in ["01.py", "02.py", "03.txt", "AMENT_IGNORE"]]
+    files = [ignore_me.join(arg) for arg in ['01.py', '02.py', '03.txt', 'AMENT_IGNORE']]
     files.append(ignore_me.join('me_too', '03.py'))
 
     for tmp_file in files:
@@ -61,10 +61,10 @@ def mock_mypy_succ(mocker):
 def sample_errors(use_dir):
     def filename(slug: str):
         return str(use_dir.join(slug))
-    error_line_col = "{}:0:0: error: error message".format(filename('lc.py'))
-    error_line = "{}:0: error: error message".format(filename('l.py'))
-    error_no_pos = "{}: error: error message".format(filename('no_pos.py'))
-    warning = "{}: warning: warning message".format(filename('warn.py'))
+    error_line_col = '{}:0:0: error: error message'.format(filename('lc.py'))
+    error_line = '{}:0: error: error message'.format(filename('l.py'))
+    error_no_pos = '{}: error: error message'.format(filename('no_pos.py'))
+    warning = '{}: warning: warning message'.format(filename('warn.py'))
     return [error_line_col, error_line, error_no_pos, warning]
 
 
@@ -119,41 +119,41 @@ def test_main_success(mock_generate_report, use_dir):
     mock_generate_report.return_value = ('', '', 0)
 
     # Test that a successful lint returns 0
-    assert ament_mypy.main.main([str(use_dir.join("01.py"))]) == 0
+    assert ament_mypy.main.main([str(use_dir.join('01.py'))]) == 0
 
     # Sub-test that no other files in directory were checked, too
     args, _ = mock_generate_report.call_args
-    assert str(use_dir.join("01.py")) in args[0]
-    assert str(use_dir.join("02.py")) not in args[0]
-    assert str(use_dir.join("03.txt")) not in args[0]
+    assert str(use_dir.join('01.py')) in args[0]
+    assert str(use_dir.join('02.py')) not in args[0]
+    assert str(use_dir.join('03.txt')) not in args[0]
 
     # Test that a directory recursively is checked
     assert ament_mypy.main.main([str(use_dir)]) == 0
     args, _ = mock_generate_report.call_args
-    assert str(use_dir.join("01.py")) in args[0]
-    assert str(use_dir.join("02.py")) in args[0]
-    assert str(use_dir.join("03.py")) not in args[0]
+    assert str(use_dir.join('01.py')) in args[0]
+    assert str(use_dir.join('02.py')) in args[0]
+    assert str(use_dir.join('03.py')) not in args[0]
 
     # Test that non-'.py' files were ignored
-    assert str(use_dir.join("03.txt")) not in args[0]
+    assert str(use_dir.join('03.txt')) not in args[0]
 
 
 def test_main_exclude(mock_generate_report, use_dir):
     mock_generate_report.return_value = ('', '', 0)
     # Test that excluding a file that was passed as an arg works
-    assert ament_mypy.main.main([str(use_dir.join("01.py")),
-                                 str(use_dir.join("02.py")),
+    assert ament_mypy.main.main([str(use_dir.join('01.py')),
+                                 str(use_dir.join('02.py')),
                                  '--exclude',
-                                 "02.py"]) == 0
+                                 '02.py']) == 0
     args, _ = mock_generate_report.call_args
-    assert str(use_dir.join("01.py")) in args[0]
-    assert str(use_dir.join("02.py")) not in args[0]
+    assert str(use_dir.join('01.py')) in args[0]
+    assert str(use_dir.join('02.py')) not in args[0]
 
     # Test that excluding a file when its directory was passed works
     assert ament_mypy.main.main([str(use_dir), '--exclude', '02.py']) == 0
     args, _ = mock_generate_report.call_args
-    assert str(use_dir.join("01.py")) in args[0]
-    assert str(use_dir.join("02.py")) not in args[0]
+    assert str(use_dir.join('01.py')) in args[0]
+    assert str(use_dir.join('02.py')) not in args[0]
 
     # Test that an error is raised when all files are excluded
     mock_generate_report.reset_mock()
@@ -170,20 +170,20 @@ def test_ignore(use_dir, ignore_dir):
 
 def test_fail(mocker, mock_mypy_generate_fail, use_dir):
     # Test if an error message from mypy causes a non-zero return
-    assert ament_mypy.main.main([str(use_dir.join("01.py"))])
+    assert ament_mypy.main.main([str(use_dir.join('01.py'))])
 
     # Test that a failure correctly forwards the error code out of main
     ret_val = mock_mypy_generate_fail.return_value
     test_val = 5
     mock_mypy_generate_fail.return_value = (ret_val[0], ret_val[1], test_val)
-    assert ament_mypy.main.main([str(use_dir.join("01.py"))]) == test_val
+    assert ament_mypy.main.main([str(use_dir.join('01.py'))]) == test_val
     test_val = 6
     mock_mypy_generate_fail.return_value = (ret_val[0], ret_val[1], test_val)
-    assert ament_mypy.main.main([str(use_dir.join("01.py"))]) == test_val
+    assert ament_mypy.main.main([str(use_dir.join('01.py'))]) == test_val
 
     # Test that an error code even with a blank message still gets forwarded out
     mock_mypy_generate_fail.return_value = ('', '', test_val)
-    assert ament_mypy.main.main([str(use_dir.join("01.py"))]) == test_val
+    assert ament_mypy.main.main([str(use_dir.join('01.py'))]) == test_val
 
 
 def test_main_error(mocker, use_dir):
@@ -200,24 +200,24 @@ def test_main_config_file(mock_generate_report, mocker, use_dir):
     conf_file.write('[mypy]')
 
     mock_generate_report.return_value = ('', None, 0)
-    assert ament_mypy.main.main([str(use_dir.join("01.py")), '--config', str(conf_file)]) == 0
+    assert ament_mypy.main.main([str(use_dir.join('01.py')), '--config', str(conf_file)]) == 0
     args, _ = mock_generate_report.call_args
     assert args[1] == conf_file
 
     # Test program handles no config file being passed correctly
-    assert ament_mypy.main.main([str(use_dir.join("01.py"))]) == 0
+    assert ament_mypy.main.main([str(use_dir.join('01.py'))]) == 0
     args, _ = mock_generate_report.call_args
     assert args[1] is not None
 
     # Test program raises error when invalid config file is presented
-    assert ament_mypy.main.main([str(use_dir.join("01.py")),
+    assert ament_mypy.main.main([str(use_dir.join('01.py')),
                                  '--config',
                                  str(use_dir.join('aeiou.ini'))]) == 1
 
 
 def test_main_xunit(mock_mypy_generate_fail, mocker, use_dir):
     mock_xunit = mocker.patch('ament_mypy.main._get_xunit_content')
-    mock_xunit.return_value = '<?xml version="1.0" encoding="UTF-8"?></xml>\n'
+    mock_xunit.return_value = "<?xml version='1.0' encoding='UTF-8'?></xml>\n"
 
     # Test that generating report files works
     assert ament_mypy.main.main([str(use_dir), '--xunit-file', str(use_dir.join('testgen'))])

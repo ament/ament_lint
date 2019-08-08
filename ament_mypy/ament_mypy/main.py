@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+#
 # Copyright 2019 Canonical, Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -202,7 +202,7 @@ def _get_xunit_content(errors: List[Match],
             """, '  ').format(testname)
 
     # output list of checked files
-    xml += "  <system-out>Checked files:{escaped_files}\n  </system-out>\n".format(
+    xml += '  <system-out>Checked files:{escaped_files}\n  </system-out>\n'.format(
         escaped_files=escape(''.join(['\n* %s' % f for f in filenames]))
     )
 
@@ -232,7 +232,7 @@ def _get_files(paths: List[str]) -> List[str]:
 
 
 def _get_errors(report_string: str) -> List[Match]:
-    return list(re.finditer(r"^(?P<filename>[^:]+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning):\ (?P<msg>.*)$", report_string, re.MULTILINE))  # noqa: E501
+    return list(re.finditer(r'^(?P<filename>[^:]+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning):\ (?P<msg>.*)$', report_string, re.MULTILINE))  # noqa: E501
 
 
 def _dedent_to(text: str, prefix: str) -> str:
