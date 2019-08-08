@@ -1,4 +1,4 @@
-# Copyright 2016 Open Source Robotics Foundation, Inc.
+# Copyright 2019 Canonical, Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
+find_package(ament_cmake_test QUIET REQUIRED)
 
-from ament_flake8.main import main
+include("${ament_cmake_mypy_DIR}/ament_mypy.cmake")
 
-
-def test_flake8():
-    rc = main(argv=[])
-    assert rc == 0, 'Found code style errors / warnings'
+ament_register_extension("ament_lint_auto" "ament_cmake_mypy"
+  "ament_cmake_mypy_lint_hook.cmake")
