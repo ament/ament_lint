@@ -232,7 +232,7 @@ def _get_files(paths: List[str]) -> List[str]:
 
 
 def _get_errors(report_string: str) -> List[Match]:
-    return list(re.finditer(r'^(?P<filename>[^:]+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning):\ (?P<msg>.*)$', report_string, re.MULTILINE))  # noqa: E501
+    return list(re.finditer(r'^(?P<filename>[^:]+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning|note):\ (?P<msg>.*)$', report_string, re.MULTILINE))  # noqa: E501
 
 
 def _dedent_to(text: str, prefix: str) -> str:
