@@ -107,6 +107,11 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
+def _filename_in_excludes(filename, excludes):
+    absname = os.path.abspath(filename)
+    return any(os.path.commonpath([absname, e]) == e for e in excludes)
+
+
 def generate_pep257_report(paths, excludes, ignore):
     conf = ConfigurationParser()
     sys_argv = sys.argv
@@ -126,7 +131,7 @@ def generate_pep257_report(paths, excludes, ignore):
     files_dict = {}
     if LooseVersion(pydocstyle.__version__) >= LooseVersion('2.0.0'):
         for filename, checked_codes, ignore_decorators in files_to_check:
-            if os.path.abspath(filename) in excludes:
+            if _filename_in_excludes(filename, excludes):
                 continue
             files_dict[filename] = {
                 'select': checked_codes,
@@ -134,7 +139,7 @@ def generate_pep257_report(paths, excludes, ignore):
             }
     else:
         for filename, select in files_to_check:
-            if os.path.abspath(filename) in excludes:
+            if _filename_in_excludes(filename, excludes):
                 continue
             files_dict[filename] = {
                 'select': select,
