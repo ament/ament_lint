@@ -15,7 +15,9 @@
 import os
 import sys
 
-from ament_flake8.main import main
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+from ament_flake8.main import main  # noqa
 
 
 def test_flake8():
