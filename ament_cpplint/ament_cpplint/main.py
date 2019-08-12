@@ -215,7 +215,7 @@ def get_file_groups(paths, extensions):
                 # select files by extension
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
-                    if ext in ['.%s' % e for e in extensions]:
+                    if ext in ('.%s' % e for e in extensions):
                         append_file_to_group(groups,
                                              os.path.join(dirpath, filename))
         if os.path.isfile(path):

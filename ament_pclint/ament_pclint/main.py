@@ -303,7 +303,7 @@ def get_files(paths, extensions):
                 # select files by extension
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
-                    if ext in ['.%s' % e for e in extensions]:
+                    if ext in ('.%s' % e for e in extensions):
                         files.append(os.path.join(dirpath, filename))
         if os.path.isfile(path):
             files.append(path)
