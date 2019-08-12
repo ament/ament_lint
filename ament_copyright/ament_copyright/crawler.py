@@ -70,7 +70,7 @@ def is_repository_root(path):
 def match_filename(filename, extensions):
     """Check if the filename has one of the extensions."""
     _, ext = os.path.splitext(filename)
-    return ext in ['.%s' % e for e in extensions]
+    return ext in ('.%s' % e for e in extensions)
 
 
 def add_files_for_all_filetypes(path, files):
