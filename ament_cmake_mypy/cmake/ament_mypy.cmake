@@ -38,7 +38,7 @@ function(ament_mypy)
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_mypy_BIN}" "--xunit-file" "${result_file}")
   if(ARG_CONFIG_FILE)
-    list(APPEND cmd "--config-file" "${ARG_CONFIG_FILE}")
+    list(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
