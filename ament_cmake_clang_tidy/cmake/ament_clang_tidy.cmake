@@ -49,9 +49,9 @@ function(ament_clang_tidy)
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   if(ARG_CONFIG_FILE)
-    set(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
+    list(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
   elseif(DEFINED ament_cmake_clang_tidy_CONFIG_FILE)
-    set(APPEND cmd "--config" "${ament_cmake_clang_tidy_CONFIG_FILE}")
+    list(APPEND cmd "--config" "${ament_cmake_clang_tidy_CONFIG_FILE}")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_clang_tidy")
