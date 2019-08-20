@@ -6,6 +6,7 @@ setup(
     version='0.7.3',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools'],
+    include_package_data=True,
     zip_safe=False,
     author='Ted Kern',
     author_email='ted.kern@canonical.com',
