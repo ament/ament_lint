@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='ament_clang_tidy',
-    version='6.0.0',
+    version='0.7.8',
     packages=find_packages(exclude=['test']),
     install_requires=['setuptools', 'pyyaml'],
     package_data={'': [
