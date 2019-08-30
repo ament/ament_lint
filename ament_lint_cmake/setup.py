@@ -1,10 +1,15 @@
 from setuptools import find_packages
 from setuptools import setup
 
+package_name = 'ament_lint_cmake'
+
 setup(
-    name='ament_lint_cmake',
+    name=package_name,
     version='0.7.8',
     packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/' + package_name, ['package.xml']),
+    ],
     install_requires=['setuptools'],
     zip_safe=True,
     author='Dirk Thomas',
