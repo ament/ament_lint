@@ -1,10 +1,15 @@
 from setuptools import find_packages
 from setuptools import setup
 
+package_name = 'ament_clang_tidy'
+
 setup(
-    name='ament_clang_tidy',
+    name=package_name,
     version='0.7.8',
     packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/' + package_name, ['package.xml']),
+    ],
     install_requires=['setuptools', 'pyyaml'],
     package_data={'': [
         'configuration/.clang-tidy',

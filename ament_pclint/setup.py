@@ -1,10 +1,15 @@
 from setuptools import find_packages
 from setuptools import setup
 
+package_name = 'ament_pclint'
+
 setup(
-    name='ament_pclint',
+    name=package_name,
     version='0.7.8',
     packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/' + package_name, ['package.xml']),
+    ],
     install_requires=['setuptools'],
     package_data={'': [
         'config/gcc/co-g++.h',
