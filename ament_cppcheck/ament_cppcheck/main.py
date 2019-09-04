@@ -170,7 +170,12 @@ def main(argv=sys.argv[1:]):
             'severity': error.get('severity'),
             'msg': error.get('verbose'),
         }
-        report[filename].append(data)
+        if os.path.relpath(os.path.realpath(filename)) in report:
+            filename = os.path.relpath(os.path.realpath(filename))
+        # in the case where relative and absolute paths are mixed for paths and
+        # include_dirs cppcheck might return duplicate results
+        if not any(data == d for d in report[filename]):
+            report[filename].append(data)
 
         data = dict(data)
         data['filename'] = filename
