@@ -138,7 +138,7 @@ def main(argv=sys.argv[1:]):
     if args.language:
         cmd.extend(['--language={0}'.format(args.language)])
     for include_dir in (args.include_dirs or []):
-        cmd.extend(['-I', include_dir])
+        cmd.extend(['-I', os.path.relpath(include_dir, os.curdir)])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
