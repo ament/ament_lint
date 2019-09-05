@@ -174,7 +174,7 @@ def main(argv=sys.argv[1:]):
             filename = os.path.relpath(os.path.realpath(filename))
         # in the case where relative and absolute paths are mixed for paths and
         # include_dirs cppcheck might return duplicate results
-        if not any(data == d for d in report[filename]):
+        if data not in report[filename]:
             report[filename].append(data)
 
         data = dict(data)
