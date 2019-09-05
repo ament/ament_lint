@@ -179,10 +179,10 @@ def main(argv=sys.argv[1:]):
         if data not in report[filename]:
             report[filename].append(data)
 
-        data = dict(data)
-        data['filename'] = filename
-        print('[%(filename)s:%(line)d]: (%(severity)s: %(id)s) %(msg)s' % data,
-              file=sys.stderr)
+            data = dict(data)
+            data['filename'] = filename
+            print('[%(filename)s:%(line)d]: (%(severity)s: %(id)s) %(msg)s' % data,
+                file=sys.stderr)
 
     # output summary
     error_count = sum(len(r) for r in report.values())
