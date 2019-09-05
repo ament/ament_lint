@@ -170,8 +170,10 @@ def main(argv=sys.argv[1:]):
             'severity': error.get('severity'),
             'msg': error.get('verbose'),
         }
-        if os.path.relpath(os.path.realpath(filename)) in report:
-            filename = os.path.relpath(os.path.realpath(filename))
+        for key in report.keys():
+            if os.path.samefile(key, filename):
+                filename = key
+                break
         # in the case where relative and absolute paths are mixed for paths and
         # include_dirs cppcheck might return duplicate results
         if data not in report[filename]:
