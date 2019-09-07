@@ -1,18 +1,14 @@
 ---
 Language: Cpp
-Standard: Cpp11
 BasedOnStyle: Google
+
 AccessModifierOffset: -2
 AlignAfterOpenBracket: AlwaysBreak
-AlwaysBreakAfterReturnType: None
-AlwaysBreakTemplateDeclarations: Yes
 BraceWrapping:
   AfterClass: true
   AfterFunction: true
   AfterNamespace: true
   AfterStruct: true
-  SplitEmptyRecord: true
-  SplitEmptyFunction: true
 BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: false
 BinPackArguments: false
@@ -26,6 +22,5 @@ MaxEmptyLinesToKeep: 1
 PointerAlignment: Middle
 ReflowComments: false
 AllowShortFunctionsOnASingleLine: None
-BreakConstructorInitializers: BeforeColon
 SpaceAfterTemplateKeyword: false
 ...
