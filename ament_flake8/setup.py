@@ -1,10 +1,15 @@
 from setuptools import find_packages
 from setuptools import setup
 
+package_name = 'ament_flake8'
+
 setup(
-    name='ament_flake8',
+    name=package_name,
     version='0.7.9',
     packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/' + package_name, ['package.xml']),
+    ],
     install_requires=['setuptools'],
     package_data={'': [
         'configuration/ament_flake8.ini',
