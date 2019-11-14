@@ -15,8 +15,16 @@
 #
 # Add a test to check the code for compliance with uncrustify.
 #
+# The default configuration file used for uncrustify is located at
+# configuration/ament_code_style.cfg within the uncrustify directory
+# The default configuration file can be overridden by the
+# argument 'CONFIG_FILE'.
+#
 # :param TESTNAME: the name of the test, default: "uncrustify"
 # :type TESTNAME: string
+# :param CONFIG_FILE: the path of the configuration file for
+#                     clang-format to consider
+# :type CONFIG_FILE: string
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_uncrustify
 # :type MAX_LINE_LENGTH: integer
@@ -26,7 +34,7 @@
 # @public
 #
 function(ament_uncrustify)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME;CONFIG_FILE" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "uncrustify")
   endif()
@@ -40,6 +48,9 @@ function(ament_uncrustify)
   set(cmd "${ament_uncrustify_BIN}" "--xunit-file" "${result_file}")
   if(DEFINED ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
+  endif()
+  if(ARG_CONFIG_FILE)
+    list(APPEND cmd "-c" "${ARG_CONFIG_FILE}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
