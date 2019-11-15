@@ -15,7 +15,7 @@
 # Add a test to check the code for compliance with uncrustify.
 #
 # The default configuration file used for uncrustify is located at
-# configuration/ament_code_style.cfg within the uncrustify directory
+# configuration/ament_code_style.cfg within the ament_uncrustify directory.
 # The default configuration file can be overridden by the
 # argument 'CONFIG_FILE'.
 #
