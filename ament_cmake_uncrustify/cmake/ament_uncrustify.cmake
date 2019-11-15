@@ -22,7 +22,7 @@
 # :param TESTNAME: the name of the test, default: "uncrustify"
 # :type TESTNAME: string
 # :param CONFIG_FILE: the path of the configuration file for
-#                     uncrustify to consider
+#   uncrustify to consider
 # :type CONFIG_FILE: string
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_uncrustify
