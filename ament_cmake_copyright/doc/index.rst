@@ -32,7 +32,7 @@ How to run the check from within a CMake ament package as part of the tests?
     find_package(ament_cmake REQUIRED)
     if(BUILD_TESTING)
       find_package(ament_cmake_copyright REQUIRED)
-      ament_cmake_copyright()
+      ament_copyright()
     endif()
 
 When running multiple linters as part of the CMake tests the documentation of
