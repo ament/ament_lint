@@ -47,7 +47,7 @@ def main(argv=sys.argv[1:]):
         nargs='*',
         default=[
             'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D106', 'D107',
-            'D203', 'D212', 'D404',
+            'D203', 'D212', 'D401', 'D404',
         ],
         help='The pep257 categories to ignore')
     parser.add_argument(
