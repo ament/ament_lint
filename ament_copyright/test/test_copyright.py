@@ -33,3 +33,13 @@ def test_bsd_indented():
 def test_bsd_tabs():
     rc = main(argv=[os.path.join(cases_path, 'bsd_license_tabs')])
     assert rc == 0, 'Found errors'
+
+
+def test_3bsd_cpp():
+    rc = main(argv=[os.path.join(cases_path, '3clause_bsd/case2.cpp')])
+    assert rc == 0, 'Found errors'
+
+
+def test_3bsd_py():
+    rc = main(argv=[os.path.join(cases_path, '3clause_bsd/case.py')])
+    assert rc == 0, 'Found errors'
