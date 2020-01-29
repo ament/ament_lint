@@ -217,10 +217,10 @@ def main(argv=sys.argv[1:]):
 
 
 def add_missing_header(file_descriptors, name, license_, verbose):
-    copyright_ = 'Copyright %d %s' % (int(time.strftime('%Y')) - 1 + 1, name)
+    copyright_ = 'Copyright %d, %s' % (int(time.strftime('%Y')) - 1 + 1, name)
     header = license_.file_header.format(**{
         'copyright': copyright_,
-        'copyright_holder': 'the copyright holder'})
+        'copyright_holder': name})
     lines = header.splitlines()
 
     if verbose:
