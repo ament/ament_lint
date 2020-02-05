@@ -70,6 +70,14 @@ def main(argv=sys.argv[1:]):
         print("Could not find config file '%s'" % args.config_file, file=sys.stderr)
         return 1
 
+    # Filter out folders having AMENT_IGNORE
+    if args.excludes is None:
+        args.excludes = []
+    for dirpath, dirnames, filenames in os.walk(os.getcwd()):
+        if 'AMENT_IGNORE' in filenames:
+            dirnames[:] = []
+            args.excludes.append(dirpath)
+
     report = generate_flake8_report(
         args.config_file, args.paths, args.excludes,
         max_line_length=args.linelength)
@@ -154,7 +162,7 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
     flake8_argv = []
     if config_file is not None:
         flake8_argv.append('--config={0}'.format(config_file))
-    if excludes is not None:
+    if len(excludes) > 0:
         flake8_argv.append('--exclude={0}'.format(','.join(excludes)))
 
     if max_line_length is not None:
