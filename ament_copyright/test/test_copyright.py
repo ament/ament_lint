@@ -20,6 +20,21 @@ from ament_copyright.main import main
 cases_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'cases')
 
 
+def test_apache2_standard():
+    rc = main(argv=[os.path.join(cases_path, 'apache2_license')])
+    assert rc == 0, 'Found errors'
+
+
+def test_boost1_cpp():
+    rc = main(argv=[os.path.join(cases_path, 'boost1/case2.cpp')])
+    assert rc == 0, 'Found errors'
+
+
+def test_boost1_py():
+    rc = main(argv=[os.path.join(cases_path, 'boost1/case.py')])
+    assert rc == 0, 'Found errors'
+
+
 def test_bsd_standard():
     rc = main(argv=[os.path.join(cases_path, 'bsd_license')])
     assert rc == 0, 'Found errors'
