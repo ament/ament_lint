@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+from collections import defaultdict
 from configparser import ConfigParser
 import difflib
 import filecmp
@@ -34,7 +35,8 @@ def main(argv=sys.argv[1:]):
         os.path.dirname(__file__),
         'configuration', 'ament_code_style.cfg')
 
-    extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
+    c_extensions = ['c', 'cc', 'h', 'hh']
+    cpp_extensions = ['cpp', 'cxx', 'hpp', 'hxx']
 
     parser = argparse.ArgumentParser(
         description='Check code style using uncrustify.',
@@ -54,7 +56,8 @@ def main(argv=sys.argv[1:]):
         default=[os.curdir],
         help='The files or directories to check. For directories files ending '
              'in %s will be considered.' %
-             ', '.join(["'.%s'" % e for e in extensions]))
+             ', '.join([
+                 "'.%s'" % e for e in sorted(c_extensions + cpp_extensions)]))
     parser.add_argument(
         '--exclude',
         nargs='*',
@@ -96,8 +99,10 @@ def main(argv=sys.argv[1:]):
         if args.xunit_file:
             start_time = time.time()
 
-        files = get_files(args.paths, extensions, args.exclude)
-        if not files:
+        files_by_language = get_files(
+            args.paths, {'C': c_extensions, 'C++': cpp_extensions},
+            args.exclude)
+        if not files_by_language:
             print('No files found', file=sys.stderr)
             return 1
 
@@ -106,106 +111,22 @@ def main(argv=sys.argv[1:]):
             print("Could not find 'uncrustify' executable", file=sys.stderr)
             return 1
 
-        suffix = '.uncrustify'
-
         report = []
         temp_path = tempfile.mkdtemp(prefix='uncrustify_')
+        suffix = '.uncrustify'
 
         # invoke uncrustify on all files
-        input_files = [os.path.abspath(f) for f in files]
-
-        # on Windows uncrustify fails to concatenate
-        # the absolute prefix path with the absolute input files
-        # https://github.com/bengardner/uncrustify/issues/364
-        cwd = None
-        if os.name == 'nt':
-            cwd = os.path.commonprefix(input_files)
-            if not os.path.isdir(cwd):
-                cwd = os.path.dirname(cwd)
-                assert os.path.isdir(cwd), \
-                    'Could not determine common prefix of input files'
-            input_files = [os.path.relpath(f, start=cwd) for f in input_files]
-
-        try:
-            cmd = [uncrustify_bin,
-                   '-c', args.config_file,
-                   '--prefix', temp_path,
-                   '--suffix', suffix]
-            cmd.extend(input_files)
-            subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            if e.output:
-                print(e.output.decode(), file=sys.stderr)
-            print("The invocation of 'uncrustify' failed with error code %d: %s" %
-                  (e.returncode, e), file=sys.stderr)
-            return 1
-
-        if cwd:
-            # input files are relative
-            # prepend temp path, append suffix
-            output_files = [
-                os.path.join(temp_path, f + suffix) for f in input_files]
-        else:
-            # input files are absolute
-            # remove leading slash, prepend temp path, append suffix
-            output_files = [
-                os.path.join(
-                    temp_path,
-                    os.sep.join(f.split(os.sep)[1:]) +
-                    suffix
-                ) for f in input_files
-            ]
-
-        uncrustified_files = output_files
-        i = 1
-        while True:
-            # identify files which have changed since the latest uncrustify run
-            changed_files = []
-            for input_filename, output_filename in zip(
-                    input_files, uncrustified_files):
-                if cwd and not os.path.isabs(input_filename):
-                    input_filename = os.path.join(cwd, input_filename)
-                if not filecmp.cmp(input_filename, output_filename):
-                    if output_filename == input_filename + suffix:
-                        # for repeated invocations
-                        # replace the previous uncrustified file
-                        os.rename(output_filename, input_filename)
-                        changed_files.append(input_filename)
-                    else:
-                        # after first invocation remove suffix
-                        # otherwise uncrustify behaves different
-                        output_filename_without_suffix = \
-                            output_filename[:-len(suffix)]
-                        os.rename(
-                            output_filename, output_filename_without_suffix)
-                        changed_files.append(output_filename_without_suffix)
-            if not changed_files:
-                break
-            # reinvoke uncrustify for previously changed files
-            input_files = changed_files
-            try:
-                cmd = [uncrustify_bin,
-                       '-c', args.config_file,
-                       '--suffix', suffix]
-                cmd.extend(input_files)
-                subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError as e:
-                if e.output:
-                    print(e.output, file=sys.stderr)
-                print("The invocation of 'uncrustify' failed with error code %d: %s" %
-                      (e.returncode, e), file=sys.stderr)
-                return 1
-
-            uncrustified_files = [f + suffix for f in input_files]
-            i += 1
-            if i >= 5:
-                print("'uncrustify' did not settle on a final result even "
-                      "after %d invocations" % i, file=sys.stderr)
-                return 1
+        all_input_files = []
+        all_output_files = []
+        for language, input_files in files_by_language.items():
+            input_files = files_by_language[language]
+            all_input_files += input_files
+            output_files = invoke_uncrustify(
+                uncrustify_bin, input_files, args, language, temp_path, suffix)
+            all_output_files += output_files
 
         # compute diff
-        for index, filename in enumerate(files):
-            modified_filename = output_files[index]
+        for filename, modified_filename in sorted(zip(all_input_files, all_output_files)):
             with open(filename, 'r', encoding='utf-8') as original_file:
                 with open(modified_filename, 'r', encoding='utf-8') as modified_file:
                     diff_lines = list(difflib.unified_diff(
@@ -282,8 +203,12 @@ def find_executable(file_name, additional_paths=None):
     return shutil.which(file_name, path=path)
 
 
-def get_files(paths, extensions, excludes=[]):
-    files = []
+def get_files(paths, extension_types, excludes=[]):
+    extensions_with_dot_to_language = {}
+    for language, extensions in extension_types.items():
+        for extension in extensions:
+            extensions_with_dot_to_language['.%s' % extension] = language
+    files = defaultdict(list)
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
@@ -301,12 +226,116 @@ def get_files(paths, extensions, excludes=[]):
                     if filename in excludes:
                         continue
                     _, ext = os.path.splitext(filename)
-                    if ext not in ['.%s' % e for e in extensions]:
-                        continue
-                    files.append(os.path.join(dirpath, filename))
+                    language = extensions_with_dot_to_language.get(ext, None)
+                    if language is not None:
+                        files[language].append(
+                            os.path.normpath(os.path.join(dirpath, filename)))
         if os.path.isfile(path):
-            files.append(path)
-    return [os.path.normpath(f) for f in files]
+            _, ext = os.path.splitext(path)
+            language = extensions_with_dot_to_language.get(ext, None)
+            files[language].append(os.path.normpath(path))
+    return files
+
+
+def invoke_uncrustify(
+    uncrustify_bin, files, args, language, temp_path, suffix
+):
+    if not files:
+        return []
+
+    # invoke uncrustify on all files
+    input_files = [os.path.abspath(f) for f in files]
+
+    # on Windows uncrustify fails to concatenate
+    # the absolute prefix path with the absolute input files
+    # https://github.com/bengardner/uncrustify/issues/364
+    cwd = None
+    if os.name == 'nt':
+        cwd = os.path.commonprefix(input_files)
+        if not os.path.isdir(cwd):
+            cwd = os.path.dirname(cwd)
+            assert os.path.isdir(cwd), \
+                'Could not determine common prefix of input files'
+        input_files = [os.path.relpath(f, start=cwd) for f in input_files]
+
+    try:
+        cmd = [
+            uncrustify_bin,
+            '-c', args.config_file,
+            '-l', language,
+            '--prefix', temp_path,
+            '--suffix', suffix]
+        cmd.extend(input_files)
+        subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        if e.output:
+            print(e.output.decode(), file=sys.stderr)
+        print("The invocation of 'uncrustify' failed with error code %d: %s" %
+            (e.returncode, e), file=sys.stderr)
+        return 1
+
+    if cwd:
+        # input files are relative
+        # prepend temp path, append suffix
+        output_files = [
+            os.path.join(temp_path, f + suffix) for f in input_files]
+    else:
+        # input files are absolute
+        # remove leading slash, prepend temp path, append suffix
+        output_files = [
+            os.path.join(
+                temp_path,
+                os.sep.join(f.split(os.sep)[1:]) +
+                suffix
+            ) for f in input_files
+        ]
+
+    uncrustified_files = output_files
+    i = 1
+    while True:
+        # identify files which have changed since the latest uncrustify run
+        changed_files = []
+        for input_filename, output_filename in zip(
+                input_files, uncrustified_files):
+            if cwd and not os.path.isabs(input_filename):
+                input_filename = os.path.join(cwd, input_filename)
+            if not filecmp.cmp(input_filename, output_filename):
+                if output_filename == input_filename + suffix:
+                    # for repeated invocations
+                    # replace the previous uncrustified file
+                    os.rename(output_filename, input_filename)
+                    changed_files.append(input_filename)
+                else:
+                    # after first invocation remove suffix
+                    # otherwise uncrustify behaves different
+                    output_filename_without_suffix = \
+                        output_filename[:-len(suffix)]
+                    os.rename(
+                        output_filename, output_filename_without_suffix)
+                    changed_files.append(output_filename_without_suffix)
+        if not changed_files:
+            break
+        # reinvoke uncrustify for previously changed files
+        input_files = changed_files
+        try:
+            cmd = [uncrustify_bin, '-c', args.config_file, '--suffix', suffix]
+            cmd.extend(input_files)
+            subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            if e.output:
+                print(e.output, file=sys.stderr)
+            print("The invocation of 'uncrustify' failed with error code %d: "
+                  '%s' % (e.returncode, e), file=sys.stderr)
+            return 1
+
+        uncrustified_files = [f + suffix for f in input_files]
+        i += 1
+        if i >= 5:
+            print("'uncrustify' did not settle on a final result even after "
+                  '%d invocations' % i, file=sys.stderr)
+            return 1
+
+    return output_files
 
 
 def get_xunit_content(report, testname, elapsed):
