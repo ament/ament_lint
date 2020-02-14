@@ -303,16 +303,18 @@ def invoke_uncrustify(
                 if output_filename == input_filename + suffix:
                     # for repeated invocations
                     # replace the previous uncrustified file
-                    os.rename(output_filename, input_filename)
-                    changed_files.append(input_filename)
+                    dst_filename = input_filename
                 else:
                     # after first invocation remove suffix
                     # otherwise uncrustify behaves different
                     output_filename_without_suffix = \
                         output_filename[:-len(suffix)]
-                    os.rename(
-                        output_filename, output_filename_without_suffix)
-                    changed_files.append(output_filename_without_suffix)
+                    dst_filename = output_filename_without_suffix
+                if os.path.exists(dst_filename):
+                    # on Windows os.rename doesn't replace an existing dst
+                    os.remove(dst_filename)
+                os.rename(output_filename, dst_filename)
+                changed_files.append(dst_filename)
         if not changed_files:
             break
         # reinvoke uncrustify for previously changed files
