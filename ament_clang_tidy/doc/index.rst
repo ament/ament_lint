@@ -10,22 +10,27 @@ Files with the following extensions are considered:
 How to run the check from the command line?
 -------------------------------------------
 
+*Prerequisites*: ``clang-tidy-6.0`` and ``clang-tools-6.0`` packages should
+have already been installed. ``compile_commands.json`` files should have already
+been generated (e.g.: ``colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON``).
+
 .. code:: sh
 
     ament_clang_tidy [<path> ...]
+
+If ``<path>`` is a directory, it will be recursively searched for
+"compile_commands.json" files (this is usually the ``build`` directory of a
+``colcon`` workspace). If ``<path>`` is a file, it will be treated as a
+"compile_commands.json" file.
+
+The ``--jobs`` option will control the number of clang-tidy jobs should be
+run in parallel.
 
 The ``--explain-config`` option will explain the origin of the enabled
 configuration checks.
 
 The ``--export-fixes`` option will generate a DAT file of the recorded
 fixes when supplied with a file name.
-
-When using the option ``--fix-errors`` the proposed changes are
-applied in place.
-
-The ``--header-filter`` option will accept a regex and display errors from
-the specified non-system header files.  To display errors from all non-system
-header, use ``--header-filter='.*'``.
 
 The ``--quiet`` option will suppress printing statistics about ignored
 warnings and warnings treated as errors.
