@@ -119,7 +119,6 @@ def main(argv=sys.argv[1:]):
         all_input_files = []
         all_output_files = []
         for language, input_files in files_by_language.items():
-            input_files = files_by_language[language]
             all_input_files += input_files
             output_files = invoke_uncrustify(
                 uncrustify_bin, input_files, args, language, temp_path, suffix)
