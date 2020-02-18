@@ -67,13 +67,6 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--export-fixes',
         help='Generate a DAT file of recorded fixes')
-    # parser.add_argument(
-    #     '--fix-errors',
-    #     action='store_true',
-    #     help='Fix the suggested changes')
-    # parser.add_argument(
-    #     '--header-filter',
-    #     help='Accepts a regex and displays errors from the specified non-system headers')
     parser.add_argument(
         '--quiet',
         action='store_true',
@@ -214,8 +207,6 @@ def invoke_clang_tidy(clang_tidy_bin, compilation_db_path, args):
     if args.export_fixes:
         cmd.append('--export-fixes')
         cmd.append(args.export_fixes)
-    # if args.fix_errors:
-    #     cmd.append('--fix-errors')
     if args.quiet:
         cmd.append('--quiet')
     if args.system_headers:
@@ -254,13 +245,6 @@ def invoke_clang_tidy(clang_tidy_bin, compilation_db_path, args):
 
 def find_error_message(data):
     return data[data.rfind(':') + 2:]
-
-
-def find_line_and_col_num(data):
-    first_col = data.find(':')
-    second_col = data.find(':', first_col + 1)
-    third_col = data.find(':', second_col + 1)
-    return data[first_col + 1:second_col], data[second_col + 1:third_col]
 
 
 def get_xunit_content(report, testname, elapsed):
@@ -322,14 +306,6 @@ def get_xunit_content(report, testname, elapsed):
             xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"/>
-""" % data
-
-    # output list of checked files
-    data = {
-        'escaped_files': escape(''.join(['\n* %s' % r
-                                         for r in sorted(report.keys())])),
-    }
-    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
 """ % data
 
     xml += '</testsuite>\n'
