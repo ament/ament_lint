@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
 import argparse
+from collections import defaultdict
 import copy
+import json
 import multiprocessing.pool
 import os
 import re
@@ -24,11 +25,9 @@ import subprocess
 import sys
 import time
 
-from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 import yaml
-import json
 
 
 def main(argv=sys.argv[1:]):
@@ -56,7 +55,7 @@ def main(argv=sys.argv[1:]):
         '--jobs',
         type=int,
         default=1,
-        help="number of clang-tidy jobs to run in parallel")
+        help='number of clang-tidy jobs to run in parallel')
 
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
@@ -108,7 +107,7 @@ def main(argv=sys.argv[1:]):
     for file in files:
         package_dir = os.path.dirname(file)
         package_name = os.path.basename(package_dir)
-        print("linting " + package_name + "...")
+        print('linting ' + package_name + '...')
         async_outputs.append(pool.apply_async(invoke_clang_tidy, (clang_tidy_bin, file, args)))
     pool.close()
     pool.join()
@@ -226,11 +225,11 @@ def invoke_clang_tidy(clang_tidy_bin, compilation_db_path, args):
     for item in db:
         # exclude gtest sources from being checked by clang-tidy
         if is_gtest_source(os.path.basename(item['file'])):
-          continue
+            continue
         # exclude unit test sources from being checked by clang-tidy
         # because gtest macros are problematic
         if is_unittest_source(package_name, item['file']):
-          continue
+            continue
 
         full_cmd = cmd + [item['file']]
         # print(' '.join(full_cmd))
