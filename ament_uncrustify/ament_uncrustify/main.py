@@ -260,10 +260,10 @@ def invoke_uncrustify(
         input_files = [os.path.relpath(f, start=cwd) for f in input_files]
 
     try:
-        cmd = [
-            uncrustify_bin,
-            '-c', args.config_file,
-            '-l', language,
+        cmd = [uncrustify_bin, '-c', args.config_file]
+        if language:
+            cmd += ['-l', language]
+        cmd += [
             '--prefix', temp_path,
             '--suffix', suffix]
         cmd.extend(input_files)
@@ -321,7 +321,10 @@ def invoke_uncrustify(
         # reinvoke uncrustify for previously changed files
         input_files = changed_files
         try:
-            cmd = [uncrustify_bin, '-c', args.config_file, '--suffix', suffix]
+            cmd = [uncrustify_bin, '-c', args.config_file]
+            if language:
+                cmd += ['-l', language]
+            cmd += ['--suffix', suffix]
             cmd.extend(input_files)
             subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
