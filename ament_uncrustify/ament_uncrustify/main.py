@@ -204,10 +204,11 @@ def find_executable(file_name, additional_paths=None):
 
 
 def get_files(paths, extension_types, excludes=[]):
-    extensions_with_dot_to_language = {}
-    for language, extensions in extension_types.items():
-        for extension in extensions:
-            extensions_with_dot_to_language['.%s' % extension] = language
+    extensions_with_dot_to_language = {
+        (language, extension)
+        for language, extensions in extension_types.items()
+        for extension in extensions
+    }
     files = defaultdict(list)
     for path in paths:
         if os.path.isdir(path):
