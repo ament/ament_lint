@@ -314,8 +314,7 @@ def get_xunit_content(report, testname, elapsed):
             }
             xml += """  <testcase
     name=%(quoted_location)s
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files

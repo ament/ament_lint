@@ -450,8 +450,7 @@ def get_xunit_content(report, testname, elapsed):
             # if there is a known copyright / license report a single successful test
             xml += """  <testcase
     name=%(quoted_filename)s
-    classname="%(testname)s"
-    status="%(escaped_message)s"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files
