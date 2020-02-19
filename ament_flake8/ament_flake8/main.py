@@ -229,8 +229,7 @@ def get_xunit_content(report, testname, elapsed):
         }
         xml += """  <testcase
     name="flake8"
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files

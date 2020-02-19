@@ -264,7 +264,6 @@ def get_xunit_content(report, testname, elapsed, skip=None):
             xml += """  <testcase
     name=%(quoted_name)s
     classname="%(testname)s"
-    status="notrun"
   >
     <skipped type="skip" message=%(quoted_message)s>
       ![CDATA[Test Skipped due to %(skip)s]]
@@ -298,8 +297,7 @@ def get_xunit_content(report, testname, elapsed, skip=None):
             }
             xml += """  <testcase
     name=%(quoted_location)s
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files
