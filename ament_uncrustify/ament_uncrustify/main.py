@@ -204,7 +204,7 @@ def find_executable(file_name, additional_paths=None):
 
 def get_files(paths, extension_types, excludes=[]):
     extensions_with_dot_to_language = {
-        language: extension
+        f'.{extension}': language
         for language, extensions in extension_types.items()
         for extension in extensions
     }
