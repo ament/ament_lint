@@ -163,8 +163,7 @@ def get_xunit_content(report, testname):
         }
         xml += """  <testcase
     name="pep8"
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files

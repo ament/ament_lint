@@ -198,8 +198,7 @@ def _get_xunit_content(errors: List[Match],
         xml += _dedent_to("""\
             <testcase
               name="mypy"
-              classname="{}"
-              status="No problems found"/>
+              classname="{}"/>
             """, '  ').format(testname)
 
     # output list of checked files
