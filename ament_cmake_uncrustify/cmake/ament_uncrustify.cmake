@@ -28,13 +28,16 @@
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_uncrustify
 # :type MAX_LINE_LENGTH: integer
+# :param LANGUAGE: a specific language argument for uncrustify instead of
+#   deriving the language from the file extension, either 'C' or 'C++'
+# :type LANGUAGE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_uncrustify)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME;CONFIG_FILE" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "CONFIG_FILE;LANGUAGE;MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "uncrustify")
   endif()
@@ -51,6 +54,9 @@ function(ament_uncrustify)
   endif()
   if(ARG_CONFIG_FILE)
     list(APPEND cmd "-c" "${ARG_CONFIG_FILE}")
+  endif()
+  if(ARG_LANGUAGE)
+    list(APPEND cmd "--language" "${ARG_LANGUAGE}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 

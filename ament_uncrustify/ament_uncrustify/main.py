@@ -64,6 +64,11 @@ def main(argv=sys.argv[1:]):
         default=[],
         help='Exclude specific file names and directory names from the check')
     parser.add_argument(
+        '--language',
+        choices=['C', 'C++'],
+        help="Passed to uncrustify as '-l <language>' to force a specific "
+             'rather then choose based on the file extensions')
+    parser.add_argument(
         '--reformat',
         action='store_true',
         help='Reformat the files in place')
@@ -101,7 +106,7 @@ def main(argv=sys.argv[1:]):
 
         files_by_language = get_files(
             args.paths, {'C': c_extensions, 'C++': cpp_extensions},
-            args.exclude)
+            excludes=args.exclude, language=args.language)
         if not files_by_language:
             print('No files found', file=sys.stderr)
             return 1
@@ -202,10 +207,10 @@ def find_executable(file_name, additional_paths=None):
     return shutil.which(file_name, path=path)
 
 
-def get_files(paths, extension_types, excludes=[]):
+def get_files(paths, extension_types, excludes=[], language=None):
     extensions_with_dot_to_language = {
-        f'.{extension}': language
-        for language, extensions in extension_types.items()
+        f'.{extension}': language or ext_language
+        for ext_language, extensions in extension_types.items()
         for extension in extensions
     }
     files = defaultdict(list)
