@@ -67,7 +67,7 @@ def main(argv=sys.argv[1:]):
         '--language',
         choices=['C', 'C++'],
         help="Passed to uncrustify as '-l <language>' to force a specific "
-             'rather then choose based on the file extensions')
+             'language rather then choosing one based on file extension')
     parser.add_argument(
         '--reformat',
         action='store_true',
