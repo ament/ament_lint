@@ -10,9 +10,9 @@ Files with the following extensions are considered:
 How to run the check from the command line?
 -------------------------------------------
 
-*Prerequisites*: ``clang-tidy-6.0`` and ``clang-tools-6.0`` packages should
-have already been installed. ``compile_commands.json`` files should have already
-been generated (e.g.: ``colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON``).
+*Prerequisites*: ``clang-tidy-6.0``, ``clang-tools-6.0``, and ``python-yaml`` packages should
+have already been installed. ``compile_commands.json`` files should have already been generated
+(e.g.: workspace built with ``colcon build --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON``).
 
 .. code:: sh
 
