@@ -174,6 +174,9 @@ def main(argv=sys.argv[1:]):
             if os.path.samefile(key, filename):
                 filename = key
                 break
+        # report errors from additional include directories
+        if filename not in report:
+            report[filename] = []
         # in the case where relative and absolute paths are mixed for paths and
         # include_dirs cppcheck might return duplicate results
         if data not in report[filename]:
