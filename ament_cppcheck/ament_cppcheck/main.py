@@ -158,7 +158,8 @@ def main(argv=sys.argv[1:]):
         return 1
 
     # output errors
-    report = {}
+    report = defaultdict(list)
+    # even though we use a defaultdict, explicity add known files so they are listed
     for filename in files:
         report[filename] = []
     for error in root.find('errors'):
@@ -174,9 +175,6 @@ def main(argv=sys.argv[1:]):
             if os.path.samefile(key, filename):
                 filename = key
                 break
-        # report errors from additional include directories
-        if filename not in report:
-            report[filename] = []
         # in the case where relative and absolute paths are mixed for paths and
         # include_dirs cppcheck might return duplicate results
         if data not in report[filename]:
