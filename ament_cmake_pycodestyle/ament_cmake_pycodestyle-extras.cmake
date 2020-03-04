@@ -1,4 +1,4 @@
-# Copyright 2014-2015 Open Source Robotics Foundation, Inc.
+# Copyright 2014-2015, 2020 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# copied from ament_cmake_pep8/ament_cmake_pep8-extras.cmake
+# copied from ament_cmake_pycodestyle/ament_cmake_pycodestyle-extras.cmake
 
 find_package(ament_cmake_test QUIET REQUIRED)
 
-include("${ament_cmake_pep8_DIR}/ament_pep8.cmake")
+include("${ament_cmake_pycodestyle_DIR}/ament_pycodestyle.cmake")
 
-ament_register_extension("ament_lint_auto" "ament_cmake_pep8"
-  "ament_cmake_pep8_lint_hook.cmake")
+ament_register_extension("ament_lint_auto" "ament_cmake_pycodestyle"
+  "ament_cmake_pycodestyle_lint_hook.cmake")
