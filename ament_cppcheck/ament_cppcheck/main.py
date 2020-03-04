@@ -158,7 +158,8 @@ def main(argv=sys.argv[1:]):
         return 1
 
     # output errors
-    report = {}
+    report = defaultdict(list)
+    # even though we use a defaultdict, explicity add known files so they are listed
     for filename in files:
         report[filename] = []
     for error in root.find('errors'):
