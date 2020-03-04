@@ -1,15 +1,15 @@
-ament_pep8
-==========
+ament_cmake_pycodestyle
+=======================
 
-Checks the code style of Python source files using `pep8
-<http://pep8.readthedocs.org/>`_.
+Checks the code style of Python source files using `pycodestyle
+<http://pycodestyle.readthedocs.org/>`_.
 Files with the following extensions are being considered: ``.py``.
 
 
 How to run the check from the command line?
 -------------------------------------------
 
-The command line tool is provided by the package `ament_pep8
+The command line tool is provided by the package `ament_pycodestyle
 <https://github.com/ament/ament_lint>`_.
 
 
@@ -21,7 +21,7 @@ How to run the check from within a CMake ament package as part of the tests?
 .. code:: xml
 
     <buildtool_depend>ament_cmake</buildtool_depend>
-    <test_depend>ament_cmake_pep8</test_depend>
+    <test_depend>ament_cmake_pycodestyle</test_depend>
 
 ``CMakeLists.txt``:
 
@@ -29,8 +29,8 @@ How to run the check from within a CMake ament package as part of the tests?
 
     find_package(ament_cmake REQUIRED)
     if(BUILD_TESTING)
-      find_package(ament_cmake_pep8 REQUIRED)
-      ament_pep8()
+      find_package(ament_cmake_pycodestyle REQUIRED)
+      ament_pycodestyle()
     endif()
 
 When running multiple linters as part of the CMake tests the documentation of

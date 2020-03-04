@@ -1,4 +1,4 @@
-# Copyright 2015 Open Source Robotics Foundation, Inc.
+# Copyright 2015, 2020 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,6 @@
 
 file(GLOB_RECURSE _python_files FOLLOW_SYMLINKS "*.py")
 if(_python_files)
-  message(STATUS "Added test 'pep8' to check Python code against some of the style conventions in PEP 8")
-  ament_pep8()
+  message(STATUS "Added test 'pycodestyle' to check Python code against some of the style conventions in PEP 8")
+  ament_pycodestyle()
 endif()

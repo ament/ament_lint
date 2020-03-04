@@ -26,7 +26,7 @@ test dependencies.
     <!-- add test dependencies on any linter, e.g. -->
     <test_depend>ament_clang_format</test_depend>
     <test_depend>ament_cppcheck</test_depend>
-    <test_depend>ament_pep8</test_depend>
+    <test_depend>ament_pycodestyle</test_depend>
 
 Since recursive dependencies are also being used a single test dependency is
 sufficient to test with a set of common linters.

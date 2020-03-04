@@ -1,7 +1,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-package_name = 'ament_pep8'
+package_name = 'ament_pycodestyle'
 
 setup(
     name=package_name,
@@ -14,7 +14,7 @@ setup(
     ],
     install_requires=['setuptools'],
     package_data={'': [
-        'configuration/ament_pep8.ini',
+        'configuration/ament_pycodestyle.ini',
     ]},
     zip_safe=False,
     author='Dirk Thomas',
@@ -30,7 +30,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    description='Check Python code style using pep8.',
+    description='Check Python code style using pycodestyle.',
     long_description="""\
 The ability to check code against the style conventions in PEP 8 and
 generate xUnit test result files.""",
@@ -38,7 +38,7 @@ generate xUnit test result files.""",
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'ament_pep8 = ament_pep8.main:main',
+            'ament_pycodestyle = ament_pycodestyle.main:main',
         ],
     },
 )
