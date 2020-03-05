@@ -15,6 +15,8 @@
 from ament_flake8.main import main
 
 
+@pytest.mark.linter
+@pytest.mark.flake8
 def test_flake8():
     rc = main(argv=[])
     assert rc == 0, 'Found code style errors / warnings'
