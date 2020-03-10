@@ -16,8 +16,10 @@
 
 import argparse
 from collections import defaultdict
+import datetime
 import multiprocessing
 import os
+from platform import node
 from shutil import which
 import subprocess
 import sys
@@ -234,28 +236,44 @@ def get_files(paths, extensions):
 def get_xunit_content(report, testname, elapsed, skip=None):
     test_count = sum(max(len(r), 1) for r in report.values())
     error_count = sum(len(r) for r in report.values())
+    # assume no problems on test implementation. This is diferent than test
+    # failures. The description of XSD is "An errored test is one that had
+    # an unanticipated problem. e.g., an unchecked throwable;
+    # or a problem with the implementation of the test."
     data = {
+        'assume_number_system_errors': 0,
+        'hostname': node(),
         'testname': testname,
         'test_count': test_count,
+        'timestamp': datetime.datetime.now().replace(microsecond=0).isoformat(),
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
         'skip': test_count if skip else 0,
     }
     xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
+  hostname="%(hostname)s"
   name="%(testname)s"
   tests="%(test_count)d"
+  timestamp="%(timestamp)s"
   failures="%(error_count)d"
+  errors="%(assume_number_system_errors)d"
   time="%(time)s"
-  skip="%(skip)d"
+  skipped="%(skip)d"
 >
+  <properties />
 """ % data
 
     for filename in sorted(report.keys()):
         errors = report[filename]
+        # The XSD require the time spent on running each test.
+        # cppcheck does not expose this information in the output
+        # setting time to 0
+        assume_testcase_time = 0
 
         if skip:
             data = {
+              'assume_testcase_time': assume_testcase_time,
               'quoted_name': quoteattr(filename),
               'testname': testname,
               'quoted_message': quoteattr(''),
@@ -264,6 +282,7 @@ def get_xunit_content(report, testname, elapsed, skip=None):
             xml += """  <testcase
     name=%(quoted_name)s
     classname="%(testname)s"
+    time="%(assume_testcase_time)s"
   >
     <skipped type="skip" message=%(quoted_message)s>
       ![CDATA[Test Skipped due to %(skip)s]]
@@ -274,6 +293,7 @@ def get_xunit_content(report, testname, elapsed, skip=None):
             # report each cppcheck error as a failing testcase
             for error in errors:
                 data = {
+                    'assume_testcase_time': assume_testcase_time,
                     'quoted_name': quoteattr(
                         '%s: %s (%s:%d)' % (
                             error['severity'], error['id'],
@@ -284,6 +304,7 @@ def get_xunit_content(report, testname, elapsed, skip=None):
                 xml += """  <testcase
     name=%(quoted_name)s
     classname="%(testname)s"
+    time="%(assume_testcase_time)s"
   >
       <failure message=%(quoted_message)s/>
   </testcase>
@@ -292,12 +313,14 @@ def get_xunit_content(report, testname, elapsed, skip=None):
         else:
             # if there are no cpplint errors report a single successful test
             data = {
+                'assume_testcase_time': assume_testcase_time,
                 'quoted_location': quoteattr(filename),
                 'testname': testname,
             }
             xml += """  <testcase
     name=%(quoted_location)s
-    classname="%(testname)s"/>
+    classname="%(testname)s"
+    time="%(assume_testcase_time)"/>
 """ % data
 
     # output list of checked files
@@ -305,8 +328,8 @@ def get_xunit_content(report, testname, elapsed, skip=None):
         data = {
             'skip': skip,
         }
-        xml += """  <system-err>Tests Skipped due to %(skip)s</system-err>
-""" % data
+        xml += """  <system-out />
+  <system-err>Tests Skipped due to %(skip)s</system-err>""" % data
     else:
         data = {
             'escaped_files': escape(
@@ -314,6 +337,7 @@ def get_xunit_content(report, testname, elapsed, skip=None):
             ),
         }
         xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+  <system-err />
 """ % data
 
     xml += '</testsuite>\n'
