@@ -13,6 +13,11 @@ How to run the check from the command line?
 The command line tool is provided by the package `ament_uncrustify
 <https://github.com/ament/ament_lint>`_.
 
+Note that ament_uncrustify comes with a command line tool which can automatically reformat the code according to the style guide by calling
+
+.. code:: sh
+
+  ament_uncrustify --reformat <path_to_source_folders>
 
 How to run the check from within a CMake ament package as part of the tests?
 ----------------------------------------------------------------------------
