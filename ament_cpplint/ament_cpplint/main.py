@@ -281,6 +281,7 @@ def get_xunit_content(report, testname, elapsed):
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
+  errors="0"
   time="%(time)s"
 >
 """ % data
