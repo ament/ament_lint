@@ -131,6 +131,7 @@ def get_xunit_content(report, testname):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >
