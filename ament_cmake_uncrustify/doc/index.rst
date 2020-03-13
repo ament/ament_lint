@@ -11,7 +11,7 @@ How to run the check from the command line?
 -------------------------------------------
 
 The command line tool is provided by the package `ament_uncrustify
-<https://github.com/ament/ament_lint>`_.
+<https://github.com/ament/ament_lint/tree/master/ament_uncrustify>`_.
 
 Note that ament_uncrustify comes with a command line tool which can automatically reformat the code according to the style guide by calling
 
