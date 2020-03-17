@@ -29,11 +29,11 @@ configuration checks.
 The ``--export-fixes`` option will generate a DAT file of the recorded
 fixes when supplied with a file name.
 
-When using the option ``--fix-errors`` the proposed changes are 
-applied in place.   
+When using the option ``--fix-errors`` the proposed changes are
+applied in place.
 
-The ``--header-filter`` option will accept a regex and display errors from  
-the specified non-system header files.  To display errors from all non-system   
+The ``--header-filter`` option will accept a regex and display errors from
+the specified non-system header files.  To display errors from all non-system
 header, use ``--header-filter='.*'``.
 
 The ``--quiet`` option will suppress printing statistics about ignored

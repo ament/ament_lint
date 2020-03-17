@@ -104,16 +104,6 @@ def main(argv=sys.argv[1:]):
               ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
         return 1
 
-    script_names = [
-        'run-clang-tidy',
-        'run-clang-tidy-6.0.py'
-    ]
-    clang_tidy_script = find_executable(script_names)
-    if args.fix_errors and not clang_tidy_script:
-        print('Could not find %s script' %
-              ' / '.join(["'%s'" % n for n in script_names]), file=sys.stderr)
-        return 1
-
     def invoke_clang_tidy(compilation_db_path):
         package_dir = os.path.dirname(compilation_db_path)
         package_name = os.path.basename(package_dir)
@@ -122,23 +112,27 @@ def main(argv=sys.argv[1:]):
             content = h.read()
         data = yaml.safe_load(content)
         style = yaml.dump(data, default_flow_style=True, width=float('inf'))
-
-        cmd_args = ['--config=%s' % style, '-p', package_dir]
-        cmd_args.append('--header-filter')
-        if args.header_filter:
-            cmd_args.append(args.header_filter)
-        else:
-            cmd_args.append('include/%s/.*' % package_name)
-
+        cmd = [clang_tidy_bin,
+               '--config=%s' % style,
+               '-p', package_dir]
         if args.explain_config:
-            cmd_args.append('--explain-config')
+            cmd.append('--explain-config')
         if args.export_fixes:
-            cmd_args.append('--export-fixes')
-            cmd_args.append(args.export_fixes)
+            cmd.append('--export-fixes')
+            cmd.append(args.export_fixes)
+        if args.fix_errors:
+            cmd.append('--fix-errors')
+        cmd.append('--header-filter')
+        if args.header_filter:
+            cmd.append(args.header_filter)
+        else:
+            cmd.append('include/%s/.*' % package_name)
         if args.quiet:
-            cmd_args.append('--quiet')
+            cmd.append('--quiet')
         if args.system_headers:
-            cmd_args.append('--system-headers')
+            cmd.append('--system-headers')
+        cmd.extend(files)
+        cmd.append('--')
 
         def is_gtest_source(file_name):
             if(file_name == 'gtest_main.cc' or file_name == 'gtest-all.cc'
@@ -155,12 +149,13 @@ def main(argv=sys.argv[1:]):
             # exclude gtest sources from being checked by clang-tidy
             if is_gtest_source(os.path.basename(item['file'])):
                 continue
+
             # exclude unit test sources from being checked by clang-tidy
             # because gtest macros are problematic
             if is_unittest_source(package_name, item['file']):
                 continue
 
-            full_cmd = [clang_tidy_bin] + cmd_args + [item['file']]
+            full_cmd = cmd + [item['file']]
             # print(' '.join(full_cmd))
             try:
                 output += subprocess.check_output(full_cmd, stderr=subprocess.DEVNULL).strip().decode()
