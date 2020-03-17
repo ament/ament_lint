@@ -18,7 +18,6 @@ import argparse
 from collections import defaultdict
 import copy
 import json
-import multiprocessing.pool
 import os
 import re
 import subprocess
@@ -51,11 +50,6 @@ def main(argv=sys.argv[1:]):
         help='If <path> is a directory, ament_clang_tidy will recursively search it for'
              ' "compile_commands.json" files. If <path> is a file, ament_clang_tidy will'
              ' treat it as a "compile_commands.json" file')
-    parser.add_argument(
-        '--jobs',
-        type=int,
-        default=1,
-        help='number of clang-tidy jobs to run in parallel')
 
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
@@ -88,7 +82,8 @@ def main(argv=sys.argv[1:]):
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
-        print("Could not find config file '%s'" % args.config_file, file=sys.stderr)
+        print("Could not find config file '%s'" % args.config_file,
+              file=sys.stderr)
         return 1
 
     if args.xunit_file:
@@ -99,42 +94,100 @@ def main(argv=sys.argv[1:]):
         print('No compilation database files found', file=sys.stderr)
         return 1
 
-    bin_names = ['clang-tidy', 'clang-tidy-6.0']
+    bin_names = [
+        'clang-tidy',
+        'clang-tidy-6.0',
+    ]
     clang_tidy_bin = find_executable(bin_names)
     if not clang_tidy_bin:
-        print('Could not find %s executable' % ' / '.join(["'%s'" % n for n in bin_names]),
-              file=sys.stderr)
+        print('Could not find %s executable' %
+              ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
         return 1
 
-    script_names = ['run-clang-tidy', 'run-clang-tidy-6.0.py']
+    script_names = [
+        'run-clang-tidy',
+        'run-clang-tidy-6.0.py'
+    ]
     clang_tidy_script = find_executable(script_names)
     if args.fix_errors and not clang_tidy_script:
-        print('Could not find %s script' % ' / '.join(["'%s'" % n for n in script_names]),
-              file=sys.stderr)
+        print('Could not find %s script' %
+              ' / '.join(["'%s'" % n for n in script_names]), file=sys.stderr)
         return 1
 
-    pool = multiprocessing.pool.ThreadPool(args.jobs)
-    async_outputs = []
+    def invoke_clang_tidy(compilation_db_path):
+        package_dir = os.path.dirname(compilation_db_path)
+        package_name = os.path.basename(package_dir)
+
+        with open(args.config_file, 'r') as h:
+            content = h.read()
+        data = yaml.safe_load(content)
+        style = yaml.dump(data, default_flow_style=True, width=float('inf'))
+
+        cmd_args = ['--config=%s' % style, '-p', package_dir]
+        cmd_args.append('--header-filter')
+        if args.header_filter:
+            cmd_args.append(args.header_filter)
+        else:
+            cmd_args.append('include/%s/.*' % package_name)
+
+        if args.explain_config:
+            cmd_args.append('--explain-config')
+        if args.export_fixes:
+            cmd_args.append('--export-fixes')
+            cmd_args.append(args.export_fixes)
+        if args.quiet:
+            cmd_args.append('--quiet')
+        if args.system_headers:
+            cmd_args.append('--system-headers')
+
+        def is_gtest_source(file_name):
+            if(file_name == 'gtest_main.cc' or file_name == 'gtest-all.cc'
+               or file_name == 'gmock_main.cc' or file_name == 'gmock-all.cc'):
+                return True
+            return False
+
+        def is_unittest_source(package, file_path):
+            return ('%s/test/' % package) in file_path
+
+        output = ''
+        db = json.load(open(compilation_db_path))
+        for item in db:
+            # exclude gtest sources from being checked by clang-tidy
+            if is_gtest_source(os.path.basename(item['file'])):
+                continue
+            # exclude unit test sources from being checked by clang-tidy
+            # because gtest macros are problematic
+            if is_unittest_source(package_name, item['file']):
+                continue
+
+            full_cmd = [clang_tidy_bin] + cmd_args + [item['file']]
+            # print(' '.join(full_cmd))
+            try:
+                output += subprocess.check_output(full_cmd, stderr=subprocess.DEVNULL).strip().decode()
+            except subprocess.CalledProcessError as e:
+                print('The invocation of "%s" failed with error code %d: %s' %
+                      (os.path.basename(clang_tidy_bin), e.returncode, e),
+                      file=sys.stderr)
+        return output
+
+    outputs = []
     for file in files:
         package_dir = os.path.dirname(file)
         package_name = os.path.basename(package_dir)
         print('found compilation database for package "%s"...' % package_name)
-        async_output = pool.apply_async(invoke_clang_tidy, (clang_tidy_bin, clang_tidy_script,
-                                        file, args))
-        async_outputs.append(async_output)
-    pool.close()
-    pool.join()
-
-    error_re = re.compile('(/.*\\.(?:%s)):(\\d+):(\\d+):' % '|'.join(extensions))
+        output = invoke_clang_tidy(file)
+        outputs.append(output)
 
     # output errors
     report = defaultdict(list)
+
+    error_re = re.compile('(/.*\\.(?:%s)):(\\d+):(\\d+):' % '|'.join(extensions))
+
     current_file = None
     new_file = None
     data = {}
 
-    for async_output in async_outputs:
-        output = async_output.get()
+    for output in outputs:
         print(output)
         for line in output.splitlines():
             # error found
@@ -203,63 +256,6 @@ def get_compilation_db_files(paths):
         elif os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
-
-
-def invoke_clang_tidy(clang_tidy_bin, clang_tidy_script, compilation_db_path, args):
-    package_dir = os.path.dirname(compilation_db_path)
-    package_name = os.path.basename(package_dir)
-
-    with open(args.config_file, 'r') as h:
-        content = h.read()
-    data = yaml.safe_load(content)
-    style = yaml.dump(data, default_flow_style=True, width=float('inf'))
-
-    cmd_args = ['--config=%s' % style, '-p', package_dir]
-    cmd_args.append('--header-filter')
-    if args.header_filter:
-        cmd_args.append(args.header_filter)
-    else:
-        cmd_args.append('include/%s/.*' % package_name)
-
-    if args.explain_config:
-        cmd_args.append('--explain-config')
-    if args.export_fixes:
-        cmd_args.append('--export-fixes')
-        cmd_args.append(args.export_fixes)
-    if args.quiet:
-        cmd_args.append('--quiet')
-    if args.system_headers:
-        cmd_args.append('--system-headers')
-
-    def is_gtest_source(file_name):
-        if(file_name == 'gtest_main.cc' or file_name == 'gtest-all.cc'
-           or file_name == 'gmock_main.cc' or file_name == 'gmock-all.cc'):
-            return True
-        return False
-
-    def is_unittest_source(package, file_path):
-        return ('%s/test/' % package) in file_path
-
-    output = ''
-    db = json.load(open(compilation_db_path))
-    for item in db:
-        # exclude gtest sources from being checked by clang-tidy
-        if is_gtest_source(os.path.basename(item['file'])):
-            continue
-        # exclude unit test sources from being checked by clang-tidy
-        # because gtest macros are problematic
-        if is_unittest_source(package_name, item['file']):
-            continue
-
-        full_cmd = [clang_tidy_bin] + cmd_args + [item['file']]
-        # print(' '.join(full_cmd))
-        try:
-            output += subprocess.check_output(full_cmd, stderr=subprocess.DEVNULL).strip().decode()
-        except subprocess.CalledProcessError as e:
-            print('The invocation of "%s" failed with error code %d: %s' %
-                  (os.path.basename(clang_tidy_bin), e.returncode, e),
-                  file=sys.stderr)
-    return output
 
 
 def find_error_message(data):
