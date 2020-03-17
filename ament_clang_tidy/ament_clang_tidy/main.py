@@ -158,7 +158,8 @@ def main(argv=sys.argv[1:]):
             full_cmd = cmd + [item['file']]
             # print(' '.join(full_cmd))
             try:
-                output += subprocess.check_output(full_cmd, stderr=subprocess.DEVNULL).strip().decode()
+                output += subprocess.check_output(full_cmd,
+                                                  stderr=subprocess.DEVNULL).strip().decode()
             except subprocess.CalledProcessError as e:
                 print('The invocation of "%s" failed with error code %d: %s' %
                       (os.path.basename(clang_tidy_bin), e.returncode, e),
