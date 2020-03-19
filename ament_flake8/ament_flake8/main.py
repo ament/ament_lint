@@ -126,7 +126,7 @@ def main(argv=sys.argv[1:]):
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
 
-    return rc
+    return ReturnCode(rc, errors=report.errors)
 
 
 def get_flake8_style_guide(argv):
@@ -178,10 +178,7 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
         format_func(error)
         report.add_error(error)
         print('')
-        print(
-            '%s:%d:%d: %s %s' % (
-                error.filename, error.line_number,
-                error.column_number, error.code, error.text))
+        print(format_error(error))
     style._application.formatter.format = custom_format
 
     # Get the names of files checked
@@ -191,6 +188,12 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
 
     assert report.report.total_errors == len(report.errors)
     return report
+
+
+def format_error(error):
+    return '%s:%d:%d: %s %s' % (
+        error.filename, error.line_number, error.column_number, error.code,
+        error.text)
 
 
 def get_xunit_content(report, testname, elapsed):
@@ -283,6 +286,22 @@ class CustomReport:
 
     def print_statistics(self):
         self.report._application.report_statistics()
+
+
+class ReturnCode(int):
+    """
+    Mimic an integer return code.
+
+    The class exists to maintain backward compatibility while offering detailed
+    error strings.
+    """
+
+    @staticmethod
+    def __new__(cls, value, *, errors):
+        return int.__new__(cls, value)
+
+    def __init__(self, value, *, errors):
+        self.error_strings = [format_error(error) for error in errors]
 
 
 if __name__ == '__main__':
