@@ -29,6 +29,11 @@ if LooseVersion(flake8.__version__) >= '3.0':
 
 
 def main(argv=sys.argv[1:]):
+    rc, _ = main_with_errors(argv=argv)
+    return rc
+
+
+def main_with_errors(argv=sys.argv[1:]):
     config_file = os.path.join(
         os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
 
@@ -126,7 +131,7 @@ def main(argv=sys.argv[1:]):
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
 
-    return ReturnCode(rc, errors=report.errors)
+    return rc, [format_error(e) for e in report.errors]
 
 
 def get_flake8_style_guide(argv):
@@ -286,22 +291,6 @@ class CustomReport:
 
     def print_statistics(self):
         self.report._application.report_statistics()
-
-
-class ReturnCode(int):
-    """
-    Mimic an integer return code.
-
-    The class exists to maintain backward compatibility while offering detailed
-    error strings.
-    """
-
-    @staticmethod
-    def __new__(cls, value, *, errors):
-        return int.__new__(cls, value)
-
-    def __init__(self, value, *, errors):
-        self.error_strings = [format_error(error) for error in errors]
 
 
 if __name__ == '__main__':
