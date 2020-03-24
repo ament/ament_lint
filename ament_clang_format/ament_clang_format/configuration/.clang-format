@@ -16,4 +16,15 @@ ContinuationIndentWidth: 2
 DerivePointerAlignment: false
 PointerAlignment: Middle
 ReflowComments: false
+SpaceBeforeCtorInitializerColon: true
+BreakBeforeInheritanceComma: false
+BreakInheritanceList: AfterColon
+BreakConstructorInitializersBeforeComma: true
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpacesBeforeTrailingComments: 2
 ...
