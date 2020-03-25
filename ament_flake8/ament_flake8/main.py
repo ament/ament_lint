@@ -29,6 +29,11 @@ if LooseVersion(flake8.__version__) >= '3.0':
 
 
 def main(argv=sys.argv[1:]):
+    rc, _ = main_with_errors(argv=argv)
+    return rc
+
+
+def main_with_errors(argv=sys.argv[1:]):
     config_file = os.path.join(
         os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
 
@@ -126,7 +131,7 @@ def main(argv=sys.argv[1:]):
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
 
-    return rc
+    return rc, [format_error(e) for e in report.errors]
 
 
 def get_flake8_style_guide(argv):
@@ -178,10 +183,7 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
         format_func(error)
         report.add_error(error)
         print('')
-        print(
-            '%s:%d:%d: %s %s' % (
-                error.filename, error.line_number,
-                error.column_number, error.code, error.text))
+        print(format_error(error))
     style._application.formatter.format = custom_format
 
     # Get the names of files checked
@@ -191,6 +193,12 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
 
     assert report.report.total_errors == len(report.errors)
     return report
+
+
+def format_error(error):
+    return '%s:%d:%d: %s %s' % (
+        error.filename, error.line_number, error.column_number, error.code,
+        error.text)
 
 
 def get_xunit_content(report, testname, elapsed):
