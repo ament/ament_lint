@@ -161,6 +161,7 @@ def _get_xunit_content(errors: List[Match],
         <testsuite
         name="{test_name:s}"
         tests="{test_count:d}"
+        errors="0"
         failures="{error_count:d}"
         time="{time:s}"
         >
@@ -197,8 +198,7 @@ def _get_xunit_content(errors: List[Match],
         xml += _dedent_to("""\
             <testcase
               name="mypy"
-              classname="{}"
-              status="No problems found"/>
+              classname="{}"/>
             """, '  ').format(testname)
 
     # output list of checked files
