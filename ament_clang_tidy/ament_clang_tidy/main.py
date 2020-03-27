@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
 import copy
 import json
 import os
@@ -24,6 +23,7 @@ import subprocess
 import sys
 import time
 
+from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 import yaml
@@ -95,7 +95,7 @@ def main(argv=sys.argv[1:]):
         return 1
 
     bin_names = [
-        'clang-tidy',
+        # 'clang-tidy',
         'clang-tidy-6.0',
     ]
     clang_tidy_bin = find_executable(bin_names)
@@ -141,6 +141,7 @@ def main(argv=sys.argv[1:]):
         def is_unittest_source(package, file_path):
             return ('%s/test/' % package) in file_path
 
+        files = []
         output = ''
         db = json.load(open(compilation_db_path))
         for item in db:
@@ -153,8 +154,8 @@ def main(argv=sys.argv[1:]):
             if is_unittest_source(package_name, item['file']):
                 continue
 
+            files.append(item['file'])
             full_cmd = cmd + [item['file']]
-            # print(' '.join(full_cmd))
             try:
                 output += subprocess.check_output(full_cmd,
                                                   stderr=subprocess.DEVNULL).strip().decode()
@@ -162,21 +163,25 @@ def main(argv=sys.argv[1:]):
                 print('The invocation of "%s" failed with error code %d: %s' %
                       (os.path.basename(clang_tidy_bin), e.returncode, e),
                       file=sys.stderr)
-        return output
+        return (files, output)
 
     files = []
     outputs = []
     for compilation_db in compilation_dbs:
-        package_dir = os.path.dirname(file)
+        package_dir = os.path.dirname(compilation_db)
         package_name = os.path.basename(package_dir)
         print('found compilation database for package "%s"...' % package_name)
-        output = invoke_clang_tidy(compilation_db)
+        (source_files, output) = invoke_clang_tidy(compilation_db)
+        files += source_files
         outputs.append(output)
 
     # output errors
-    report = defaultdict(list)
+    report = {}
+    for filename in files:
+        report[filename] = []
 
-    error_re = re.compile('(/.*\\.(?:%s)):(\\d+):(\\d+):' % '|'.join(extensions))
+    error_re = re.compile('(/.*?\\.(?:%s)):(\\d+):(\\d+): (?:warning:|error:)' %
+                          '|'.join(extensions))
 
     current_file = None
     new_file = None
@@ -316,6 +321,16 @@ def get_xunit_content(report, testname, elapsed):
             xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"/>
+""" % data
+
+    # output list of checked files
+    data = {
+        'escaped_files': escape(
+            ''.join(['\n* %s' % r for r in sorted(map(
+                os.path.relpath, report.keys()
+            ))])),
+    }
+    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
 """ % data
 
     xml += '</testsuite>\n'
