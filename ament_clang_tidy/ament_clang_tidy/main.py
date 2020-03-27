@@ -89,8 +89,8 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
-    files = get_compilation_db_files(args.paths)
-    if not files:
+    compilation_dbs = get_compilation_db_files(args.paths)
+    if not compilation_dbs:
         print('No compilation database files found', file=sys.stderr)
         return 1
 
@@ -131,8 +131,6 @@ def main(argv=sys.argv[1:]):
             cmd.append('--quiet')
         if args.system_headers:
             cmd.append('--system-headers')
-        cmd.extend(files)
-        cmd.append('--')
 
         def is_gtest_source(file_name):
             if(file_name == 'gtest_main.cc' or file_name == 'gtest-all.cc'
@@ -166,12 +164,13 @@ def main(argv=sys.argv[1:]):
                       file=sys.stderr)
         return output
 
+    files = []
     outputs = []
-    for file in files:
+    for compilation_db in compilation_dbs:
         package_dir = os.path.dirname(file)
         package_name = os.path.basename(package_dir)
         print('found compilation database for package "%s"...' % package_name)
-        output = invoke_clang_tidy(file)
+        output = invoke_clang_tidy(compilation_db)
         outputs.append(output)
 
     # output errors
