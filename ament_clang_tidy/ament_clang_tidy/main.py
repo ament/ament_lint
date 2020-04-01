@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+from collections import defaultdict
 import copy
 import json
 import os
@@ -176,7 +177,7 @@ def main(argv=sys.argv[1:]):
         outputs.append(output)
 
     # output errors
-    report = {}
+    report = defaultdict(list)
     for filename in files:
         report[filename] = []
 
