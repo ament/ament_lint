@@ -127,6 +127,8 @@ def main(argv=sys.argv[1:]):
             all_input_files += input_files
             output_files = invoke_uncrustify(
                 uncrustify_bin, input_files, args, language, temp_path, suffix)
+            if output_files is None:
+                return 1
             all_output_files += output_files
 
         # compute diff
@@ -277,7 +279,7 @@ def invoke_uncrustify(
             print(e.output.decode(), file=sys.stderr)
         print("The invocation of 'uncrustify' failed with error code %d: %s" %
             (e.returncode, e), file=sys.stderr)
-        return 1
+        return None
 
     if cwd:
         # input files are relative
@@ -336,14 +338,14 @@ def invoke_uncrustify(
                 print(e.output, file=sys.stderr)
             print("The invocation of 'uncrustify' failed with error code %d: "
                   '%s' % (e.returncode, e), file=sys.stderr)
-            return 1
+            return None
 
         uncrustified_files = [f + suffix for f in input_files]
         i += 1
         if i >= 5:
             print("'uncrustify' did not settle on a final result even after "
                   '%d invocations' % i, file=sys.stderr)
-            return 1
+            return None
 
     return output_files
 
