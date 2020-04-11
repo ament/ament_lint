@@ -131,6 +131,7 @@ def get_xunit_content(report, testname):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >
@@ -162,8 +163,7 @@ def get_xunit_content(report, testname):
         }
         xml += """  <testcase
     name="pep8"
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files
