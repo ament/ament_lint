@@ -79,7 +79,7 @@ def main_with_errors(argv=sys.argv[1:]):
     if args.excludes is None:
         args.excludes = []
     for dirpath, dirnames, filenames in os.walk(os.getcwd()):
-        if 'AMENT_IGNORE' in filenames:
+        if 'AMENT_IGNORE' in dirnames + filenames:
             dirnames[:] = []
             args.excludes.append(dirpath)
 
