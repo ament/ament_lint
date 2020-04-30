@@ -26,13 +26,15 @@
 # :type ROOT: string
 # :param TIMEOUT: the test timeout in seconds, default: 120
 # :type TIMEOUT: integer
+# :param EXCLUDE_DIRS: an optional list of exclude directories for cpplint
+# :type EXCLUDE_DIRS: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cpplint)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT;EXCLUDE_DIRS" "FILTERS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cpplint")
   endif()
@@ -57,6 +59,9 @@ function(ament_cpplint)
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
   if(NOT ARG_TIMEOUT)
     set(ARG_TIMEOUT 120)
+  endif()
+  if(ARG_EXCLUDE_DIRS)
+    list(APPEND cmd "--excludedirs" "${ARG_EXCLUDE_DIRS}")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")
