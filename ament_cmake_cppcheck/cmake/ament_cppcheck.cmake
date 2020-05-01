@@ -23,10 +23,8 @@
 # :type TESTNAME: string
 # :param LANGUAGE: the language argument for cppcheck, either 'c' or 'c++'
 # :type LANGUAGE: string
-# :param EXCLUDE_FILES: an optional list of exclude files for cppcheck
-# :type EXCLUDE_FILES: list
-# :param EXCLUDE_DIRS: an optional list of exclude directories for cppcheck
-# :type EXCLUDE_DIRS: list
+# :param EXCLUDE: an optional list of exclude files or directories for cppcheck
+# :type EXCLUDE: list
 # :param INCLUDE_DIRS: an optional list of include paths for cppcheck
 # :type INCLUDE_DIRS: list
 # :param ARGN: the files or directories to check
