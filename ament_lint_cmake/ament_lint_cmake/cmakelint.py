@@ -34,7 +34,7 @@ _RE_COMMAND_START_SPACES = re.compile(r'^\s*\w+\s*\((\s*)', re.VERBOSE)
 _RE_COMMAND_END_SPACES = re.compile(r'(\s*)\)', re.VERBOSE)
 _RE_LOGIC_CHECK = re.compile(r'(\w+)\s*\(\s*\S+[^)]+\)', re.VERBOSE)
 _RE_COMMAND_ARG = re.compile(r'(\w+)', re.VERBOSE)
-_RE_STRING = re.compile(r'^\s*#?\s*"[^"]+"\)?', re.VERBOSE)
+_RE_STRING = re.compile(r'^\s*\#?\s*"[^"]+"\)?', re.VERBOSE)
 _logic_commands = """
 else
 endforeach
