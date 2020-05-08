@@ -142,8 +142,8 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
       Examples:
         --linelength=120
 
-    excludedir=dir1 dir2 ...
-      List of exclude directories for cpplint
+    exclude=dir1 dir2 file1...
+      List of exclude directories or files for cpplint
 
       Examples:
         --excludedir=LinearMath impl
@@ -189,8 +189,8 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
     The "root" option is similar in function to the --root flag (see example
     above).
-    
-    The "headers" option is similar in function to the --headers flag 
+
+    The "headers" option is similar in function to the --headers flag
     (see example above).
 
     CPPLINT.cfg has an effect on files in the same directory and all

@@ -27,10 +27,10 @@ if(_source_files)
 
   # Get exclude paths for added targets
   set(_all_exclude "")
-  if(DEFINED ament_cmake_cpplint_ADDITIONAL_EXCLUDE_DIRS)
-    list(APPEND _all_exclude ${ament_cmake_cpplint_ADDITIONAL_EXCLUDE_DIRS})
+  if(DEFINED ament_cmake_cpplint_ADDITIONAL_EXCLUDE)
+    list(APPEND _all_exclude ${ament_cmake_cpplint_ADDITIONAL_EXCLUDE})
   endif()
 
   message(STATUS "Configured cpplint exclude dirs and/or files: ${_all_exclude}")
-  ament_cpplint(EXCLUDE_DIRS ${_all_exclude})
+  ament_cpplint(EXCLUDE ${_all_exclude})
 endif()
