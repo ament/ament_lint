@@ -78,6 +78,10 @@ def main(argv=sys.argv[1:]):
         '--root', type=str,
         help='The --root option for cpplint')
     parser.add_argument(
+        '--exclude', default=[''],
+        nargs='*',
+        help='Exclude directories or C/C++ files to be checked.')
+    parser.add_argument(
         'paths',
         nargs='*',
         default=[os.curdir],
@@ -144,7 +148,8 @@ def main(argv=sys.argv[1:]):
         else:
             print("Not using '--root'")
         print('')
-        arguments += files
+        arguments += [file for file in files
+                      if any(excl not in file or not excl for excl in args.exclude)]
         filenames = ParseArguments(arguments)
 
         for filename in filenames:
