@@ -70,7 +70,6 @@ _USAGE = """
 Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
                    [--counting=total|toplevel|detailed] [--root=subdir]
                    [--linelength=digits] [--headers=x,y,...]
-                   [--excludedirs=x y]
         <file> [file] ...
 
   The style guidelines this tries to follow are those in
@@ -142,12 +141,6 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
       Examples:
         --linelength=120
 
-    exclude=dir1 dir2 file1...
-      List of exclude directories or files for cpplint
-
-      Examples:
-        --excludedir=LinearMath impl
-
     extensions=extension,extension,...
       The allowed file extensions that cpplint will check
 
@@ -189,8 +182,8 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
     The "root" option is similar in function to the --root flag (see example
     above).
-
-    The "headers" option is similar in function to the --headers flag
+    
+    The "headers" option is similar in function to the --headers flag 
     (see example above).
 
     CPPLINT.cfg has an effect on files in the same directory and all
