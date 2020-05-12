@@ -34,7 +34,7 @@ if(_source_files)
   endif()
 
   # Language
-  set(_language "")
+  set(_language "c")
   if(DEFINED ament_cmake_cppcheck_LANGUAGE)
     set(_language ${ament_cmake_cppcheck_LANGUAGE})
   endif()
