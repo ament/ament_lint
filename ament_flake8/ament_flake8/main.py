@@ -141,13 +141,26 @@ def get_flake8_style_guide(argv):
     # appropriate options to pass into the standard flake8.legacy.get_style_guide();
     # passing argv gets it to determine the options for us.
     application = flake8_app.Application()
-    application.parse_preliminary_options_and_args([])
-    flake8.configure_logging(
-        application.prelim_opts.verbose, application.prelim_opts.output_file)
-    application.make_config_finder()
-    application.find_plugins()
-    application.register_plugin_options()
-    application.parse_configuration_and_cli(argv)
+    if hasattr(application, 'parse_preliminary_options'):
+        prelim_opts, remaining_args = application.parse_preliminary_options(
+            argv)
+        flake8.configure_logging(prelim_opts.verbose, prelim_opts.output_file)
+        from flake8.options import config
+        config_finder = config.ConfigFileFinder(
+            application.program, prelim_opts.append_config,
+            config_file=prelim_opts.config,
+            ignore_config_files=prelim_opts.isolated)
+        application.find_plugins(config_finder)
+        application.register_plugin_options()
+        application.parse_configuration_and_cli(config_finder, remaining_args)
+    else:
+        application.parse_preliminary_options_and_args([])
+        flake8.configure_logging(
+            application.prelim_opts.verbose, application.prelim_opts.output_file)
+        application.make_config_finder()
+        application.find_plugins()
+        application.register_plugin_options()
+        application.parse_configuration_and_cli(argv)
     application.make_formatter()
     try:
         # needed in older flake8 versions to populate the listener
