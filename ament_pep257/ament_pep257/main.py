@@ -45,11 +45,14 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--ignore',
         nargs='*',
-        default=[
-            'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D106', 'D107',
-            'D203', 'D212', 'D404',
-        ],
+        default=['D1'],
         help='The pep257 categories to ignore')
+    parser.add_argument(
+        '--select',
+        nargs='*',
+        default=[],
+        help='The additional pydocstyle checks to run'
+    )
     parser.add_argument(
         'paths',
         nargs='*',
@@ -74,7 +77,7 @@ def main(argv=sys.argv[1:]):
         start_time = time.time()
 
     excludes = [os.path.abspath(e) for e in args.excludes]
-    report = generate_pep257_report(args.paths, excludes, args.ignore)
+    report = generate_pep257_report(args.paths, excludes, args.ignore, args.select)
     error_count = sum(len(r[1]) for r in report)
 
     # print summary
@@ -112,12 +115,15 @@ def _filename_in_excludes(filename, excludes):
     return any(os.path.commonpath([absname, e]) == e for e in excludes)
 
 
-def generate_pep257_report(paths, excludes, ignore):
+def generate_pep257_report(paths, excludes, ignore, selected):
     conf = ConfigurationParser()
     sys_argv = sys.argv
     sys.argv = [
         'main',
-        '--ignore=' + ','.join(ignore),
+        '--add-ignore=' + ','.join(ignore),
+        '--add-select=' + ','.join(selected),
+        '--match', r'.*\.py',
+        '--match-dir', r'[^\._].*',
     ]
     sys.argv += paths
     conf.parse()
