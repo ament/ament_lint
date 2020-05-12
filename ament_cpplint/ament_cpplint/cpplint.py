@@ -70,7 +70,6 @@ _USAGE = """
 Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
                    [--counting=total|toplevel|detailed] [--root=subdir]
                    [--linelength=digits] [--headers=x,y,...]
-                   [--excludedirs=x y]
         <file> [file] ...
 
   The style guidelines this tries to follow are those in
@@ -141,12 +140,6 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
       Examples:
         --linelength=120
-
-    exclude=dir1 dir2 file1...
-      List of exclude directories or files for cpplint
-
-      Examples:
-        --excludedir=LinearMath impl
 
     extensions=extension,extension,...
       The allowed file extensions that cpplint will check
