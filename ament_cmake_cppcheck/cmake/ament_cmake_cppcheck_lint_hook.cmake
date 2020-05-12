@@ -35,8 +35,8 @@ if(_source_files)
 
   # Language
   set(_language "")
-  if(DEFINED ament_cmake_cppcheck_ADDITIONAL_LANGUAGE)
-    set(_language ${ament_cmake_cppcheck_ADDITIONAL_LANGUAGE})
+  if(DEFINED ament_cmake_cppcheck_LANGUAGE)
+    set(_language ${ament_cmake_cppcheck_LANGUAGE})
   endif()
 
   # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
