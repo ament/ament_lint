@@ -34,9 +34,9 @@ if(_source_files)
   endif()
 
   # Language
-  set(_language "c")
+  set(_language "")
   if(DEFINED ament_cmake_cppcheck_LANGUAGE)
-    set(_language ${ament_cmake_cppcheck_LANGUAGE})
+    set(_language LANGUAGE ${ament_cmake_cppcheck_LANGUAGE})
   endif()
 
   # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
@@ -71,5 +71,5 @@ if(_source_files)
 
   message(STATUS "Configured cppcheck include dirs: ${_all_include_dirs}")
   message(STATUS "Configured cppcheck language : ${_language}")
-  ament_cppcheck(LANGUAGE ${_language} INCLUDE_DIRS ${_all_include_dirs})
+  ament_cppcheck(${_language} INCLUDE_DIRS ${_all_include_dirs})
 endif()
