@@ -170,9 +170,9 @@ def main(argv=sys.argv[1:]):
 
                 # format deletion / addition as unified diff
                 data['deletion'] = '\n'.join(
-                    ['- ' + l for l in data['deletion'].split('\n')])
+                    ['- ' + line for line in data['deletion'].split('\n')])
                 data['addition'] = '\n'.join(
-                    ['+ ' + l for l in data['addition'].split('\n')])
+                    ['+ ' + line for line in data['addition'].split('\n')])
 
                 report[filename].append(data)
 
