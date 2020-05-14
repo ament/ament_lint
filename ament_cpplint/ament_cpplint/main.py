@@ -148,8 +148,9 @@ def main(argv=sys.argv[1:]):
         else:
             print("Not using '--root'")
         print('')
-        arguments += [file for file in files
-                      if any(excl not in file or not excl for excl in args.exclude)]
+        arguments += [
+            f for f in files
+            if any(excl not in f or not excl for excl in args.exclude)]
         filenames = ParseArguments(arguments)
 
         for filename in filenames:
