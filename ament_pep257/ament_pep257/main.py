@@ -20,6 +20,7 @@ import logging
 import os
 import sys
 import time
+import warnings
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -45,13 +46,19 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--ignore',
         nargs='*',
-        default=['D1'],
-        help='The pep257 categories to ignore')
+        default=[],
+        help='The pep257 error codes to ignore.')
     parser.add_argument(
         '--select',
         nargs='*',
         default=[],
-        help='The additional pydocstyle checks to run'
+        help='The pep257 error codes to check.'
+    )
+    parser.add_argument(
+        '--allow-undocumented',
+        type=bool,
+        default=None,
+        help='Ignore D1 pep257 error codes, allowing undocumented code'
     )
     parser.add_argument(
         'paths',
@@ -75,6 +82,12 @@ def main(argv=sys.argv[1:]):
 
     if args.xunit_file:
         start_time = time.time()
+    if args.allow_undocumented:
+        args.ignore.append('D1')
+    elif args.allow_undocumented is None:
+        warnings.warn('Argument "--allow-undocumented" will be required in a future version. '
+                      'Defaulting to --allow-undocumented=True')
+        args.ignore.append('D1')
 
     excludes = [os.path.abspath(e) for e in args.excludes]
     report = generate_pep257_report(args.paths, excludes, args.ignore, args.select)
