@@ -26,13 +26,15 @@
 # :type ROOT: string
 # :param TIMEOUT: the test timeout in seconds, default: 120
 # :type TIMEOUT: integer
+# :param EXCLUDE: an optional list of exclude directories or files for cpplint
+# :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cpplint)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS" ${ARGN})
+  cmake_parse_arguments(ARG "" "EXCLUDE;MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cpplint")
   endif()
@@ -44,6 +46,9 @@ function(ament_cpplint)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_cpplint_BIN}" "--xunit-file" "${result_file}")
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
+  endif()
   if(ARG_FILTERS)
     string(REPLACE ";" "," filters "${ARG_FILTERS}")
     list(APPEND cmd "--filters=${filters}")
