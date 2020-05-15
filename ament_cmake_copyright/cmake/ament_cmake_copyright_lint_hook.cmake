@@ -12,5 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-message(STATUS "Added test 'copyright' to check for copyright in source files and LICENSE status")
+message(
+  STATUS
+  "Added test 'copyright' to check source files copyright and LICENSE")
 ament_copyright()
