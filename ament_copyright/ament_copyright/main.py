@@ -112,7 +112,6 @@ def main(argv=sys.argv[1:]):
         filenames = [f for f in filenames if os.path.basename(f) not in args.excludes]
     if not filenames:
         print('No repository roots and files found')
-        return 0
 
     file_descriptors = {}
     for filename in sorted(filenames):
