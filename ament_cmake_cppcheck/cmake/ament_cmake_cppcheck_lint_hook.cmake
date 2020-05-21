@@ -80,5 +80,7 @@ if(_source_files)
   message(
     STATUS "Configured cppcheck exclude dirs and/or files: ${_all_exclude}"
   )
-  ament_cppcheck(${_language} INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
+  ament_cppcheck(
+    ${_language} INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude}
+  )
 endif()
