@@ -37,6 +37,7 @@ if(_source_files)
   set(_language "")
   if(DEFINED ament_cmake_cppcheck_LANGUAGE)
     set(_language LANGUAGE ${ament_cmake_cppcheck_LANGUAGE})
+    message(STATUS "Configured cppcheck language : ${_language}")
   endif()
 
   # Get exclude paths for added targets
@@ -76,7 +77,6 @@ if(_source_files)
   endif()
 
   message(STATUS "Configured cppcheck include dirs: ${_all_include_dirs}")
-  message(STATUS "Configured cppcheck language : ${_language}")
   message(
     STATUS "Configured cppcheck exclude dirs and/or files: ${_all_exclude}"
   )
