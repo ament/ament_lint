@@ -37,7 +37,7 @@ if(_source_files)
   set(_language "")
   if(DEFINED ament_cmake_cppcheck_LANGUAGE)
     set(_language LANGUAGE ${ament_cmake_cppcheck_LANGUAGE})
-    message(STATUS "Configured cppcheck language : ${_language}")
+    message(STATUS "Configured cppcheck language: ${ament_cmake_cppcheck_LANGUAGE}")
   endif()
 
   # Get exclude paths for added targets
