@@ -33,7 +33,7 @@ if(_source_files)
     list(APPEND _all_include_dirs ${ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS})
   endif()
 
-  # Language
+  # Forces cppcheck to consider ament_cmake_cppcheck_LANGUAGE as the given language if defined
   set(_language "")
   if(DEFINED ament_cmake_cppcheck_LANGUAGE)
     set(_language LANGUAGE ${ament_cmake_cppcheck_LANGUAGE})
