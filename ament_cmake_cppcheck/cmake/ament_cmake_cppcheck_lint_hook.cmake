@@ -33,7 +33,14 @@ if(_source_files)
     list(APPEND _all_include_dirs ${ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS})
   endif()
 
-  # Get exclde paths for added targets
+  # Forces cppcheck to consider ament_cmake_cppcheck_LANGUAGE as the given language if defined
+  set(_language "")
+  if(DEFINED ament_cmake_cppcheck_LANGUAGE)
+    set(_language LANGUAGE ${ament_cmake_cppcheck_LANGUAGE})
+    message(STATUS "Configured cppcheck language: ${ament_cmake_cppcheck_LANGUAGE}")
+  endif()
+
+  # Get exclude paths for added targets
   set(_all_exclude "")
   if(DEFINED ament_cmake_cppcheck_ADDITIONAL_EXCLUDE)
     list(APPEND _all_exclude ${ament_cmake_cppcheck_ADDITIONAL_EXCLUDE})
@@ -73,5 +80,7 @@ if(_source_files)
   message(
     STATUS "Configured cppcheck exclude dirs and/or files: ${_all_exclude}"
   )
-  ament_cppcheck(INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
+  ament_cppcheck(
+    ${_language} INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude}
+  )
 endif()
