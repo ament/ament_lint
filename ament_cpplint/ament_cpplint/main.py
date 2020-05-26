@@ -148,29 +148,29 @@ def main(argv=sys.argv[1:]):
         else:
             print("Not using '--root'")
         print('')
-        arguments_dirs = [f for f in files if os.path.dirname(f) not in args.excludes]
-        arguments_files = [f for f in files if f not in args.excludes]
-        arguments += list(set(arguments_dirs).intersection(arguments_files))
-        filenames = ParseArguments(arguments)
+        files_check = [f for f in files if not any(f for excl in args.excludes if excl in f)]
+        if(len(files_check) != 0):
+            arguments += files_check
+            filenames = ParseArguments(arguments)
 
-        for filename in filenames:
-            # hook into error reporting
-            errors = []
+            for filename in filenames:
+                # hook into error reporting
+                errors = []
 
-            def custom_error(filename, linenum, category, confidence, message):
-                if ament_cpplint.cpplint._ShouldPrintError(category, confidence, linenum):
-                    errors.append({
-                        'linenum': linenum,
-                        'category': category,
-                        'confidence': confidence,
-                        'message': message,
-                    })
-                DefaultError(filename, linenum, category, confidence, message)
-            ament_cpplint.cpplint.Error = custom_error
+                def custom_error(filename, linenum, category, confidence, message):
+                    if ament_cpplint.cpplint._ShouldPrintError(category, confidence, linenum):
+                        errors.append({
+                            'linenum': linenum,
+                            'category': category,
+                            'confidence': confidence,
+                            'message': message,
+                        })
+                    DefaultError(filename, linenum, category, confidence, message)
+                ament_cpplint.cpplint.Error = custom_error
 
-            ProcessFile(filename, _cpplint_state.verbose_level)
-            report.append((filename, errors))
-            print('')
+                ProcessFile(filename, _cpplint_state.verbose_level)
+                report.append((filename, errors))
+                print('')
 
     # output summary
     for category in sorted(_cpplint_state.errors_by_category.keys()):
