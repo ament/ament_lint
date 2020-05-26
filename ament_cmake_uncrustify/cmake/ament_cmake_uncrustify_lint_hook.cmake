@@ -30,6 +30,6 @@ if(_source_files)
     list(APPEND _args ${ament_cmake_uncrustify_ADDITIONAL_ARGS})
   endif()
 
-  message(STATUS "Configured uncrustify aditional arguments: ${_args}")
+  message(STATUS "Configured uncrustify additional arguments: ${_args}")
   ament_uncrustify(${_args})
 endif()

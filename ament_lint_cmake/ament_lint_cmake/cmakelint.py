@@ -405,20 +405,21 @@ def _ProcessFile(filename):
         return
     global _package_state
     _package_state = _CMakePackageState()
-    for l in open(filename).readlines():
-        l = l.rstrip('\n')
-        if l.endswith('\r'):
-            have_cr = True
-            l = l.rstrip('\r')
-        lines.append(l)
-        # Check this line to see if it is a lint_cmake pragma
-        if l.startswith(linter_pragma_start):
-            try:
-                _lint_state.SetFilters(l[len(linter_pragma_start):])
-            except:
-                print("Exception occurred while processing '{0}:{1}':"
-                      .format(filename, len(lines)))
-                raise
+    with open(filename) as f:
+        for l in f.readlines():
+            l = l.rstrip('\n')
+            if l.endswith('\r'):
+                have_cr = True
+                l = l.rstrip('\r')
+            lines.append(l)
+            # Check this line to see if it is a lint_cmake pragma
+            if l.startswith(linter_pragma_start):
+                try:
+                    _lint_state.SetFilters(l[len(linter_pragma_start):])
+                except:
+                    print("Exception occurred while processing '{0}:{1}':"
+                          .format(filename, len(lines)))
+                    raise
     lines.append('# Lines end here')
     # Check file name after reading lines incase of a # lint_cmake: pragma
     CheckFileName(filename, Error)
