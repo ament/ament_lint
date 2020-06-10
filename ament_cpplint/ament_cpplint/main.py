@@ -148,7 +148,16 @@ def main(argv=sys.argv[1:]):
         else:
             print("Not using '--root'")
         print('')
-        files_check = [f for f in files if not any(f for excl in args.excludes if excl in f)]
+
+        files_to_avoid = []
+        for f in files:
+            path, file_name = os.path.split(f)
+            path_tokens = os.path.split(path)
+            for excl in args.excludes:
+                if excl in file_name or excl in path_tokens:
+                    files_to_avoid.append(f)
+        files_check = list(set(files) ^ set(files_to_avoid))
+
         if(len(files_check) != 0):
             arguments += files_check
             filenames = ParseArguments(arguments)
