@@ -154,7 +154,7 @@ def main(argv=sys.argv[1:]):
             path, file_name = os.path.split(f)
             path_tokens = os.path.split(path)
             for excl in args.excludes:
-                if excl in file_name or excl in path_tokens:
+                if excl == file_name or excl in path_tokens:
                     files_to_avoid.append(f)
         files_check = list(set(files) ^ set(files_to_avoid))
 
