@@ -20,7 +20,6 @@ import logging
 import os
 import sys
 import time
-import warnings
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -45,26 +44,20 @@ def main(argv=sys.argv[1:]):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         '--ignore',
-        nargs='*',
-        default=[],
-        help='The pep257 error codes to ignore.')
+        nargs='+',
+        action='extend',
+        help='The pep257 error codes to ignore. Has precedence over --select.')
     parser.add_argument(
         '--select',
-        nargs='*',
-        default=[],
+        nargs='+',
+        action='extend',
         help='The pep257 error codes to check.'
-    )
-    parser.add_argument(
-        '--allow-undocumented',
-        type=bool,
-        default=None,
-        help='Ignore D1 pep257 error codes, allowing undocumented code'
     )
     parser.add_argument(
         'paths',
         nargs='*',
         default=[os.curdir],
-        help='The files or directories to check. For directories files ending '
+        help='The files or directories to check. For directories, files ending '
              "in '.py' will be considered.")
     parser.add_argument(
         '--exclude',
@@ -80,14 +73,16 @@ def main(argv=sys.argv[1:]):
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
+    default_ignore = set(['D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D106', 'D107'])
+    if 'D1' in args.select:
+        default_ignore = set([])
+    default_ignore -= set(args.select)
+    args.ignore += default_ignore
+
+    args.select.append('D213')
+
     if args.xunit_file:
         start_time = time.time()
-    if args.allow_undocumented:
-        args.ignore.append('D1')
-    elif args.allow_undocumented is None:
-        warnings.warn('Argument "--allow-undocumented" will be required in a future version. '
-                      'Defaulting to --allow-undocumented=True')
-        args.ignore.append('D1')
 
     excludes = [os.path.abspath(e) for e in args.excludes]
     report = generate_pep257_report(args.paths, excludes, args.ignore, args.select)
