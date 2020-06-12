@@ -16,6 +16,7 @@
 
 import argparse
 import os
+import pathlib
 import re
 import sys
 import time
@@ -152,9 +153,20 @@ def main(argv=sys.argv[1:]):
         files_to_avoid = []
         for f in files:
             path, file_name = os.path.split(f)
-            path_tokens = os.path.split(path)
+            path_to_check = pathlib.Path(path)
+
+            def check_path_parents(parents, exclude):
+                for p in parents:
+                    if p.match(exclude):
+                        return True
+                return False
+
             for excl in args.excludes:
-                if excl == file_name or excl in path_tokens:
+                if (
+                    excl == file_name or
+                    path_to_check.match(excl) or
+                    check_path_parents(path_to_check.parents, excl)
+                ):
                     files_to_avoid.append(f)
         files_check = list(set(files) ^ set(files_to_avoid))
 
