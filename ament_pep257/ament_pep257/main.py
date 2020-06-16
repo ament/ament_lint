@@ -118,8 +118,6 @@ def generate_pep257_report(paths, excludes, ignore):
     sys.argv = [
         'main',
         '--ignore=' + ','.join(ignore),
-        '--match', r'.*\.py',
-        '--match-dir', r'[^\._].*',
     ]
     sys.argv += paths
     conf.parse()
