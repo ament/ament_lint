@@ -124,7 +124,7 @@ def main(argv=sys.argv[1:]):
 
     argv.append('--linelength=%d' % args.linelength)
 
-    groups = get_file_groups(args.paths, extensions + headers)
+    groups = get_file_groups(args.paths, extensions + headers, args.excludes)
     if not groups:
         print('No files found', file=sys.stderr)
         return 1
@@ -150,48 +150,27 @@ def main(argv=sys.argv[1:]):
             print("Not using '--root'")
         print('')
 
-        files_to_avoid = []
-        for f in files:
-            path, file_name = os.path.split(f)
-            path_to_check = pathlib.Path(path)
+        arguments += files
+        filenames = ParseArguments(arguments)
 
-            def check_path_parents(parents, exclude):
-                for p in parents:
-                    if p.match(exclude):
-                        return True
-                return False
+        for filename in filenames:
+            # hook into error reporting
+            errors = []
 
-            for excl in args.excludes:
-                if (
-                    excl == file_name or
-                    path_to_check.match(excl) or
-                    check_path_parents(path_to_check.parents, excl)
-                ):
-                    files_to_avoid.append(f)
-        files_check = list(set(files) ^ set(files_to_avoid))
+            def custom_error(filename, linenum, category, confidence, message):
+                if ament_cpplint.cpplint._ShouldPrintError(category, confidence, linenum):
+                    errors.append({
+                        'linenum': linenum,
+                        'category': category,
+                        'confidence': confidence,
+                        'message': message,
+                    })
+                DefaultError(filename, linenum, category, confidence, message)
+            ament_cpplint.cpplint.Error = custom_error
 
-        if(len(files_check) != 0):
-            arguments += files_check
-            filenames = ParseArguments(arguments)
-
-            for filename in filenames:
-                # hook into error reporting
-                errors = []
-
-                def custom_error(filename, linenum, category, confidence, message):
-                    if ament_cpplint.cpplint._ShouldPrintError(category, confidence, linenum):
-                        errors.append({
-                            'linenum': linenum,
-                            'category': category,
-                            'confidence': confidence,
-                            'message': message,
-                        })
-                    DefaultError(filename, linenum, category, confidence, message)
-                ament_cpplint.cpplint.Error = custom_error
-
-                ProcessFile(filename, _cpplint_state.verbose_level)
-                report.append((filename, errors))
-                print('')
+            ProcessFile(filename, _cpplint_state.verbose_level)
+            report.append((filename, errors))
+            print('')
 
     # output summary
     for category in sorted(_cpplint_state.errors_by_category.keys()):
@@ -226,7 +205,27 @@ def main(argv=sys.argv[1:]):
     return 1 if _cpplint_state.error_count else 0
 
 
-def get_file_groups(paths, extensions):
+def is_file_to_exclude(path_to_file, excludes):
+    path, file_name = os.path.split(path_to_file)
+    path_to_check = pathlib.Path(path)
+
+    def check_path_parents(parents, exclude):
+        for p in parents:
+            if p.match(exclude):
+                return True
+        return False
+
+    for excl in excludes:
+        if (
+            excl == file_name or
+            path_to_check.match(excl) or
+            check_path_parents(path_to_check.parents, excl)
+        ):
+            return True
+    return False
+
+
+def get_file_groups(paths, extensions, excludes):
     # dict mapping root path to files
     groups = {}
     for path in paths:
@@ -243,10 +242,12 @@ def get_file_groups(paths, extensions):
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
                     if ext in ('.%s' % e for e in extensions):
-                        append_file_to_group(groups,
-                                             os.path.join(dirpath, filename))
+                        if not is_file_to_exclude(os.path.join(dirpath, filename), excludes):
+                            append_file_to_group(groups,
+                                                 os.path.join(dirpath, filename))
         if os.path.isfile(path):
-            append_file_to_group(groups, path)
+            if not is_file_to_exclude(path, excludes):
+                append_file_to_group(groups, path)
     return groups
 
 
