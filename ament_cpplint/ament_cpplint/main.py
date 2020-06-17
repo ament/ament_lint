@@ -205,8 +205,12 @@ def main(argv=sys.argv[1:]):
     return 1 if _cpplint_state.error_count else 0
 
 
-def is_file_to_exclude(path_to_file, excludes):
-    path, file_name = os.path.split(path_to_file)
+def is_file_or_directory_to_exclude(path_to_file, excludes):
+    if not os.path.isdir(path_to_file):
+        path, file_name = os.path.split(path_to_file)
+    else:
+        path = path_to_file
+        file_name = ''
     path_to_check = pathlib.Path(path)
 
     def check_path_parents(parents, exclude):
@@ -231,6 +235,9 @@ def get_file_groups(paths, extensions, excludes):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
+                if is_file_or_directory_to_exclude(dirpath, excludes):
+                    continue
+
                 if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
@@ -242,11 +249,11 @@ def get_file_groups(paths, extensions, excludes):
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
                     if ext in ('.%s' % e for e in extensions):
-                        if not is_file_to_exclude(os.path.join(dirpath, filename), excludes):
+                        if filename not in excludes:
                             append_file_to_group(groups,
                                                  os.path.join(dirpath, filename))
         if os.path.isfile(path):
-            if not is_file_to_exclude(path, excludes):
+            if not is_file_or_directory_to_exclude(path, excludes):
                 append_file_to_group(groups, path)
     return groups
 
