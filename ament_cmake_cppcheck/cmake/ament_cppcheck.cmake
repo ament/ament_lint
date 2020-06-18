@@ -53,6 +53,7 @@ function(ament_cppcheck)
     list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
   endif()
   if(ARG_LANGUAGE)
+    string(TOLOWER ${ARG_LANGUAGE} ARG_LANGUAGE)
     list(APPEND cmd "--language" "${ARG_LANGUAGE}")
   endif()
 
