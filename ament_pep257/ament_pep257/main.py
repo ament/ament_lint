@@ -46,11 +46,13 @@ def main(argv=sys.argv[1:]):
         '--ignore',
         nargs='+',
         action='extend',
+        default=[],
         help='The pep257 error codes to ignore. Has precedence over --select.')
     parser.add_argument(
         '--select',
         nargs='+',
         action='extend',
+        default=[],
         help='The pep257 error codes to check.'
     )
     parser.add_argument(
