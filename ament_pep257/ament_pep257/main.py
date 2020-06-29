@@ -42,18 +42,38 @@ def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(
         description='Check docstrings against the style conventions in PEP 257.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument(
+    err_code_group = parser.add_mutually_exclusive_group()
+    err_code_group.add_argument(
         '--ignore',
         nargs='+',
         action='extend',
         default=[],
-        help='The pep257 error codes to ignore. Has precedence over --select.')
-    parser.add_argument(
+        help='Choose the list of error codes for pydocstyle NOT to check for.')
+    err_code_group.add_argument(
         '--select',
         nargs='+',
         action='extend',
         default=[],
-        help='The pep257 error codes to check.'
+        help='Choose the basic list of error codes for pydocstyle to check for.'
+    )
+    err_code_group.add_argument(
+        '--convention',
+        choices=pydocstyle.conventions,
+        default='ament',
+        help=f'Choose a preset list of error codes. Valid options are {pydocstyle.conventions}'
+    )
+    parser.add_argument(
+        '--add-ignore',
+        nargs='+',
+        action='extend',
+        default=[],
+        help='Ignore an extra error code, removing it from the list set by --(select/ignore)')
+    parser.add_argument(
+        '--add-select',
+        nargs='+',
+        action='extend',
+        default=[],
+        help='Check an extra error code, adding it to the list set by --(select/ignore).'
     )
     parser.add_argument(
         'paths',
@@ -75,19 +95,29 @@ def main(argv=sys.argv[1:]):
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
-    default_ignore = set(['D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D106', 'D107'])
-    if 'D1' in args.select:
-        default_ignore = set([])
-    default_ignore -= set(args.select)
-    args.ignore += default_ignore
-
-    args.select.append('D213')
-
     if args.xunit_file:
         start_time = time.time()
 
+    args.ignore = ','.join(args.ignore)
+    args.select = ','.join(args.select)
+    args.add_select = ','.join(args.add_select)
+    args.add_ignore = ','.join(args.add_ignore)
+    if not (args.ignore or args.select) and args.convention == 'ament':
+        args.ignore = ','.join(['D100',
+                                'D101',
+                                'D102',
+                                'D103',
+                                'D104',
+                                'D105',
+                                'D106',
+                                'D107',
+                                'D203',
+                                'D212',
+                                'D404'])
+
     excludes = [os.path.abspath(e) for e in args.excludes]
-    report = generate_pep257_report(args.paths, excludes, args.ignore, args.select)
+    report = generate_pep257_report(args.paths, excludes, args.ignore, args.select,
+                                    args.convention, args.add_ignore, args.add_select)
     error_count = sum(len(r[1]) for r in report)
 
     # print summary
@@ -125,16 +155,24 @@ def _filename_in_excludes(filename, excludes):
     return any(os.path.commonpath([absname, e]) == e for e in excludes)
 
 
-def generate_pep257_report(paths, excludes, ignore, selected):
+def generate_pep257_report(paths, excludes, ignore, select, convention, add_ignore, add_select):
     conf = ConfigurationParser()
     sys_argv = sys.argv
     sys.argv = [
         'main',
-        '--add-ignore=' + ','.join(ignore),
-        '--add-select=' + ','.join(selected),
         '--match', r'.*\.py',
         '--match-dir', r'[^\._].*',
     ]
+    if ignore:
+        sys.argv += ['--ignore', ignore]
+    elif select:
+        sys.argv += ['--select', select]
+    else:
+        sys.argv += ['--convention', convention]
+    if add_ignore:
+        sys_argv += ['--add-ignore', add_ignore]
+    if add_select:
+        sys_argv += ['--add-select', add_select]
     sys.argv += paths
     conf.parse()
     sys.argv = sys_argv
