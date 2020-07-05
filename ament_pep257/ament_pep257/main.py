@@ -174,9 +174,9 @@ def generate_pep257_report(paths, excludes, ignore, select, convention, add_igno
     else:
         sys.argv += ['--convention', convention]
     if add_ignore:
-        sys_argv += ['--add-ignore', add_ignore]
+        sys.argv += ['--add-ignore', add_ignore]
     if add_select:
-        sys_argv += ['--add-select', add_select]
+        sys.argv += ['--add-select', add_select]
     sys.argv += paths
     conf.parse()
     sys.argv = sys_argv
