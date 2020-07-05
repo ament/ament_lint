@@ -107,17 +107,21 @@ def main(argv=sys.argv[1:]):
     args.add_select = ','.join(args.add_select)
     args.add_ignore = ','.join(args.add_ignore)
     if not (args.ignore or args.select) and args.convention == 'ament':
-        args.ignore = ','.join(['D100',
-                                'D101',
-                                'D102',
-                                'D103',
-                                'D104',
-                                'D105',
-                                'D106',
-                                'D107',
-                                'D203',
-                                'D212',
-                                'D404'])
+        args.ignore = ','.join(
+            [
+                'D100',
+                'D101',
+                'D102',
+                'D103',
+                'D104',
+                'D105',
+                'D106',
+                'D107',
+                'D203',
+                'D212',
+                'D404',
+            ]
+        )
 
     excludes = [os.path.abspath(e) for e in args.excludes]
     report = generate_pep257_report(args.paths, excludes, args.ignore, args.select,
