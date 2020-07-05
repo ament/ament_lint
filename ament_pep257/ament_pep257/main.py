@@ -38,6 +38,10 @@ except ImportError:  # try version 1.0.0
 log.setLevel(logging.INFO)
 
 
+_conventions = set(pydocstyle.conventions.keys())
+_conventions.add('ament')
+
+
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(
         description='Check docstrings against the style conventions in PEP 257.',
@@ -58,9 +62,9 @@ def main(argv=sys.argv[1:]):
     )
     err_code_group.add_argument(
         '--convention',
-        choices=pydocstyle.conventions,
+        choices=_conventions,
         default='ament',
-        help=f'Choose a preset list of error codes. Valid options are {pydocstyle.conventions}'
+        help=f'Choose a preset list of error codes. Valid options are {_conventions}'
     )
     parser.add_argument(
         '--add-ignore',
