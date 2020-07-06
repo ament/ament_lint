@@ -41,6 +41,20 @@ log.setLevel(logging.INFO)
 _conventions = set(pydocstyle.conventions.keys())
 _conventions.add('ament')
 
+_ament_ignore = [
+    'D100',
+    'D101',
+    'D102',
+    'D103',
+    'D104',
+    'D105',
+    'D106',
+    'D107',
+    'D203',
+    'D212',
+    'D404',
+]
+
 
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(
@@ -64,7 +78,10 @@ def main(argv=sys.argv[1:]):
         '--convention',
         choices=_conventions,
         default='ament',
-        help=f'Choose a preset list of error codes. Valid options are {_conventions}'
+        help=(
+            f'Choose a preset list of error codes. Valid options are {_conventions}.'
+            f'The "ament" convention is defined as --ignore {_ament_ignore}.'
+        ),
     )
     parser.add_argument(
         '--add-ignore',
@@ -107,21 +124,7 @@ def main(argv=sys.argv[1:]):
     args.add_select = ','.join(args.add_select)
     args.add_ignore = ','.join(args.add_ignore)
     if not (args.ignore or args.select) and args.convention == 'ament':
-        args.ignore = ','.join(
-            [
-                'D100',
-                'D101',
-                'D102',
-                'D103',
-                'D104',
-                'D105',
-                'D106',
-                'D107',
-                'D203',
-                'D212',
-                'D404',
-            ]
-        )
+        args.ignore = ','.join(_ament_ignore)
 
     excludes = [os.path.abspath(e) for e in args.excludes]
     report = generate_pep257_report(args.paths, excludes, args.ignore, args.select,
