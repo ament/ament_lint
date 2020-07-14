@@ -64,13 +64,11 @@ def main(argv=sys.argv[1:]):
     err_code_group.add_argument(
         '--ignore',
         nargs='+',
-        action='extend',
         default=[],
         help='Choose the list of error codes for pydocstyle NOT to check for.')
     err_code_group.add_argument(
         '--select',
         nargs='+',
-        action='extend',
         default=[],
         help='Choose the basic list of error codes for pydocstyle to check for.'
     )
@@ -86,13 +84,11 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--add-ignore',
         nargs='+',
-        action='extend',
         default=[],
         help='Ignore an extra error code, removing it from the list set by --(select/ignore)')
     parser.add_argument(
         '--add-select',
         nargs='+',
-        action='extend',
         default=[],
         help='Check an extra error code, adding it to the list set by --(select/ignore).'
     )
