@@ -209,9 +209,8 @@ def is_file_or_directory_to_exclude(path_to_file, excludes):
     if not os.path.isdir(path_to_file):
         path, file_name = os.path.split(path_to_file)
     else:
-        path = path_to_file
         file_name = ''
-    path_to_check = pathlib.Path(path)
+    path_to_check = pathlib.Path(path_to_file)
 
     def check_path_parents(parents, exclude):
         for p in parents:
@@ -253,7 +252,8 @@ def get_file_groups(paths, extensions, excludes):
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
                     if ext in ('.%s' % e for e in extensions):
-                        if filename not in excludes:
+                        if not is_file_or_directory_to_exclude(
+                           os.path.join(dirpath, filename), excludes):
                             append_file_to_group(groups,
                                                  os.path.join(dirpath, filename))
         if os.path.isfile(path):
