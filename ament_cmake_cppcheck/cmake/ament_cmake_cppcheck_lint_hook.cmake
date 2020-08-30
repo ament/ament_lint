@@ -50,29 +50,7 @@ if(_source_files)
   if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
     get_directory_property(_build_targets DIRECTORY ${PROJECT_SOURCE_DIR} BUILDSYSTEM_TARGETS)
     foreach(_target ${_build_targets})
-      # Include directories property is different for INTERFACE libraries
-      get_target_property(_target_type ${_target} TYPE)
-      if(${_target_type} STREQUAL "INTERFACE_LIBRARY")
-        get_target_property(_include_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
-      else()
-        get_target_property(_include_dirs ${_target} INCLUDE_DIRECTORIES)
-      endif()
-
-      # Only append include directories that are from the package being tested
-      # This accomplishes two things:
-      #     1. Reduces execution time (less include directories to search)
-      #     2. cppcheck will not check for errors in external packages
-      foreach(_include_dir ${_include_dirs})
-        # TODO(jacobperron): Escape special regex characters in PROJECT_SOURCE_DIR
-        #                    Related CMake feature request: https://gitlab.kitware.com/cmake/cmake/issues/18409
-        # Check if include directory is a subdirectory of the source directory
-        string(REGEX MATCH "^${PROJECT_SOURCE_DIR}/.*" _is_subdirectory ${_include_dir})
-        # Check if include directory is part of a generator expression (e.g. $<BUILD_INTERFACE:...>)
-        string(REGEX MATCH "^\\$<.*:${PROJECT_SOURCE_DIR}/.*>$" _is_genexp_subdirectory "${_include_dir}")
-        if(_is_subdirectory OR _is_genexp_subdirectory)
-          list_append_unique(_all_include_dirs ${_include_dir})
-        endif()
-      endforeach()
+      list(APPEND _all_include_dirs $<TARGET_GENEX_EVAL:${_target},$<TARGET_PROPERTY:${_target},INCLUDE_DIRECTORIES>>)
     endforeach()
   endif()
 
