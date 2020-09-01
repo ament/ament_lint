@@ -140,7 +140,8 @@ def main(argv=sys.argv[1:]):
            '-rp',
            '--xml',
            '--xml-version=2',
-           '--suppress=internalAstError']
+           '--suppress=internalAstError',
+           '--suppress=unknownMacro']
     if args.language:
         cmd.extend(['--language={0}'.format(args.language)])
     for include_dir in (args.include_dirs or []):
