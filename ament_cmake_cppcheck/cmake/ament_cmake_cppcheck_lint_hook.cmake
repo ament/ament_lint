@@ -54,8 +54,10 @@ if(_source_files)
       get_target_property(_target_type ${_target} TYPE)
       if(${_target_type} STREQUAL "INTERFACE_LIBRARY")
         get_target_property(_include_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
+        get_target_property(_definitions ${_target} INTERFACE_COMPILE_DEFINITIONS)
       else()
         get_target_property(_include_dirs ${_target} INCLUDE_DIRECTORIES)
+        get_target_property(_definitions ${_target} COMPILE_DEFINITIONS)
       endif()
 
       # Only append include directories that are from the package being tested
@@ -82,5 +84,6 @@ if(_source_files)
   )
   ament_cppcheck(
     ${_language} INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude}
+    DEFINITIONS ${_definitions}
   )
 endif()

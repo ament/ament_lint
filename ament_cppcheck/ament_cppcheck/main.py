@@ -63,12 +63,17 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--include_dirs',
         nargs='*',
-        help="Include directories for C/C++ files being checked."
+        help="Include directories for C/C++ files being checked. "
              "Each directory is passed to cppcheck as '-I <include_dir>'")
+    parser.add_argument(
+        '--definitions',
+        nargs='*',
+        help="Preprocessor definitions for the compiler as either 'X' or 'X=Y'. "
+             "Each definition is passed to cppcheck as '-D<definition>'")
     parser.add_argument(
         '--exclude',
         nargs='*',
-        help="Exclude files or directories for C/C++ files being checked."
+        help="Exclude files or directories for C/C++ files being checked. "
              "Each files is passed to cppcheck as '--suppress='")
     parser.add_argument(
         '--language',
@@ -147,6 +152,8 @@ def main(argv=sys.argv[1:]):
         cmd.extend(['-I', include_dir])
     for exclude in (args.exclude or []):
         cmd.extend(['--suppress=*:', exclude])
+    for definition in (args.definitions or []):
+        cmd.extend(["-D" + definition])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
