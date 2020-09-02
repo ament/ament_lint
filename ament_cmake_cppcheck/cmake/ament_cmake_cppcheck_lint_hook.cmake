@@ -47,7 +47,7 @@ if(_source_files)
     endif()
 
     ament_cppcheck(
-      TESTNAME ${target}_ament_cppcheck
+      TESTNAME ${_target}_ament_cppcheck
       ${_language}
       INCLUDE_DIRS ${ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS} ${_include_dirs}
       EXCLUDE  ${ament_cmake_cppcheck_ADDITIONAL_EXCLUDE}
