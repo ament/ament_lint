@@ -14,17 +14,6 @@
 
 find_package(ament_cmake_core REQUIRED)
 
-file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
-  "*.c"
-  "*.cc"
-  "*.cpp"
-  "*.cxx"
-  "*.h"
-  "*.hh"
-  "*.hpp"
-  "*.hxx"
-)
-if(_source_files)
   message(STATUS "Added test 'cppcheck' to perform static code analysis on C / C++ code")
 
   # Forces cppcheck to consider ament_cmake_cppcheck_LANGUAGE as the given language if defined
@@ -36,15 +25,21 @@ if(_source_files)
 
   get_directory_property(_build_targets DIRECTORY ${PROJECT_SOURCE_DIR} BUILDSYSTEM_TARGETS)
   foreach(_target ${_build_targets})
+  
+    set(_source_files "")
     # Include directories property is different for INTERFACE libraries
     get_target_property(_target_type ${_target} TYPE)
     if(${_target_type} STREQUAL "INTERFACE_LIBRARY")
       set(_include_dirs $<TARGET_PROPERTY:${_target},INTERFACE_INCLUDE_DIRECTORIES>)
       set(_definitions $<TARGET_PROPERTY:${_target},INTERFACE_COMPILE_DEFINITIONS>)
+      set(_source_files $<TARGET_PROPERTY:${_target},INTERFACE_SOURCES>,INCLUDE,"^.*[.](c|cc|cpp|cxx|h|hh|hpp|hxx)$")
     elif(${_target_type} MATCHES "^(STATIC_LIBRARY|SHARED_LIBRARY|EXECUTABLE)$")
       set(_include_dirs $<TARGET_PROPERTY:${_target},INCLUDE_DIRECTORIES>)
       set(_definitions $<TARGET_PROPERTY:${_target},COMPILE_DEFINITIONS>)
-    else()
+      set(_source_files $<TARGET_PROPERTY:${_target},SOURCES>,INCLUDE,"^.*[.](c|cc|cpp|cxx|h|hh|hpp|hxx)$")
+    endif()
+    
+    if("${_source_files} STREQUAL "")
       continue()
     endif()
     
@@ -54,6 +49,6 @@ if(_source_files)
       INCLUDE_DIRS ${ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS} ${_include_dirs}
       EXCLUDE  ${ament_cmake_cppcheck_ADDITIONAL_EXCLUDE}
       DEFINITIONS ${_definitions}
+      ${_source_files}
     )
   endforeach()
-endif()
