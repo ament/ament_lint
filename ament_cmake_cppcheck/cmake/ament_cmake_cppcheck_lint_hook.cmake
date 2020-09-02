@@ -25,16 +25,18 @@ find_package(ament_cmake_core REQUIRED)
 
   get_directory_property(_build_targets DIRECTORY ${PROJECT_SOURCE_DIR} BUILDSYSTEM_TARGETS)
   foreach(_target ${_build_targets})
-    get_target_property(_linker_language ${_target} LINKER_LANGUAGE)
-    if(NOT ${linker_language} MATCHES "(C|CXX)")
-      continue()
-    endif()
-    
     get_target_property(_target_type ${_target} TYPE)
+    set(_files_to_check "")
     if(${_target_type} MATCHES "^(STATIC_LIBRARY|SHARED_LIBRARY|EXECUTABLE)$")
       set(_include_dirs $<TARGET_PROPERTY:${_target},INCLUDE_DIRECTORIES>)
       set(_definitions $<TARGET_PROPERTY:${_target},COMPILE_DEFINITIONS>)
-      set(_source_files $<FILTER,$<TARGET_PROPERTY:${_target},SOURCES>,INCLUDE,"^.*[.](c|cc|cpp|cxx|h|hh|hpp|hxx)$>>")
+      get_target_property(_source_files TARGET ${_target} SOURCE_FILES)
+      foreach(_file ${_source_files})
+        get_source_file_property(_file_language ${_file} TARGET_DIRECTORY ${_target} LANGUAGE)
+        if(${_file_language} MATCHES "^(C|CXX)$")
+          list(APPEND _files_to_check ${_file})
+        endif()
+      endforeach()
     else()
       continue()
     endif()
@@ -45,6 +47,6 @@ find_package(ament_cmake_core REQUIRED)
       INCLUDE_DIRS ${ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS} ${_include_dirs}
       EXCLUDE  ${ament_cmake_cppcheck_ADDITIONAL_EXCLUDE}
       DEFINITIONS ${_definitions}
-      ${_source_files}
+      ${_files_to_check}
     )
   endforeach()
