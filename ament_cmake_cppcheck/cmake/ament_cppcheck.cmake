@@ -33,7 +33,7 @@
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "EXCLUDE;LANGUAGE;TESTNAME" "INCLUDE_DIRS" ${ARGN})
+  cmake_parse_arguments(ARG "" "EXCLUDE;LANGUAGE;TESTNAME" "INCLUDE_DIRS;DEFINITIONS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -52,6 +52,8 @@ function(ament_cppcheck)
   if(ARG_INCLUDE_DIRS)
     list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
   endif()
+  if(ARG_DEFINITIONS)
+    list(APPEND cmd "--definitions" "${ARG_DEFINITIONS}")
   if(ARG_LANGUAGE)
     string(TOLOWER ${ARG_LANGUAGE} ARG_LANGUAGE)
     list(APPEND cmd "--language" "${ARG_LANGUAGE}")
