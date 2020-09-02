@@ -41,11 +41,13 @@ if(_source_files)
     if(${_target_type} STREQUAL "INTERFACE_LIBRARY")
       set(_include_dirs $<TARGET_PROPERTY:${_target},INTERFACE_INCLUDE_DIRECTORIES>)
       set(_definitions $<TARGET_PROPERTY:${_target},INTERFACE_COMPILE_DEFINITIONS>)
-    else()
+    elif(${_target_type} MATCHES "^(STATIC_LIBRARY|SHARED_LIBRARY|EXECUTABLE)$")
       set(_include_dirs $<TARGET_PROPERTY:${_target},INCLUDE_DIRECTORIES>)
       set(_definitions $<TARGET_PROPERTY:${_target},COMPILE_DEFINITIONS>)
+    else()
+      continue()
     endif()
-
+    
     ament_cppcheck(
       TESTNAME ${_target}_ament_cppcheck
       ${_language}
