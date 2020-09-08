@@ -61,7 +61,7 @@ function(ament_cppcheck)
   ament_add_test(
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
-    TIMEOUT 180
+    TIMEOUT 300
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_cppcheck/${ARG_TESTNAME}.txt"
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
