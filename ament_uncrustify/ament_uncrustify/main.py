@@ -65,7 +65,7 @@ def main(argv=sys.argv[1:]):
         help='Exclude specific file names and directory names from the check')
     parser.add_argument(
         '--language',
-        choices=['C', 'C++'],
+        choices=['C', 'CPP'],
         help="Passed to uncrustify as '-l <language>' to force a specific "
              'language rather then choosing one based on file extension')
     parser.add_argument(
