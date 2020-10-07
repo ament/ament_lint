@@ -7,7 +7,7 @@
     The CMake API for ament_mypy to perform static type analysis on python code
     with mypy.
   </description>
-  <maintainer email="ted.kern@canonical.com">Ted Kern</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
   <author email="ted.kern@canonical.com">Ted Kern</author>
 

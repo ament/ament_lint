@@ -7,7 +7,7 @@
     The ability to check source files for copyright and license
     information.
   </description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
   <exec_depend>ament_lint</exec_depend>

@@ -7,7 +7,7 @@
     The CMake API for ament_cppcheck to perform static code analysis on C/C++
     code using Cppcheck.
   </description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>

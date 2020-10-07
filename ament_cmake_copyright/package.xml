@@ -4,7 +4,7 @@
   <name>ament_cmake_copyright</name>
   <version>0.10.0</version>
   <description>The CMake API for ament_copyright to check every source file contains copyright reference.</description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>

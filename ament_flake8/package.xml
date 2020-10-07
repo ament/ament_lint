@@ -6,7 +6,7 @@
   <description>
     The ability to check code for style and syntax conventions with flake8.
   </description>
-  <maintainer email="steven@osrfoundation.org">Steven! Ragnarok</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
   <author email="dhood@osrfoundation.org">D. Hood</author>
 

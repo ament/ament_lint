@@ -7,7 +7,7 @@
     The ability to check code against the style conventions in PEP 8 and
     generate xUnit test result files.
   </description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
   <exec_depend>python3-pycodestyle</exec_depend>
