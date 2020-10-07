@@ -11,6 +11,8 @@
   <license>Apache License 2.0</license>
   <license>MIT</license>
 
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>	
+
   <exec_depend>ament_lint</exec_depend>
   <exec_depend>pydocstyle</exec_depend>
 

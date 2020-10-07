@@ -10,6 +10,8 @@
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>	
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
