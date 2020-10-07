@@ -7,8 +7,10 @@
     The ability to check XML files like the package manifest using xmllint
     and generate xUnit test result files.
   </description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
+
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>	
 
   <exec_depend>ament_lint</exec_depend>
   <exec_depend>libxml2-utils</exec_depend>
