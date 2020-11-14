@@ -134,7 +134,7 @@ def main(argv=sys.argv[1:]):
 
     # invoke cppcheck
     cmd = [cppcheck_bin,
-           '-f',
+           '--max-configs=1',
            '--inline-suppr',
            '-q',
            '-rp',
