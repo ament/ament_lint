@@ -16,9 +16,15 @@ have already been installed. ``compile_commands.json`` files should have already
 
 .. code:: sh
 
-    ament_clang_tidy [<path> ...]
+    ament_clang_tidy [-h] [--config path] [--explain-config]
+                     [--export-fixes EXPORT_FIXES] [--fix-errors]
+                     [--header-filter HEADER_FILTER] [--quiet]
+                     [--system-headers]
+                     [--clang-tidy-version CLANG_TIDY_VERSION]
+                     [--xunit-file XUNIT_FILE]
+                     [paths [paths ...]]
 
-If ``<path>`` is a directory, it will be recursively searched for
+If ``<paths>`` is a directory, it will be recursively searched for
 "compile_commands.json" files (this is usually the ``build`` directory of a
 ``colcon`` workspace). If ``<path>`` is a file, it will be treated as a
 "compile_commands.json" file.
@@ -41,6 +47,9 @@ warnings and warnings treated as errors.
 
 The ``--system-headers`` option will display errors from all system header
 files.
+
+The ``--clang-tidy-version`` enables you to set a different version of
+clang-tidy to use.
 
 The ``--xunit-file`` option will generate a xunit compliant XML file when
 supplied with a file name.

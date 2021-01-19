@@ -78,6 +78,10 @@ def main(argv=sys.argv[1:]):
         action='store_true',
         help='Displays errors from all system headers')
     parser.add_argument(
+        '--clang-tidy-version',
+        default='6.0',
+        help='The version of clang-tidy to use.')
+    parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
@@ -97,8 +101,9 @@ def main(argv=sys.argv[1:]):
 
     bin_names = [
         # 'clang-tidy',
-        'clang-tidy-6.0',
+        'clang-tidy-' + args.clang_tidy_version,
     ]
+
     clang_tidy_bin = find_executable(bin_names)
     if not clang_tidy_bin:
         print('Could not find %s executable' %
