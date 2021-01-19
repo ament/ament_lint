@@ -23,6 +23,9 @@ If ``<path>`` is a directory, it will be recursively searched for
 ``colcon`` workspace). If ``<path>`` is a file, it will be treated as a
 "compile_commands.json" file.
 
+The ``--jobs`` option will control the number of clang-tidy jobs should be
+run in parallel.
+
 The ``--explain-config`` option will explain the origin of the enabled
 configuration checks.
 
