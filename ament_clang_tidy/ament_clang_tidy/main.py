@@ -56,7 +56,7 @@ def main(argv=sys.argv[1:]):
         '--jobs',
         type=int,
         default=1,
-        help="number of clang-tidy jobs to run in parallel")
+        help='number of clang-tidy jobs to run in parallel')
 
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
@@ -112,6 +112,7 @@ def main(argv=sys.argv[1:]):
         return 1
 
     pool = ThreadPool(args.jobs)
+
     def invoke_clang_tidy(compilation_db_path):
         package_dir = os.path.dirname(compilation_db_path)
         package_name = os.path.basename(package_dir)
