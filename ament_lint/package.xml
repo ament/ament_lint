@@ -9,7 +9,7 @@
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>	
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
 
   <export>
     <build_type>ament_python</build_type>
