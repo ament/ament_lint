@@ -58,3 +58,8 @@ def test_3bsd_cpp():
 def test_3bsd_py():
     rc = main(argv=[os.path.join(cases_path, '3clause_bsd/case.py')])
     assert rc == 0, 'Found errors'
+
+
+def test_mit0_py():
+    rc = main(argv=[os.path.join(cases_path, 'mit0/case.py')])
+    assert rc == 0, 'Found errors'
