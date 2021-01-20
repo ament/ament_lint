@@ -80,20 +80,52 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+
+    parser.add_argument(
+        '--filter-repo-path',
+        help='Used to test only packages from one repo. '
+        'Accepts a path to repo containing ros packages.  If this path contains '
+        'a .clang-tidy config file, the tests will use that config.')
+    parser.add_argument(
+        '--filter-diff',
+        help='Used to only run tests on packages with changes since a specified git commit. '
+        'Accepts branch, tag, or git commit hash to generate diff.  Requires --filter-repo-path.')
+
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='Show clang-tidy commands as they are run.')
     args = parser.parse_args(argv)
+
+    if args.filter_repo_path:
+        repo_clang_tidy = args.filter_repo_path + '/.clang-tidy'
+        if os.path.exists(repo_clang_tidy):
+            args.config_file = repo_clang_tidy
 
     if not os.path.exists(args.config_file):
         print("Could not find config file '%s'" % args.config_file,
               file=sys.stderr)
         return 1
 
+    print('Using config file %s' % args.config_file)
+
     if args.xunit_file:
         start_time = time.time()
 
     compilation_dbs = get_compilation_db_files(args.paths)
     if not compilation_dbs:
-        print('No compilation database files found', file=sys.stderr)
+        print('No compilation database files found in paths: %s' % (args.paths), file=sys.stderr)
         return 1
+
+    if args.filter_repo_path:
+        compilation_dbs = filter_packages_in_repo(compilation_dbs, args.filter_repo_path)
+
+    if args.filter_diff:
+        if not args.filter_repo_path:
+            print('Diff filter requires --filter-repo-path to be set.', file=sys.stderr)
+            return 1
+        compilation_dbs = filter_diff(compilation_dbs, args.filter_repo_path,
+                                      args.filter_diff)
 
     bin_names = [
         # 'clang-tidy',
@@ -157,6 +189,9 @@ def main(argv=sys.argv[1:]):
 
             files.append(item['file'])
             full_cmd = cmd + [item['file']]
+
+            if args.verbose:
+                print(' '.join(full_cmd))
             try:
                 output += subprocess.check_output(full_cmd,
                                                   stderr=subprocess.DEVNULL).strip().decode()
@@ -171,7 +206,7 @@ def main(argv=sys.argv[1:]):
     for compilation_db in compilation_dbs:
         package_dir = os.path.dirname(compilation_db)
         package_name = os.path.basename(package_dir)
-        print('found compilation database for package "%s"...' % package_name)
+        print('Invoking clang-tidy for package `%s`...' % package_name)
         (source_files, output) = invoke_clang_tidy(compilation_db)
         files += source_files
         outputs.append(output)
@@ -257,6 +292,77 @@ def get_compilation_db_files(paths):
         elif os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
+
+
+def filter_packages_in_repo(compilation_dbs, repo_path):
+    bin_names = [
+        'catkin_topological_order',
+    ]
+    catkin_topological_order_bin = find_executable(bin_names)
+    if not catkin_topological_order_bin:
+        print('Could not find %s executable' %
+              ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
+        return 1
+
+    cmd = [catkin_topological_order_bin, repo_path, '--only-names']
+    output = ''
+    try:
+        output = subprocess.check_output(cmd).strip().decode()
+    except subprocess.CalledProcessError as e:
+        print('The invocation of "%s" failed with error code %d: %s' %
+              (os.path.basename(catkin_topological_order_bin), e.returncode, e),
+              file=sys.stderr)
+
+    def test(path):
+        return os.path.basename(os.path.dirname(path)) in output.split()
+
+    filtered_dbs = list(filter(test, compilation_dbs))
+    return filtered_dbs
+
+
+def filter_diff(compilation_dbs, repo_path, diff_head):
+    bin_names = [
+        'git',
+    ]
+    git_bin = find_executable(bin_names)
+    if not git_bin:
+        print('Could not find %s executable' %
+              ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
+        return 1
+
+    def modified_files_test(db_path):
+        package_dir = os.path.dirname(db_path)
+        package_name = os.path.basename(package_dir)
+        src_path = ''
+        with open(package_dir + '/CMakeCache.txt', 'r') as file:
+            for line in file:
+                if re.match('^CMAKE_HOME_DIRECTORY:INTERNAL=', line):
+                    src_path = line.split('=')[1].strip()
+                    break
+
+        if len(src_path) == 0:
+            print('Source path not found in CMakeCache.txt of package '
+                  '`%s`, skipping.' % package_name, file=sys.stderr)
+            return False
+
+        cmd = ['git', 'diff', '--name-only', '--diff-filter=MA', diff_head + '..HEAD', src_path]
+        output = ''
+        try:
+            output = subprocess.check_output(cmd, cwd=repo_path).strip().decode()
+        except subprocess.CalledProcessError as e:
+            print('The invocation of "%s" failed with error code %d: %s' %
+                  (os.path.basename(git_bin), e.returncode, ' '.join(cmd)),
+                  file=sys.stderr)
+            return False
+        modified_files = output.split()
+        if len(modified_files) == 0:
+            print('No files modified in package `%s`, skipping clang-tidy test.' % package_name)
+            return False
+        else:
+            return True
+
+    filtered_dbs = list(filter(modified_files_test, compilation_dbs))
+    return filtered_dbs
 
 
 def find_error_message(data):
