@@ -48,6 +48,9 @@ def main(argv=sys.argv[1:]):
              'in %s will be considered.' %
              ', '.join(["'.%s'" % e for e in extensions]))
     parser.add_argument(
+        '--clang-format-version',
+        help='The version of clang-format to use.')
+    parser.add_argument(
         '--reformat',
         action='store_true',
         help='Reformat the files in place')
@@ -80,6 +83,10 @@ def main(argv=sys.argv[1:]):
         'clang-format-3.4',
         'clang-format-3.3',
     ]
+
+    if args.clang_format_version:
+        bin_names = ['clang-format-' + args.clang_format_version]
+
     clang_format_bin = find_executable(bin_names)
     if not clang_format_bin:
         print('Could not find %s executable' %
