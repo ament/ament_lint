@@ -78,6 +78,9 @@ def main(argv=sys.argv[1:]):
         action='store_true',
         help='Displays errors from all system headers')
     parser.add_argument(
+        '--packages-select', nargs='*', metavar='PKG_NAME',
+        help='Only process a subset of packages')
+    parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
@@ -91,6 +94,13 @@ def main(argv=sys.argv[1:]):
         start_time = time.time()
 
     compilation_dbs = get_compilation_db_files(args.paths)
+
+    if args.packages_select is not None:
+        # Handle the case of a quoted list of space separated package names
+        if len(args.packages_select) == 1:
+            args.packages_select = args.packages_select[0].strip().split()
+        compilation_dbs = filter_packages_select(compilation_dbs, args.packages_select)
+
     if not compilation_dbs:
         print('No compilation database files found', file=sys.stderr)
         return 1
@@ -257,6 +267,13 @@ def get_compilation_db_files(paths):
         elif os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
+
+
+def filter_packages_select(compilation_db_paths, packages):
+    def package_test(compilation_db_paths):
+        package_name = os.path.basename(os.path.dirname(compilation_db_paths))
+        return (package_name in packages)
+    return list(filter(package_test, compilation_db_paths))
 
 
 def find_error_message(data):
