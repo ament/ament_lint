@@ -18,6 +18,7 @@ import argparse
 from collections import defaultdict
 import copy
 import json
+from multiprocessing.pool import ThreadPool
 import os
 import re
 import subprocess
@@ -51,6 +52,11 @@ def main(argv=sys.argv[1:]):
         help='If <path> is a directory, ament_clang_tidy will recursively search it for'
              ' "compile_commands.json" files. If <path> is a file, ament_clang_tidy will'
              ' treat it as a "compile_commands.json" file')
+    parser.add_argument(
+        '--jobs',
+        type=int,
+        default=1,
+        help='number of clang-tidy jobs to run in parallel')
 
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
@@ -115,6 +121,8 @@ def main(argv=sys.argv[1:]):
               ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
         return 1
 
+    pool = ThreadPool(args.jobs)
+
     def invoke_clang_tidy(compilation_db_path):
         package_dir = os.path.dirname(compilation_db_path)
         package_name = os.path.basename(package_dir)
@@ -152,8 +160,19 @@ def main(argv=sys.argv[1:]):
         def is_unittest_source(package, file_path):
             return ('%s/test/' % package) in file_path
 
+        def start_subprocess(full_cmd):
+            output = ''
+            try:
+                output = subprocess.check_output(full_cmd,
+                                                 stderr=subprocess.DEVNULL).strip().decode()
+            except subprocess.CalledProcessError as e:
+                print('The invocation of "%s" failed with error code %d: %s' %
+                      (os.path.basename(clang_tidy_bin), e.returncode, e),
+                      file=sys.stderr)
+            return output
+
         files = []
-        output = ''
+        async_outputs = []
         db = json.load(open(compilation_db_path))
         for item in db:
             # exclude gtest sources from being checked by clang-tidy
@@ -167,13 +186,12 @@ def main(argv=sys.argv[1:]):
 
             files.append(item['file'])
             full_cmd = cmd + [item['file']]
-            try:
-                output += subprocess.check_output(full_cmd,
-                                                  stderr=subprocess.DEVNULL).strip().decode()
-            except subprocess.CalledProcessError as e:
-                print('The invocation of "%s" failed with error code %d: %s' %
-                      (os.path.basename(clang_tidy_bin), e.returncode, e),
-                      file=sys.stderr)
+            async_outputs.append(pool.apply_async(start_subprocess, (full_cmd,)))
+
+        output = ''
+        for async_output in async_outputs:
+            output += async_output.get()
+
         return (files, output)
 
     files = []
@@ -185,6 +203,8 @@ def main(argv=sys.argv[1:]):
         (source_files, output) = invoke_clang_tidy(compilation_db)
         files += source_files
         outputs.append(output)
+    pool.close()
+    pool.join()
 
     # output errors
     report = defaultdict(list)
