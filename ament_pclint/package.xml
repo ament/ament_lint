@@ -10,7 +10,7 @@
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="jp.samper@apex.ai">Juan Pablo Samper</author>	
+  <author email="jp.samper@apex.ai">Juan Pablo Samper</author>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

@@ -10,7 +10,7 @@
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="jp.samper@apex.ai">Juan Pablo Samper</author>	
+  <author email="jp.samper@apex.ai">Juan Pablo Samper</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>
