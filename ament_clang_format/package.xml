@@ -2,12 +2,14 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_clang_format</name>
-  <version>0.8.1</version>
+  <version>0.10.1</version>
   <description>
     The ability to check code against style conventions using
     clang-format and generate xUnit test result files.</description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
+
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
 
   <exec_depend>clang-format</exec_depend>
   <exec_depend>python3-yaml</exec_depend>

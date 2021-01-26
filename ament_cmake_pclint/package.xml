@@ -2,13 +2,15 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_cmake_pclint</name>
-  <version>0.8.1</version>
+  <version>0.10.1</version>
   <description>
     The CMake API for ament_pclint to perform static code analysis on C/C++
     code using PCLint.
   </description>
-  <maintainer email="jp.samper@apex.ai">Juan Pablo Samper</maintainer>
+  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
+
+  <author email="jp.samper@apex.ai">Juan Pablo Samper</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>

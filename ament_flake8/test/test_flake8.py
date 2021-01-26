@@ -17,9 +17,11 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from ament_flake8.main import main  # noqa
+from ament_flake8.main import main_with_errors  # noqa
 
 
 def test_flake8():
-    rc = main(argv=[])
-    assert rc == 0, 'Found code style errors / warnings'
+    rc, errors = main_with_errors(argv=[])
+    assert rc == 0, \
+        'Found %d code style errors / warnings:\n' % len(errors) + \
+        '\n'.join(errors)

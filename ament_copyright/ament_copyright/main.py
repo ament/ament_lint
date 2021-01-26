@@ -111,8 +111,7 @@ def main(argv=sys.argv[1:]):
     if args.excludes:
         filenames = [f for f in filenames if os.path.basename(f) not in args.excludes]
     if not filenames:
-        print('No repository roots and files found', file=sys.stderr)
-        return 0
+        print('No repository roots and files found')
 
     file_descriptors = {}
     for filename in sorted(filenames):
@@ -424,6 +423,7 @@ def get_xunit_content(report, testname, elapsed):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >

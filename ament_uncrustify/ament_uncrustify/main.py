@@ -127,6 +127,8 @@ def main(argv=sys.argv[1:]):
             all_input_files += input_files
             output_files = invoke_uncrustify(
                 uncrustify_bin, input_files, args, language, temp_path, suffix)
+            if output_files is None:
+                return 1
             all_output_files += output_files
 
         # compute diff
@@ -217,7 +219,7 @@ def get_files(paths, extension_types, excludes=[], language=None):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -277,7 +279,7 @@ def invoke_uncrustify(
             print(e.output.decode(), file=sys.stderr)
         print("The invocation of 'uncrustify' failed with error code %d: %s" %
             (e.returncode, e), file=sys.stderr)
-        return 1
+        return None
 
     if cwd:
         # input files are relative
@@ -336,14 +338,14 @@ def invoke_uncrustify(
                 print(e.output, file=sys.stderr)
             print("The invocation of 'uncrustify' failed with error code %d: "
                   '%s' % (e.returncode, e), file=sys.stderr)
-            return 1
+            return None
 
         uncrustified_files = [f + suffix for f in input_files]
         i += 1
         if i >= 5:
             print("'uncrustify' did not settle on a final result even after "
                   '%d invocations' % i, file=sys.stderr)
-            return 1
+            return None
 
     return output_files
 
@@ -362,6 +364,7 @@ def get_xunit_content(report, testname, elapsed):
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
+  errors="0"
   time="%(time)s"
 >
 """ % data

@@ -48,6 +48,9 @@ def main(argv=sys.argv[1:]):
              'in %s will be considered.' %
              ', '.join(["'.%s'" % e for e in extensions]))
     parser.add_argument(
+        '--clang-format-version',
+        help='The version of clang-format to use.')
+    parser.add_argument(
         '--reformat',
         action='store_true',
         help='Reformat the files in place')
@@ -80,6 +83,10 @@ def main(argv=sys.argv[1:]):
         'clang-format-3.4',
         'clang-format-3.3',
     ]
+
+    if args.clang_format_version:
+        bin_names = ['clang-format-' + args.clang_format_version]
+
     clang_format_bin = find_executable(bin_names)
     if not clang_format_bin:
         print('Could not find %s executable' %
@@ -170,9 +177,9 @@ def main(argv=sys.argv[1:]):
 
                 # format deletion / addition as unified diff
                 data['deletion'] = '\n'.join(
-                    ['- ' + l for l in data['deletion'].split('\n')])
+                    ['- ' + line for line in data['deletion'].split('\n')])
                 data['addition'] = '\n'.join(
-                    ['+ ' + l for l in data['addition'].split('\n')])
+                    ['+ ' + line for line in data['addition'].split('\n')])
 
                 report[filename].append(data)
 
@@ -253,7 +260,7 @@ def get_files(paths, extensions):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -303,6 +310,7 @@ def get_xunit_content(report, testname, elapsed):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >

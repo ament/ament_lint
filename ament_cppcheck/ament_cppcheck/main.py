@@ -66,6 +66,11 @@ def main(argv=sys.argv[1:]):
         help="Include directories for C/C++ files being checked."
              "Each directory is passed to cppcheck as '-I <include_dir>'")
     parser.add_argument(
+        '--exclude',
+        nargs='*',
+        help="Exclude files or directories for C/C++ files being checked."
+             "Each files is passed to cppcheck as '--suppress='")
+    parser.add_argument(
         '--language',
         help="Passed to cppcheck as '--language=<language>', and it forces cppcheck to consider "
              "as the given language ('c' or 'c++').")
@@ -134,11 +139,15 @@ def main(argv=sys.argv[1:]):
            '-q',
            '-rp',
            '--xml',
-           '--xml-version=2']
+           '--xml-version=2',
+           '--suppress=internalAstError',
+           '--suppress=unknownMacro']
     if args.language:
         cmd.extend(['--language={0}'.format(args.language)])
     for include_dir in (args.include_dirs or []):
         cmd.extend(['-I', include_dir])
+    for exclude in (args.exclude or []):
+        cmd.extend(['--suppress=*:', exclude])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     cmd.extend(files)
@@ -214,7 +223,7 @@ def get_files(paths, extensions):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -245,9 +254,10 @@ def get_xunit_content(report, testname, elapsed, skip=None):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
-  skip="%(skip)d"
+  skipped="%(skip)d"
 >
 """ % data
 

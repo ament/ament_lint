@@ -161,6 +161,7 @@ def _get_xunit_content(errors: List[Match],
         <testsuite
         name="{test_name:s}"
         tests="{test_count:d}"
+        errors="0"
         failures="{error_count:d}"
         time="{time:s}"
         >
@@ -214,7 +215,7 @@ def _get_files(paths: List[str]) -> List[str]:
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _

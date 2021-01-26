@@ -15,7 +15,10 @@
 # limitations under the License.
 
 import argparse
+from collections import defaultdict
 import copy
+import json
+from multiprocessing.pool import ThreadPool
 import os
 import re
 import subprocess
@@ -46,9 +49,14 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help='The files or directories to check. For directories files ending '
-             'in %s will be considered.' %
-             ', '.join(["'.%s'" % e for e in extensions]))
+        help='If <path> is a directory, ament_clang_tidy will recursively search it for'
+             ' "compile_commands.json" files. If <path> is a file, ament_clang_tidy will'
+             ' treat it as a "compile_commands.json" file')
+    parser.add_argument(
+        '--jobs',
+        type=int,
+        default=1,
+        help='number of clang-tidy jobs to run in parallel')
 
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
@@ -76,6 +84,9 @@ def main(argv=sys.argv[1:]):
         action='store_true',
         help='Displays errors from all system headers')
     parser.add_argument(
+        '--packages-select', nargs='*', metavar='PKG_NAME',
+        help='Only process a subset of packages')
+    parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
@@ -88,13 +99,20 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
-    files = get_files(args.paths, extensions)
-    if not files:
-        print('No files found', file=sys.stderr)
+    compilation_dbs = get_compilation_db_files(args.paths)
+
+    if args.packages_select is not None:
+        # Handle the case of a quoted list of space separated package names
+        if len(args.packages_select) == 1:
+            args.packages_select = args.packages_select[0].strip().split()
+        compilation_dbs = filter_packages_select(compilation_dbs, args.packages_select)
+
+    if not compilation_dbs:
+        print('No compilation database files found', file=sys.stderr)
         return 1
 
     bin_names = [
-        'clang-tidy',
+        # 'clang-tidy',
         'clang-tidy-6.0',
     ]
     clang_tidy_bin = find_executable(bin_names)
@@ -103,74 +121,124 @@ def main(argv=sys.argv[1:]):
               ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
         return 1
 
-    # invoke clang_tidy
-    with open(args.config_file, 'r') as h:
-        content = h.read()
-    data = yaml.safe_load(content)
-    style = yaml.dump(data, default_flow_style=True, width=float('inf'))
-    cmd = [clang_tidy_bin,
-           '--config=%s' % style]
-    if args.explain_config:
-        cmd.append('--explain-config')
-    if args.export_fixes:
-        cmd.append('--export-fixes')
-        cmd.append(args.export_fixes)
-    if args.fix_errors:
-        cmd.append('--fix-errors')
-    if args.header_filter:
+    pool = ThreadPool(args.jobs)
+
+    def invoke_clang_tidy(compilation_db_path):
+        package_dir = os.path.dirname(compilation_db_path)
+        package_name = os.path.basename(package_dir)
+
+        with open(args.config_file, 'r') as h:
+            content = h.read()
+        data = yaml.safe_load(content)
+        style = yaml.dump(data, default_flow_style=True, width=float('inf'))
+        cmd = [clang_tidy_bin,
+               '--config=%s' % style,
+               '-p', package_dir]
+        if args.explain_config:
+            cmd.append('--explain-config')
+        if args.export_fixes:
+            cmd.append('--export-fixes')
+            cmd.append(args.export_fixes)
+        if args.fix_errors:
+            cmd.append('--fix-errors')
         cmd.append('--header-filter')
-        cmd.append(args.header_filter)
-    if args.quiet:
-        cmd.append('--quiet')
-    if args.system_headers:
-        cmd.append('--system-headers')
-    cmd.extend(files)
-    cmd.append('--')
-    try:
-        output = subprocess.check_output(cmd).strip().decode()
-        print(output)
-    except subprocess.CalledProcessError as e:
-        print("The invocation of '%s' failed with error code %d: %s" %
-              (os.path.basename(clang_tidy_bin), e.returncode, e),
-              file=sys.stderr)
-        return 1
+        if args.header_filter:
+            cmd.append(args.header_filter)
+        else:
+            cmd.append('include/%s/.*' % package_name)
+        if args.quiet:
+            cmd.append('--quiet')
+        if args.system_headers:
+            cmd.append('--system-headers')
+
+        def is_gtest_source(file_name):
+            if(file_name == 'gtest_main.cc' or file_name == 'gtest-all.cc'
+               or file_name == 'gmock_main.cc' or file_name == 'gmock-all.cc'):
+                return True
+            return False
+
+        def is_unittest_source(package, file_path):
+            return ('%s/test/' % package) in file_path
+
+        def start_subprocess(full_cmd):
+            output = ''
+            try:
+                output = subprocess.check_output(full_cmd,
+                                                 stderr=subprocess.DEVNULL).strip().decode()
+            except subprocess.CalledProcessError as e:
+                print('The invocation of "%s" failed with error code %d: %s' %
+                      (os.path.basename(clang_tidy_bin), e.returncode, e),
+                      file=sys.stderr)
+            return output
+
+        files = []
+        async_outputs = []
+        db = json.load(open(compilation_db_path))
+        for item in db:
+            # exclude gtest sources from being checked by clang-tidy
+            if is_gtest_source(os.path.basename(item['file'])):
+                continue
+
+            # exclude unit test sources from being checked by clang-tidy
+            # because gtest macros are problematic
+            if is_unittest_source(package_name, item['file']):
+                continue
+
+            files.append(item['file'])
+            full_cmd = cmd + [item['file']]
+            async_outputs.append(pool.apply_async(start_subprocess, (full_cmd,)))
+
+        output = ''
+        for async_output in async_outputs:
+            output += async_output.get()
+
+        return (files, output)
+
+    files = []
+    outputs = []
+    for compilation_db in compilation_dbs:
+        package_dir = os.path.dirname(compilation_db)
+        package_name = os.path.basename(package_dir)
+        print('found compilation database for package "%s"...' % package_name)
+        (source_files, output) = invoke_clang_tidy(compilation_db)
+        files += source_files
+        outputs.append(output)
+    pool.close()
+    pool.join()
 
     # output errors
-    report = {}
-    complete_filenames = []
-
+    report = defaultdict(list)
     for filename in files:
         report[filename] = []
-        complete_filename = os.path.join(
-            os.getcwd(), filename)
-        complete_filenames.append(complete_filename)
 
-    error_re = re.compile(r'\[.*?\]')
-    file_pairs = dict(zip(complete_filenames, files))
+    error_re = re.compile('(/.*?\\.(?:%s)):(\\d+):(\\d+): (?:warning:|error:)' %
+                          '|'.join(extensions))
 
     current_file = None
     new_file = None
     data = {}
 
-    for line in output.splitlines():
-        # error found
-        if line[0] == '/' and error_re.search(line):
-            for filename in complete_filenames:
-                if filename in line:
-                    new_file = file_pairs[filename]
-                    if current_file is not None:
-                        report[current_file].append(copy.deepcopy(data))
-                        data.clear()
-                    current_file = new_file
-            error_msg = find_error_message(line)
-            line_num, col_num = find_line_and_col_num(line)
-            data['line_no'] = line_num
-            data['offset_in_line'] = col_num
-            data['error_msg'] = error_msg
-        else:
-            data['code_correct_rec'] = data.get('code_correct_rec', '') + line + '\n'
-    if current_file is not None:
-        report[current_file].append(copy.deepcopy(data))
+    for output in outputs:
+        print(output)
+        for line in output.splitlines():
+            # error found
+            match = error_re.search(line)
+            if match:
+                new_file = match.group(1)
+                if current_file is not None:
+                    report[current_file].append(copy.deepcopy(data))
+                    data.clear()
+                current_file = new_file
+                line_num = match.group(2)
+                col_num = match.group(3)
+                error_msg = find_error_message(line)
+                data['line_no'] = line_num
+                data['offset_in_line'] = col_num
+                data['error_msg'] = error_msg
+            else:
+                data['code_correct_rec'] = data.get('code_correct_rec', '') + line + '\n'
+        if current_file is not None:
+            report[current_file].append(copy.deepcopy(data))
 
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
@@ -188,7 +256,6 @@ def main(argv=sys.argv[1:]):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
-    return
 
 
 def find_executable(file_names):
@@ -201,12 +268,12 @@ def find_executable(file_names):
     return None
 
 
-def get_files(paths, extensions):
+def get_compilation_db_files(paths):
     files = []
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -214,24 +281,23 @@ def get_files(paths, extensions):
                 dirnames.sort()
 
                 # select files by extension
-                for filename in sorted(filenames):
-                    _, ext = os.path.splitext(filename)
-                    if ext in ('.%s' % e for e in extensions):
+                for filename in filenames:
+                    if filename == 'compile_commands.json':
                         files.append(os.path.join(dirpath, filename))
-        if os.path.isfile(path):
+        elif os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
 
 
+def filter_packages_select(compilation_db_paths, packages):
+    def package_test(compilation_db_paths):
+        package_name = os.path.basename(os.path.dirname(compilation_db_paths))
+        return (package_name in packages)
+    return list(filter(package_test, compilation_db_paths))
+
+
 def find_error_message(data):
     return data[data.rfind(':') + 2:]
-
-
-def find_line_and_col_num(data):
-    first_col = data.find(':')
-    second_col = data.find(':', first_col + 1)
-    third_col = data.find(':', second_col + 1)
-    return data[first_col + 1:second_col], data[second_col + 1:third_col]
 
 
 def get_xunit_content(report, testname, elapsed):
@@ -247,6 +313,7 @@ def get_xunit_content(report, testname, elapsed):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >
@@ -270,10 +337,11 @@ def get_xunit_content(report, testname, elapsed):
                     'cdata': '\n'.join([
                         '%s:%d:%d' % (
                             filename, int(error['line_no']),
-                            int(error['offset_in_line'])),
-                        error['code_correct_rec'],
-                    ]),
+                            int(error['offset_in_line']))])
                 }
+                if 'code_correct_rec' in data:
+                    data['cdata'] += '\n'
+                    data['cdata'] += data['code_correct_rec']
                 xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
@@ -295,8 +363,10 @@ def get_xunit_content(report, testname, elapsed):
 
     # output list of checked files
     data = {
-        'escaped_files': escape(''.join(['\n* %s' % r
-                                         for r in sorted(report.keys())])),
+        'escaped_files': escape(
+            ''.join(['\n* %s' % r for r in sorted(map(
+                os.path.relpath, report.keys()
+            ))])),
     }
     xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
 """ % data
