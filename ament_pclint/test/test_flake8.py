@@ -14,7 +14,11 @@
 
 from ament_flake8.main import main_with_errors
 
+import pytest
 
+
+@pytest.mark.linter
+@pytest.mark.flake8
 def test_flake8():
     rc, errors = main_with_errors(argv=[])
     assert rc == 0, \
