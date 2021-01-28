@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pkg_resources
+try:
+    import importlib.metadata as importlib_metadata
+except ModuleNotFoundError:
+    import importlib_metadata
 
 
 COPYRIGHT_GROUP = 'ament_copyright.copyright_name'
@@ -35,8 +38,7 @@ UNKNOWN_IDENTIFIER = '<unknown>'
 
 def get_copyright_names():
     names = {}
-    for entry_point in pkg_resources.iter_entry_points(
-            group=COPYRIGHT_GROUP):
+    for entry_point in importlib_metadata.entry_points().get(COPYRIGHT_GROUP, []):
         assert entry_point.name != UNKNOWN_IDENTIFIER, \
             "Invalid entry point name '%s'" % entry_point.name
         name = entry_point.load()
@@ -46,8 +48,7 @@ def get_copyright_names():
 
 def get_licenses():
     licenses = {}
-    for entry_point in pkg_resources.iter_entry_points(
-            group=LICENSE_GROUP):
+    for entry_point in importlib_metadata.entry_points().get(LICENSE_GROUP, []):
         assert entry_point.name != UNKNOWN_IDENTIFIER, \
             "Invalid entry point name '%s'" % entry_point.name
         licenses[entry_point.name] = entry_point.load()

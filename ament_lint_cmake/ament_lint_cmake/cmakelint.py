@@ -84,6 +84,7 @@ class _CMakeLintState(object):
         self.config = 0
         self.errors = 0
         self.spaces = 2
+        self.linelength = 80
         self.allowed_categories = _ERROR_CATEGORIES.split()
 
     def SetFilters(self, filters):
@@ -109,6 +110,9 @@ class _CMakeLintState(object):
 
     def SetSpaces(self, spaces):
         self.spaces = int(spaces.strip())
+
+    def SetLineLength(self, linelength):
+        self.linelength = int(linelength)
 
 class _CMakePackageState(object):
     def __init__(self):
@@ -198,7 +202,7 @@ def CheckLineLength(filename, linenumber, clean_lines, errors):
     Check for lines longer than the recommended length
     """
     line = clean_lines.raw_lines[linenumber]
-    if len(line) > 80:
+    if len(line) > _lint_state.linelength:
         if _RE_STRING.match(line):
             lineno = linenumber
             while lineno > 0:
@@ -215,7 +219,8 @@ def CheckLineLength(filename, linenumber, clean_lines, errors):
                 filename,
                 linenumber,
                 'linelength',
-                'Lines should be <= 80 characters long')
+                'Lines should be <= %d characters long' %
+                    (_lint_state.linelength))
 
 def ContainsCommand(line):
     return _RE_COMMAND.match(line)
@@ -405,20 +410,21 @@ def _ProcessFile(filename):
         return
     global _package_state
     _package_state = _CMakePackageState()
-    for l in open(filename).readlines():
-        l = l.rstrip('\n')
-        if l.endswith('\r'):
-            have_cr = True
-            l = l.rstrip('\r')
-        lines.append(l)
-        # Check this line to see if it is a lint_cmake pragma
-        if l.startswith(linter_pragma_start):
-            try:
-                _lint_state.SetFilters(l[len(linter_pragma_start):])
-            except:
-                print("Exception occurred while processing '{0}:{1}':"
-                      .format(filename, len(lines)))
-                raise
+    with open(filename) as f:
+        for l in f.readlines():
+            l = l.rstrip('\n')
+            if l.endswith('\r'):
+                have_cr = True
+                l = l.rstrip('\r')
+            lines.append(l)
+            # Check this line to see if it is a lint_cmake pragma
+            if l.startswith(linter_pragma_start):
+                try:
+                    _lint_state.SetFilters(l[len(linter_pragma_start):])
+                except:
+                    print("Exception occurred while processing '{0}:{1}':"
+                          .format(filename, len(lines)))
+                    raise
     lines.append('# Lines end here')
     # Check file name after reading lines incase of a # lint_cmake: pragma
     CheckFileName(filename, Error)
@@ -448,6 +454,7 @@ def PrintCategories():
 def ParseOptionFile(contents, ignore_space):
     filters = None
     spaces = None
+    linelength = None
     for line in contents:
         line = line.strip()
         if not line or line.startswith('#'):
@@ -456,9 +463,13 @@ def ParseOptionFile(contents, ignore_space):
             filters = line.replace('filter=', '')
         if line.startswith('spaces='):
             spaces = line.replace('spaces=', '')
+        if line.startswith('linelength='):
+            linelength = line.replace('linelength=', '')
     _lint_state.SetFilters(filters)
     if spaces and not ignore_space:
         _lint_state.SetSpaces(spaces)
+    if linelength is not None:
+        _lint_state.SetLineLength(linelength)
 
 def ParseArgs(argv):
     try:
