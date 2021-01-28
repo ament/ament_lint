@@ -41,7 +41,7 @@ function(ament_lint_cmake)
   if(DEFINED ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
   else()
-    list(APPEND cmd "--linelength" "120")
+    list(APPEND cmd "--linelength" "140")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
