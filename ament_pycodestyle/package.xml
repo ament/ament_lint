@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_pycodestyle</name>
-  <version>0.10.0</version>
+  <version>0.10.1</version>
   <description>
     The ability to check code against the style conventions in PEP 8 and
     generate xUnit test result files.
@@ -10,7 +10,7 @@
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>	
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
 
   <exec_depend>python3-pycodestyle</exec_depend>
 

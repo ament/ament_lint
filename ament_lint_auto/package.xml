@@ -2,12 +2,12 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_lint_auto</name>
-  <version>0.10.0</version>
+  <version>0.10.1</version>
   <description>The auto-magic functions for ease to use of the ament linters in CMake.</description>
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>	
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>

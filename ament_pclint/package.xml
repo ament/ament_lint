@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_pclint</name>
-  <version>0.10.0</version>
+  <version>0.10.1</version>
   <description>
     The ability to perform static code analysis on C/C++ code using pclint
     and generate xUnit test result files.
@@ -10,7 +10,7 @@
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="jp.samper@apex.ai">Juan Pablo Samper</author>	
+  <author email="jp.samper@apex.ai">Juan Pablo Samper</author>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
