@@ -8,6 +8,7 @@
     result files.
   </description>
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
+  <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
   <author email="dthomas@osrfoundation.org">Dirk Thomas</author>

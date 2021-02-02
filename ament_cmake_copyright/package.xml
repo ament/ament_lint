@@ -5,6 +5,7 @@
   <version>0.10.1</version>
   <description>The CMake API for ament_copyright to check every source file contains copyright reference.</description>
   <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
+  <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
   <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
