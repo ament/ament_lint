@@ -208,7 +208,7 @@ def get_file_groups(paths, extensions, exclude_patterns):
     excludes = []
     for exclude_pattern in exclude_patterns:
         excludes.extend(glob.glob(exclude_pattern))
-    excludes = set([os.path.realpath(x) for x in excludes])
+    excludes = {os.path.realpath(x) for x in excludes}
 
     # dict mapping root path to files
     groups = {}
@@ -227,11 +227,11 @@ def get_file_groups(paths, extensions, exclude_patterns):
                     _, ext = os.path.splitext(filename)
                     if ext in ('.%s' % e for e in extensions):
                         filepath = os.path.join(dirpath, filename)
-                        if not os.path.realpath(filepath) in excludes:
+                        if os.path.realpath(filepath) not in excludes:
                             append_file_to_group(groups, filepath)
 
         if os.path.isfile(path):
-            if not path in excludes:
+            if path not in excludes:
                 append_file_to_group(groups, path)
 
     return groups
