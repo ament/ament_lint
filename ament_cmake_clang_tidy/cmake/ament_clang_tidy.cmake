@@ -25,16 +25,17 @@
 #
 # :param TESTNAME: the name of the test, default: "clang_tidy"
 # :type TESTNAME: string
-# :param CONFIG_FILE: the path of the configuration file
-#                     for clang-tidy to consider
+# :param CONFIG_FILE: the path of the configuration file for clang-tidy to consider
 # :type CONFIG_FILE: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
+# :param TIMEOUT: the test timeout in seconds, default: 300
+# :type TIMEOUT: integer
 #
 # @public
 #
 function(ament_clang_tidy)
-  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE;TIMEOUT" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "clang_tidy")
   endif()
@@ -54,6 +55,10 @@ function(ament_clang_tidy)
     list(APPEND cmd "--config" "${ament_cmake_clang_tidy_CONFIG_FILE}")
   endif()
 
+  if(NOT ARG_TIMEOUT)
+    set(ARG_TIMEOUT 300)
+  endif()
+
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_clang_tidy")
   ament_add_test(
     "${ARG_TESTNAME}"
@@ -61,6 +66,7 @@ function(ament_clang_tidy)
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_clang_tidy/${ARG_TESTNAME}.txt"
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    TIMEOUT "${ARG_TIMEOUT}"
   )
   set_tests_properties(
     "${ARG_TESTNAME}"
