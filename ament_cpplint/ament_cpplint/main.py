@@ -231,7 +231,7 @@ def get_file_groups(paths, extensions, exclude_patterns):
                             append_file_to_group(groups, filepath)
 
         if os.path.isfile(path):
-            if path not in excludes:
+            if os.path.realpath(path) not in excludes:
                 append_file_to_group(groups, path)
 
     return groups
