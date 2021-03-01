@@ -105,7 +105,7 @@ def main(argv=sys.argv[1:]):
             start_time = time.time()
 
         files_by_language = get_files(
-            args.paths, {'C': c_extensions, 'C++': cpp_extensions},
+            args.paths, {'C': c_extensions, 'CPP': cpp_extensions},
             excludes=args.exclude, language=args.language)
         if not files_by_language:
             print('No files found', file=sys.stderr)
