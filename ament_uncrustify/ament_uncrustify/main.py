@@ -65,7 +65,7 @@ def main(argv=sys.argv[1:]):
         help='Exclude specific file names and directory names from the check')
     parser.add_argument(
         '--language',
-        choices=['C', 'CPP'],
+        choices=['C', 'C++', 'CPP'],
         help="Passed to uncrustify as '-l <language>' to force a specific "
              'language rather then choosing one based on file extension')
     parser.add_argument(
@@ -104,9 +104,15 @@ def main(argv=sys.argv[1:]):
         if args.xunit_file:
             start_time = time.time()
 
+        # replace language set to 'C++' with 'CPP' to be more consistent with uncrustify
+        if args.language == 'C++':
+            language_ = 'CPP'
+        else:
+            language_ = args.language
+
         files_by_language = get_files(
             args.paths, {'C': c_extensions, 'CPP': cpp_extensions},
-            excludes=args.exclude, language=args.language)
+            excludes=args.exclude, language=language_)
         if not files_by_language:
             print('No files found', file=sys.stderr)
             return 1
