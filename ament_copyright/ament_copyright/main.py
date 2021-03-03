@@ -217,7 +217,7 @@ def main(argv=sys.argv[1:]):
 
 def add_missing_header(file_descriptors, name, license_, verbose):
     copyright_ = 'Copyright %d %s' % (int(time.strftime('%Y')) - 1 + 1, name)
-    header = license_.file_header.format(**{
+    header = license_.file_headers[0].format(**{
         'copyright': copyright_,
         'copyright_holder': name})
     lines = header.splitlines()
@@ -255,12 +255,12 @@ def add_missing_header(file_descriptors, name, license_, verbose):
         elif file_descriptor.filetype == CONTRIBUTING_FILETYPE:
             print('+', file_descriptor.path)
             with open(file_descriptor.path, 'w', encoding='utf-8') as h:
-                h.write(license_.contributing_file)
+                h.write(license_.contributing_files[0])
 
         elif file_descriptor.filetype == LICENSE_FILETYPE:
             print('+', file_descriptor.path)
             with open(file_descriptor.path, 'w', encoding='utf-8') as h:
-                h.write(license_.license_file)
+                h.write(license_.license_files[0])
 
         else:
             assert False, 'Unknown filetype: ' + file_descriptor.filetype

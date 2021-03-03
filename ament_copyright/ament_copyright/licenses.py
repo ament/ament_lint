@@ -19,22 +19,36 @@ from collections import namedtuple
 import os
 
 LicenseEntryPoint = namedtuple(
-    'LicenseEntryPoint', ['name', 'file_header', 'license_file', 'contributing_file'])
+    'LicenseEntryPoint', ['name', 'file_headers', 'license_files', 'contributing_files'])
 
 TEMPLATE_DIRECTORY = os.path.join(os.path.dirname(__file__), 'template')
 
 
+def read_data(path, name, prefix, type):
+    path_template = os.path.join(path, prefix + '_' + type + '_%d.txt')
+    data = []
+
+    with open(os.path.join(path, prefix + '_' + type + '.txt'), 'r') as h:
+        data.append(h.read())
+
+    index = 0
+    while True:
+        try:
+            with open(path_template % index, 'r') as h:
+                data.append(h.read())
+                index += 1
+        except Exception:
+            break
+
+    return data
+
+
 def read_license_data(path, name, prefix):
-    path_template = os.path.join(path, prefix + '_%s.txt')
+    file_headers = read_data(path, name, prefix, 'header')
+    license_files = read_data(path, name, prefix, 'license')
+    contributing_files = read_data(path, name, prefix, 'contributing')
 
-    with open(path_template % 'header', 'r') as h:
-        file_header = h.read()
-    with open(path_template % 'license', 'r') as h:
-        license_file = h.read()
-    with open(path_template % 'contributing', 'r') as h:
-        contributing_file = h.read()
-
-    return LicenseEntryPoint(name, file_header, license_file, contributing_file)
+    return LicenseEntryPoint(name, file_headers, license_files, contributing_files)
 
 
 apache2 = read_license_data(TEMPLATE_DIRECTORY, 'Apache License, Version 2.0', 'apache2')
