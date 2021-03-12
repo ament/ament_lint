@@ -40,8 +40,6 @@ function(ament_lint_cmake)
   set(cmd "${ament_lint_cmake_BIN}" "--xunit-file" "${result_file}")
   if(DEFINED ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
-  else()
-    list(APPEND cmd "--linelength" "140")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
