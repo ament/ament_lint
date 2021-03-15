@@ -49,7 +49,7 @@ def main(argv=sys.argv[1:]):
         help='Filters for lint_cmake, for a list of filters see: '
              'https://github.com/richq/cmake-lint/blob/master/README.md#usage')
     parser.add_argument(
-        '--linelength', metavar='N', type=int,
+        '--linelength', metavar='N', type=int, default=140,
         help='The maximum line length')
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
