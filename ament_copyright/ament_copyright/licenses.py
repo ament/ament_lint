@@ -24,11 +24,11 @@ LicenseEntryPoint = namedtuple(
 TEMPLATE_DIRECTORY = os.path.join(os.path.dirname(__file__), 'template')
 
 
-def read_data(path, name, prefix, type):
-    path_template = os.path.join(path, prefix + '_' + type + '_%d.txt')
+def read_data(path, name, prefix, license_type):
+    path_template = os.path.join(path, prefix + '_' + license_type + '_%d.txt')
     data = []
 
-    with open(os.path.join(path, prefix + '_' + type + '.txt'), 'r') as h:
+    with open(os.path.join(path, prefix + '_' + license_type + '.txt'), 'r') as h:
         data.append(h.read())
 
     index = 0
