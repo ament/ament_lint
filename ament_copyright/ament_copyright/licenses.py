@@ -37,7 +37,7 @@ def read_data(path, name, prefix, license_type):
             with open(path_template % index, 'r') as h:
                 data.append(h.read())
                 index += 1
-        except Exception:
+        except OSError:
             break
 
     return data
