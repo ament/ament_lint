@@ -7,11 +7,11 @@
     The ability to perform static code analysis on C/C++ code using pclint
     and generate xUnit test result files.
   </description>
-  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
   <author email="jp.samper@apex.ai">Juan Pablo Samper</author>
+  <author email="clairewang@openrobotics.org">Claire Wang</author>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

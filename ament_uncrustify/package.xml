@@ -7,11 +7,11 @@
     The ability to check code against style conventions using uncrustify
     and generate xUnit test result files.
   </description>
-  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
   <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
+  <author email="clairewang@openrobotics.org">Claire Wang</author>
 
   <exec_depend>uncrustify_vendor</exec_depend>
 
