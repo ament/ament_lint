@@ -11,7 +11,7 @@
   <license>Apache License 2.0</license>
 
   <author email="jp.samper@apex.ai">Juan Pablo Samper</author>
-  <author email="clairewang@openrobotics.org">Claire Wang</author>
+  <author>Claire Wang</author>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

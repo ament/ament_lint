@@ -10,7 +10,7 @@
   <license>Apache License 2.0</license>
 
   <author email="dhood@osrfoundation.org">D. Hood</author>
-  <author email="clairewang@openrobotics.org">Claire Wang</author>
+  <author>Claire Wang</author>
 
   <exec_depend>ament_lint</exec_depend>
   <exec_depend>python3-flake8</exec_depend>

@@ -9,7 +9,7 @@
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="clairewang@openrobotics.org">Claire Wang</author>
+  <author>Claire Wang</author>
 
   <exec_depend>clang-tidy</exec_depend>
   <exec_depend>python3-yaml</exec_depend>

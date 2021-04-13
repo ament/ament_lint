@@ -10,8 +10,8 @@
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
-  <author email="clairewang@openrobotics.org">Claire Wang</author>
+  <author>Dirk Thomas</author>
+  <author>Claire Wang</author>
 
   <exec_depend>python3-pycodestyle</exec_depend>
 
