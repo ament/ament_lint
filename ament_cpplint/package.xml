@@ -6,12 +6,12 @@
   <description>
     The ability to check code against the Google style conventions using
     cpplint and generate xUnit test result files.</description>
-  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
   <license>BSD</license>
 
-  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
+  <author>Dirk Thomas</author>
+  <author>Claire Wang</author>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

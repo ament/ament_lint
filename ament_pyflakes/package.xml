@@ -7,11 +7,11 @@
     The ability to check code using pyflakes and generate xUnit test
     result files.
   </description>
-  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
+  <author>Dirk Thomas</author>
+  <author>Claire Wang</author>
 
   <exec_depend>pyflakes3</exec_depend>
 

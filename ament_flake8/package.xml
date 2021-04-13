@@ -6,10 +6,11 @@
   <description>
     The ability to check code for style and syntax conventions with flake8.
   </description>
-  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
-  <author email="dhood@osrfoundation.org">D. Hood</author>
+
+  <author>D. Hood</author>
+  <author>Claire Wang</author>
 
   <exec_depend>ament_lint</exec_depend>
   <exec_depend>python3-flake8</exec_depend>

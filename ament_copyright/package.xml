@@ -7,11 +7,11 @@
     The ability to check source files for copyright and license
     information.
   </description>
-  <maintainer email="clairewang@openrobotics.org">Claire Wang</maintainer>
   <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
   <license>Apache License 2.0</license>
 
-  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
+  <author>Dirk Thomas</author>
+  <author>Claire Wang</author>
 
   <exec_depend>ament_lint</exec_depend>
   <exec_depend>python3-importlib-metadata</exec_depend>
