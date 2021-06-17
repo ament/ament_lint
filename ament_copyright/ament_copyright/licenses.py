@@ -51,6 +51,8 @@ def read_license_data(path, name, spdx, prefix):
     return LicenseEntryPoint(name, spdx, file_headers, license_files, contributing_files)
 
 
+# The SPDX identifier (the 3rd argument) comes from the official list at https://spdx.org/licenses/
+
 apache2 = read_license_data(TEMPLATE_DIRECTORY,
                             'Apache License, Version 2.0',
                             'Apache-2.0',
