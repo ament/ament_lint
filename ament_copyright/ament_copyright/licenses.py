@@ -19,7 +19,7 @@ from collections import namedtuple
 import os
 
 LicenseEntryPoint = namedtuple(
-    'LicenseEntryPoint', ['name', 'file_headers', 'license_files', 'contributing_files'])
+    'LicenseEntryPoint', ['name', 'spdx', 'file_headers', 'license_files', 'contributing_files'])
 
 TEMPLATE_DIRECTORY = os.path.join(os.path.dirname(__file__), 'template')
 
@@ -43,20 +43,49 @@ def read_data(path, name, prefix, license_type):
     return data
 
 
-def read_license_data(path, name, prefix):
+def read_license_data(path, name, spdx, prefix):
     file_headers = read_data(path, name, prefix, 'header')
     license_files = read_data(path, name, prefix, 'license')
     contributing_files = read_data(path, name, prefix, 'contributing')
 
-    return LicenseEntryPoint(name, file_headers, license_files, contributing_files)
+    return LicenseEntryPoint(name, spdx, file_headers, license_files, contributing_files)
 
 
-apache2 = read_license_data(TEMPLATE_DIRECTORY, 'Apache License, Version 2.0', 'apache2')
-boost1 = read_license_data(TEMPLATE_DIRECTORY, 'Boost Software License - Version 1.0', 'boost1')
-bsd2 = read_license_data(TEMPLATE_DIRECTORY, 'BSD License 2.0', 'bsd2')
-bsd_3clause = read_license_data(TEMPLATE_DIRECTORY, '3-Clause BSD License', 'bsd_3clause')
-bsd_2clause = read_license_data(TEMPLATE_DIRECTORY, '2-Clause BSD License', 'bsd_2clause')
-mit = read_license_data(TEMPLATE_DIRECTORY, 'MIT License', 'mit')
-mit0 = read_license_data(TEMPLATE_DIRECTORY, 'MIT-0 License', 'mit0')
-gplv3 = read_license_data(TEMPLATE_DIRECTORY, 'GNU General Public License 3.0', 'gplv3')
-lgplv3 = read_license_data(TEMPLATE_DIRECTORY, 'GNU Lesser General Public License 3.0', 'lgplv3')
+# The SPDX identifier (the 3rd argument) comes from the official list at https://spdx.org/licenses/
+
+apache2 = read_license_data(TEMPLATE_DIRECTORY,
+                            'Apache License, Version 2.0',
+                            'Apache-2.0',
+                            'apache2')
+boost1 = read_license_data(TEMPLATE_DIRECTORY,
+                           'Boost Software License - Version 1.0',
+                           'BSL-1.0',
+                           'boost1')
+bsd2 = read_license_data(TEMPLATE_DIRECTORY,
+                         'BSD License 2.0',
+                         'BSD-2.0',
+                         'bsd2')
+bsd_3clause = read_license_data(TEMPLATE_DIRECTORY,
+                                '3-Clause BSD License',
+                                'BSD-3-Clause',
+                                'bsd_3clause')
+bsd_2clause = read_license_data(TEMPLATE_DIRECTORY,
+                                '2-Clause BSD License',
+                                'BSD-2-Clause',
+                                'bsd_2clause')
+mit = read_license_data(TEMPLATE_DIRECTORY,
+                        'MIT License',
+                        'MIT',
+                        'mit')
+mit0 = read_license_data(TEMPLATE_DIRECTORY,
+                         'MIT-0 License',
+                         'MIT-0',
+                         'mit0')
+gplv3 = read_license_data(TEMPLATE_DIRECTORY,
+                          'GNU General Public License 3.0',
+                          'GPL-3.0-only',
+                          'gplv3')
+lgplv3 = read_license_data(TEMPLATE_DIRECTORY,
+                           'GNU Lesser General Public License 3.0',
+                           'LGPL-3.0-only',
+                           'lgplv3')
