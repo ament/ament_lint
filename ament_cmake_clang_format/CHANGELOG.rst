@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_clang_format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.11.1 (2021-06-18)
 -------------------
 
