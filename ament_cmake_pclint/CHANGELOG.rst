@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_pclint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.11.0 (2021-06-18)
 -------------------
 
