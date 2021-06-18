@@ -2,6 +2,11 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add SPDX identifiers to the licenses. (`#315 <https://github.com/ament/ament_lint/issues/315>`_)
+* Contributors: Chris Lalancette
+
 0.10.6 (2021-05-06)
 -------------------
 
