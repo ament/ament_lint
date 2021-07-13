@@ -16,7 +16,7 @@
   <buildtool_export_depend>ament_cmake_core</buildtool_export_depend>
 
   <!--<exec_depend>ament_clang_format</exec_depend>-->
-  <!--<exec_depend>ament_clang_tidy</exec_depend>-->
+  <exec_depend>ament_cmake_clang_tidy</exec_depend>
   <exec_depend>ament_cmake_copyright</exec_depend>
   <exec_depend>ament_cmake_cppcheck</exec_depend>
   <exec_depend>ament_cmake_cpplint</exec_depend>
