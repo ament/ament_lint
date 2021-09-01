@@ -84,6 +84,10 @@ def main(argv=sys.argv[1:]):
         '--cppcheck-version',
         action='store_true',
         help='Get the cppcheck version, print it, and then exit.')
+    parser.add_argument(
+        '--misra',
+        action='store_true',
+        help="Evaluate compliance with the MISRA coding standard.")
     args = parser.parse_args(argv)
 
     cppcheck_bin = find_cppcheck_executable()
@@ -150,6 +154,8 @@ def main(argv=sys.argv[1:]):
         cmd.extend(['--suppress=*:' + exclude])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
+    if args.misra:
+        cmd.extend(['--addon=misra'])
     cmd.extend(files)
     try:
         p = subprocess.Popen(cmd, stderr=subprocess.PIPE)
