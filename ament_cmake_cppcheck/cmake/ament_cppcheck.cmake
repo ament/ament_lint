@@ -35,7 +35,7 @@
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "EXCLUDE;LANGUAGE;TESTNAME" "LIBRARIES;INCLUDE_DIRS" ${ARGN})
+  cmake_parse_arguments(ARG "MISRA" "EXCLUDE;LANGUAGE;TESTNAME" "LIBRARIES;INCLUDE_DIRS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -60,6 +60,9 @@ function(ament_cppcheck)
   endif()
   if(ARG_INCLUDE_DIRS)
     list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
+  endif()
+  if(ARG_MISRA)
+    list(APPEND cmd "--misra")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")
