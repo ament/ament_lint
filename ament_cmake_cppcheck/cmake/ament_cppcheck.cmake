@@ -27,13 +27,15 @@
 # :type EXCLUDE: list
 # :param INCLUDE_DIRS: an optional list of include paths for cppcheck
 # :type INCLUDE_DIRS: list
+# :param MISRA: whether to enable the MISRA 2012 addon
+# :type MISRA: option
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "EXCLUDE;LANGUAGE;TESTNAME" "INCLUDE_DIRS" ${ARGN})
+  cmake_parse_arguments(ARG "MISRA" "EXCLUDE;LANGUAGE;TESTNAME" "INCLUDE_DIRS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -55,6 +57,9 @@ function(ament_cppcheck)
   if(ARG_LANGUAGE)
     string(TOLOWER ${ARG_LANGUAGE} ARG_LANGUAGE)
     list(APPEND cmd "--language" "${ARG_LANGUAGE}")
+  endif()
+  if(ARG_MISRA)
+    list(APPEND cmd "--enable-misra-checks")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")
