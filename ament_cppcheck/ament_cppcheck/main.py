@@ -61,6 +61,11 @@ def main(argv=sys.argv[1:]):
              'files ending in one of %s.' %
              ', '.join(["'.%s'" % e for e in extensions]))
     parser.add_argument(
+        '--libraries',
+        nargs='*',
+        help="Library configurations to load in addition to the standard libraries of C and C++."
+             "Each library is passed to cppcheck as '--library=<library_name>'")
+    parser.add_argument(
         '--include_dirs',
         nargs='*',
         help="Include directories for C/C++ files being checked."
@@ -144,6 +149,8 @@ def main(argv=sys.argv[1:]):
            '--suppress=unknownMacro']
     if args.language:
         cmd.extend(['--language={0}'.format(args.language)])
+    for library in (args.libraries or []):
+        cmd.extend(['--library={0}'.format(library)])
     for include_dir in (args.include_dirs or []):
         cmd.extend(['-I', include_dir])
     for exclude in (args.exclude or []):
