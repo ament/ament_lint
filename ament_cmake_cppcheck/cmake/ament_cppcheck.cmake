@@ -23,6 +23,8 @@
 # :type TESTNAME: string
 # :param LANGUAGE: the language argument for cppcheck, either 'c' or 'c++'
 # :type LANGUAGE: string
+# :param LIBRARIES: an optional list of library configs for cppcheck to load
+# :type LIBRARIES: list
 # :param EXCLUDE: an optional list of exclude files or directories for cppcheck
 # :type EXCLUDE: list
 # :param INCLUDE_DIRS: an optional list of include paths for cppcheck
@@ -33,7 +35,7 @@
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "EXCLUDE;LANGUAGE;TESTNAME" "INCLUDE_DIRS" ${ARGN})
+  cmake_parse_arguments(ARG "" "EXCLUDE;LANGUAGE;TESTNAME" "LIBRARIES;INCLUDE_DIRS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -49,12 +51,15 @@ function(ament_cppcheck)
   if(ARG_EXCLUDE)
     list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
-  if(ARG_INCLUDE_DIRS)
-    list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
-  endif()
   if(ARG_LANGUAGE)
     string(TOLOWER ${ARG_LANGUAGE} ARG_LANGUAGE)
     list(APPEND cmd "--language" "${ARG_LANGUAGE}")
+  endif()
+  if(ARG_LIBRARIES)
+    list(APPEND cmd "--libraries" "${ARG_LIBRARIES}")
+  endif()
+  if(ARG_INCLUDE_DIRS)
+    list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")
