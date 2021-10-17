@@ -12,13 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import os
 
 from ament_copyright import ALL_FILETYPES
 from ament_copyright import SOURCE_FILETYPE
 
 
-def get_files(paths, extensions, skip_package_level_setup_py=True):
+def get_files(paths, extensions, exclude_patterns, skip_package_level_setup_py=True):
+    excludes = []
+    for exclude_pattern in exclude_patterns:
+        excludes.extend(glob.glob(exclude_pattern))
+    excludes = {os.path.realpath(x) for x in excludes}
+
     files = {}
     for path in paths:
         if os.path.isdir(path):
@@ -45,10 +51,13 @@ def get_files(paths, extensions, skip_package_level_setup_py=True):
                     ):
                         continue
                     if match_filename(filename, extensions):
-                        files[os.path.join(dirpath, filename)] = SOURCE_FILETYPE
+                        filepath = os.path.join(dirpath, filename)
+                        if os.path.realpath(filepath) not in excludes:
+                            files[os.path.join(dirpath, filename)] = SOURCE_FILETYPE
 
         if os.path.isfile(path) and match_filename(path, extensions):
-            files[path] = SOURCE_FILETYPE
+            if os.path.realpath(path) not in excludes:
+                files[path] = SOURCE_FILETYPE
 
         if is_repository_root(os.path.dirname(path)):
             basename = os.path.basename(path)
