@@ -19,7 +19,7 @@
 # :type TESTNAME: string
 # :param TIMEOUT: the test timeout in seconds, default: 120
 # :type TIMEOUT: integer
-# :param EXCLUDE: an optional list of exclude files or directories for cppcheck
+# :param EXCLUDE: an optional list of exclude files or directories for copyright check
 # :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
