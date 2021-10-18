@@ -111,14 +111,6 @@ def main(argv=sys.argv[1:]):
 
     cmd.extend(files)
 
-    print(f'cmd: {cmd}')
-    # print(f'files: {files}')
-    print(f'cwd: {os.getcwd()}')
-    #o_files = [o_file + ".o" for o_file in files]
-    # print(f'o_files: {o_files}')
-    #for o_file in o_files:
-    #    print(o_file)
-
     try:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         cmd_output = p.communicate()[0]
