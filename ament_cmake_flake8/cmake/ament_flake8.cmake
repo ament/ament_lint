@@ -16,8 +16,18 @@
 # Add a test to check the Python code for syntax and style compliance
 # using flake8.
 #
+# The default configuration file for flake8 is located at
+# configuration/ament_flake8.ini within the ament_flake8 directory
+# The default configuration file can be either overridden by the
+# argument 'CONFIG_FILE' or by a global variable named
+# 'ament_cmake_flake8_CONFIG_FILE'
+# The 'CONFIG_FILE' argument takes priority over
+# 'ament_cmake_flake8_CONFIG_FILE' if both are defined
+#
 # :param TESTNAME: the name of the test, default: "flake8"
 # :type TESTNAME: string
+# :param CONFIG_FILE: the path of the configuration file for flake8 to consider
+# :type CONFIG_FILE: string
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_flake8
 # :type MAX_LINE_LENGTH: integer
@@ -27,7 +37,7 @@
 # @public
 #
 function(ament_flake8)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME;CONFIG_FILE" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "flake8")
   endif()
@@ -39,6 +49,11 @@ function(ament_flake8)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_flake8_BIN}" "--xunit-file" "${result_file}")
+  if(ARG_CONFIG_FILE)
+    list(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
+  elseif(DEFINED ament_cmake_flake8_CONFIG_FILE)
+    list(APPEND cmd "--config" "${ament_cmake_flake8_CONFIG_FILE}")
+  endif()
   if(ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
   endif()
