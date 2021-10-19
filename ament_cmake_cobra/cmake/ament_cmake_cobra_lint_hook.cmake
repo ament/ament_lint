@@ -30,6 +30,12 @@ if(_source_files)
     list(APPEND _all_include_dirs ${ament_cmake_cobra_ADDITIONAL_INCLUDE_DIRS})
   endif()
 
+  # Get exclude paths for added targets
+  set(_all_exclude "")
+  if(DEFINED ament_cmake_cpplint_ADDITIONAL_EXCLUDE)
+    list(APPEND _all_exclude ${ament_cmake_cpplint_ADDITIONAL_EXCLUDE})
+  endif()
+
   # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
   if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
     get_directory_property(_build_targets DIRECTORY ${PROJECT_SOURCE_DIR} BUILDSYSTEM_TARGETS)
@@ -52,7 +58,11 @@ if(_source_files)
   endif()
 
   message(STATUS "Configured cobra include dirs: ${_all_include_dirs}")
-  message("Configured cobra include dirs: ${_all_include_dirs}")
+  message(STATUS "Configured cobra exclude dirs and/or files: ${_all_exclude}")
 
-  ament_cobra(INCLUDE_DIRS ${_all_include_dirs})
+  ament_cobra(TESTNAME "cobra-basic" RULESET "basic" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
+  ament_cobra(TESTNAME "cobra-cwe" RULESET "cwd" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
+  ament_cobra(TESTNAME "cobra-p10" RULESET "p10" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
+  ament_cobra(TESTNAME "cobra-jpl" RULESET "jpl" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
+  ament_cobra(TESTNAME "cobra-misra2012" RULESET "misra2012" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
 endif()
