@@ -21,15 +21,19 @@
 #
 # :param TESTNAME: the name of the test, default: "cobra"
 # :type TESTNAME: string
+# :param RULESET: the rule set to use (basic, cwe, p10, jpl, or misra2012)
+# :type TESTNAME: string
 # :param INCLUDE_DIRS: an optional list of include paths for cobra
 # :type INCLUDE_DIRS: list
+# :param EXCLUDE: an optional list of exclude directories or files for cpplint
+# :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cobra)
-  cmake_parse_arguments(ARG "" "TESTNAME" "INCLUDE_DIRS" ${ARGN})
+  cmake_parse_arguments(ARG "" "EXCLUDE;RULESET;TESTNAME" "INCLUDE_DIRS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cobra")
   endif()
@@ -43,8 +47,14 @@ function(ament_cobra)
   set(cmd "${ament_cobra_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
+  if(ARG_RULESET)
+    list(APPEND cmd "--ruleset" "${ARG_RULESET}")
+  endif()
   if(ARG_INCLUDE_DIRS)
     list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
+  endif()
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cobra")

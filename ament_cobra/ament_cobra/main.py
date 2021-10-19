@@ -16,8 +16,10 @@
 
 import argparse
 from collections import defaultdict
+import glob
 import multiprocessing
 import os
+import re
 from shutil import which
 import subprocess
 import sys
@@ -40,9 +42,10 @@ def get_cobra_version(cobra_bin):
 
 def main(argv=sys.argv[1:]):
     extensions = ['c', 'cc', 'cpp', 'cxx']
+    rulesets = [ 'basic', 'cwe', 'p10', 'jpl', 'misra2012' ]
 
     parser = argparse.ArgumentParser(
-        description='Perform static code analysis using the cobra static analyzer.',
+        description='Analyze source code using the cobra static analyzer.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
@@ -52,24 +55,22 @@ def main(argv=sys.argv[1:]):
         help='Files and/or directories to be checked. Directories are searched recursively for '
              'files ending in one of %s.' %
              ', '.join(["'.%s'" % e for e in extensions]))
-
     parser.add_argument(
         '--include_dirs',
         nargs='*',
         help="Include directories for C/C++ files being checked."
              "Each directory is passed to cobra as '-I<include_dir>'")
     parser.add_argument(
+        '--exclude', default=[],
+        nargs='*',
+        help='Exclude C/C++ files from being checked.')
+    parser.add_argument(
         '--ruleset',
         default='basic',
         help="The cobra rule set to use to analyze the code: basic, cwe, p10, jpl, or misra2012.")
-
-    # Not using a file handle directly in order to prevent leaving
-    # an empty file when something fails early
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
-
-    # Option to just get the cobra version and print that
     parser.add_argument(
         '--cobra-version',
         action='store_true',
@@ -87,75 +88,81 @@ def main(argv=sys.argv[1:]):
         print(cobra_version)
         return 0
 
-    if args.xunit_file:
-        start_time = time.time()
-
-    files = get_files(args.paths, extensions)
-    if not files:
+    groups = get_file_groups(args.paths, extensions, args.exclude)
+    if not groups:
         print('No files found', file=sys.stderr)
         return 1
 
-    # Invoke cobra
     cmd = [cobra_bin, '-C++', '-comments', '-scrub' ]
 
-    print(f'include_dirs: {args.include_dirs}')
-    for include_dir in (args.include_dirs or []):
-        cmd.extend(['-I'+include_dir])
-
-    rulesets = [ 'basic', 'cwe', 'p10', 'jpl', 'misra2012' ]
     if args.ruleset in rulesets:
         cmd.extend(['-f', args.ruleset ])
     else:
         print(f'Invalid ruleset specified: {args.ruleset}')
         return 1
 
-    cmd.extend(files)
+    for include_dir in (args.include_dirs or []):
+        cmd.extend(['-I'+include_dir])
 
-    try:
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        cmd_output = p.communicate()[0]
-    except subprocess.CalledProcessError as e:
-        print("The invocation of 'cobra' failed with error code %d: %s" %
-              (e.returncode, e), file=sys.stderr)
-        return 1
-
-    test_failures = []
-    try:
-        lines = cmd_output.decode("utf-8").split('\n')
-        for line in lines:
-          # TODO(mjeronimo): Parse the cobra output
-          #
-          # if line.startswith('cobra:'):
-          #   [ cobra_name, filename, lineno, message ] = line.split(':', 4)
-          #   failure = {}
-          #   failure['filename'] = filename.strip()
-          #   failure['line'] = lineno.strip()
-          #   failure['severity'] = 'error'
-          #   failure['msg'] = message.strip()
-          #   failure.append(error)
-          print(line)
-    except ElementTree.ParseError as e:
-        print('Invalid XML in cobra output: %s' % str(e),
-              file=sys.stderr)
-        return 1
-
-    # Output test failures
+    # Initialize the output report
     report = defaultdict(list)
 
-    # Even though we use a defaultdict, explicity add known files so they are listed
-    for filename in files:
-        report[filename] = []
+    # Invoke cobra on each group
+    for root in sorted(groups.keys()):
+        arguments = list(cmd)
+        files = groups[root]
 
-    for failure in test_failures:
-        for key in report.keys():
-            if os.path.samefile(key, filename):
-                filename = key
-                break
+        # Even though we use a defaultdict, explicitly add known files so they are listed
+        for filename in files:
+            report[filename] = []
 
-        # In the case where relative and absolute paths are mixed for paths and
-        # include_dirs cobra might return duplicate results
-        if failure not in report[filename]:
+        arguments.extend(files)
+
+        if args.xunit_file:
+            start_time = time.time()
+
+        try:
+            p = subprocess.Popen(arguments, stdout=subprocess.PIPE)
+            cmd_output = p.communicate()[0]
+        except subprocess.CalledProcessError as e:
+            print("The invocation of 'cobra' failed with error code %d: %s" %
+                  (e.returncode, e), file=sys.stderr)
+            return 1
+
+        test_failures = []
+        try:
+            lines = cmd_output.decode("utf-8").split('\n')
+            for line in lines:
+              print(line)
+
+              # TODO(mjeronimo): Parse the cobra output
+              #
+              # if line.startswith('cobra:'):
+              #   [ cobra_name, filename, lineno, message ] = line.split(':', 4)
+
+            # Add one example failure for now. TODO(mjeronimo): remove when parsing has been implemented
+            failure = {}
+            filename = "/home/michael/src/ros2/src/ros2/rcutils/src/logging.c"
+            failure['filename'] = filename
+            failure['line'] = 895
+            failure['severity'] = 'error'
+            failure['msg'] = "Macro argument not enclosed in parentheses"
             report[filename].append(failure)
+        except ElementTree.ParseError as e:
+            print('Invalid XML in cobra output: %s' % str(e),
+                  file=sys.stderr)
+            return 1
+
+        for failure in test_failures:
+            for key in report.keys():
+                if os.path.samefile(key, filename):
+                    filename = key
+                    break
+
+            # In the case where relative and absolute paths are mixed for paths and
+            # include_dirs cobra might return duplicate results
+            if failure not in report[filename]:
+                report[filename].append(failure)
 
     # Output a summary
     error_count = sum(len(r) for r in report.values())
@@ -168,7 +175,6 @@ def main(argv=sys.argv[1:]):
 
     # Generate the xunit output file
     if args.xunit_file:
-        print(f'WRITING XUNIT FILE: {args.xunit_file}')
         write_xunit_file(args.xunit_file, report, time.time() - start_time)
 
     return rc
@@ -202,6 +208,39 @@ def get_files(paths, extensions):
         if os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
+
+
+def get_file_groups(paths, extensions, exclude_patterns):
+    excludes = []
+    for exclude_pattern in exclude_patterns:
+        excludes.extend(glob.glob(exclude_pattern))
+    excludes = {os.path.realpath(x) for x in excludes}
+
+    # dict mapping root path to files
+    groups = {}
+    for path in paths:
+        if os.path.isdir(path):
+            for dirpath, dirnames, filenames in os.walk(path):
+                if 'AMENT_IGNORE' in dirnames + filenames:
+                    dirnames[:] = []
+                    continue
+                # ignore folder starting with . or _
+                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames.sort()
+
+                # select files by extension
+                for filename in sorted(filenames):
+                    _, ext = os.path.splitext(filename)
+                    if ext in ('.%s' % e for e in extensions):
+                        filepath = os.path.join(dirpath, filename)
+                        if os.path.realpath(filepath) not in excludes:
+                            append_file_to_group(groups, filepath)
+
+        if os.path.isfile(path):
+            if os.path.realpath(path) not in excludes:
+                append_file_to_group(groups, path)
+
+    return groups
 
 
 def get_xunit_content(report, testname, elapsed, skip=None):
@@ -293,6 +332,50 @@ def get_xunit_content(report, testname, elapsed, skip=None):
 
     xml += '</testsuite>\n'
     return xml
+
+
+def append_file_to_group(groups, path):
+    path = os.path.abspath(path)
+
+    root = ''
+
+    # try to determine root from path
+    base_path = os.path.dirname(path)
+    # find longest subpath which ends with one of the following subfolder names
+    subfolder_names = ['include', 'src', 'test']
+    matches = [
+        re.search(
+            '^(.+%s%s)%s' %
+            (re.escape(os.sep), re.escape(subfolder_name), re.escape(os.sep)), path)
+        for subfolder_name in subfolder_names]
+    match_groups = [match.group(1) for match in matches if match]
+    if match_groups:
+        match_groups = [{'group_len': len(x), 'group': x} for x in match_groups]
+        sorted_groups = sorted(match_groups, key=lambda k: k['group_len'])
+        base_path = sorted_groups[-1]['group']
+        root = base_path
+
+    # try to find repository root
+    repo_root = None
+    p = path
+    while p and repo_root is None:
+        # abort if root is reached
+        if os.path.dirname(p) == p:
+            break
+        p = os.path.dirname(p)
+        for marker in ['.git', '.hg', '.svn']:
+            if os.path.exists(os.path.join(p, marker)):
+                repo_root = p
+                break
+
+    # compute relative --root argument
+    if repo_root and repo_root > base_path:
+        root = os.path.relpath(base_path, repo_root)
+
+    # add the path to the appropriate group
+    if root not in groups:
+        groups[root] = []
+    groups[root].append(path)
 
 
 def write_xunit_file(xunit_file, report, duration, skip=None):
