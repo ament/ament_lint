@@ -23,6 +23,9 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
 if(_source_files)
   message(STATUS "Added test 'cobra' to perform static code analysis on C/C++ code")
 
+  # "Create compile_commands.json file"
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
+
   # Get include paths for added targets
   set(_all_include_dirs "")
   set(_include_dirs "")
@@ -57,12 +60,14 @@ if(_source_files)
     endforeach()
   endif()
 
+  set(_compile_commands "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
+
   message(STATUS "Configured cobra include dirs: ${_all_include_dirs}")
   message(STATUS "Configured cobra exclude dirs and/or files: ${_all_exclude}")
 
-  ament_cobra(TESTNAME "cobra-basic" RULESET "basic" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
-  ament_cobra(TESTNAME "cobra-cwe" RULESET "cwe" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
-  ament_cobra(TESTNAME "cobra-p10" RULESET "p10" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
-  ament_cobra(TESTNAME "cobra-jpl" RULESET "jpl" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
-  ament_cobra(TESTNAME "cobra-misra2012" RULESET "misra2012" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude})
+  ament_cobra(TESTNAME "cobra-basic" RULESET "basic" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude} COMPILE_CMDS ${_compile_commands})
+  ament_cobra(TESTNAME "cobra-cwe" RULESET "cwe" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude} COMPILE_CMDS ${_compile_commands})
+  ament_cobra(TESTNAME "cobra-p10" RULESET "p10" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude} COMPILE_CMDS ${_compile_commands})
+  ament_cobra(TESTNAME "cobra-jpl" RULESET "jpl" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude} COMPILE_CMDS ${_compile_commands})
+  ament_cobra(TESTNAME "cobra-misra2012" RULESET "misra2012" INCLUDE_DIRS ${_all_include_dirs} EXCLUDE ${_all_exclude} COMPILE_CMDS ${_compile_commands})
 endif()

@@ -17,7 +17,7 @@
 import argparse
 from collections import defaultdict
 import glob
-import multiprocessing
+import json
 import os
 import re
 from shutil import which
@@ -42,12 +42,23 @@ def get_cobra_version(cobra_bin):
 
 def main(argv=sys.argv[1:]):
     extensions = ['c', 'cc', 'cpp', 'cxx']
-    rulesets = [ 'basic', 'cwe', 'p10', 'jpl', 'misra2012' ]
+    basic_args = ['-C++', '-scrub', '-comments']
+
+    # The Cobra rulesets
+    rulesets = ['basic', 'cwe', 'p10', 'jpl', 'misra2012']
+
+    # Some rulesets require additional arguments
+    associated_args = {
+        'basic': [],
+        'cwe': [],
+        'p10': [],
+        'jpl': [],
+        'misra2012': ['-cpp']
+    }
 
     parser = argparse.ArgumentParser(
         description='Analyze source code using the cobra static analyzer.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
     parser.add_argument(
         'paths',
         nargs='*',
@@ -68,6 +79,9 @@ def main(argv=sys.argv[1:]):
         '--ruleset',
         default='basic',
         help="The cobra rule set to use to analyze the code: basic, cwe, p10, jpl, or misra2012.")
+    parser.add_argument(
+        '--compile_cmds',
+        help="The compile_commands.json file from which to gather preprocessor directives.")
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
@@ -93,76 +107,97 @@ def main(argv=sys.argv[1:]):
         print('No files found', file=sys.stderr)
         return 1
 
-    cmd = [cobra_bin, '-C++', '-comments', '-scrub' ]
+    cmd = [cobra_bin] + basic_args
 
+    # If the user has provided a valid ruleset with --ruleset, add it
     if args.ruleset in rulesets:
-        cmd.extend(['-f', args.ruleset ])
+        cmd.extend(['-f', args.ruleset])
+        cmd.extend(associated_args[args.ruleset])
     else:
         print(f'Invalid ruleset specified: {args.ruleset}')
         return 1
 
-    for include_dir in (args.include_dirs or []):
-        cmd.extend(['-I'+include_dir])
+    # Get the preprocessor options to use for each file from the
+    # input compile_commands.json file
+    options_map = {}
+    if args.compile_cmds:
+        f = open(args.compile_cmds)
+        compile_data = json.load(f)
+
+        for item in compile_data:
+            compile_options = item['command'].split()
+
+            # With some rulesets, preprocessor directives aren't required
+            preprocessor_options = None
+            if args.ruleset not in ['basic', 'p10']:
+                preprocessor_options = [o for o in compile_options if o.startswith(('-D', '-I', '-U'))]
+                options = iter(compile_options)
+                for option in options:
+                    if option == '-isystem':
+                        preprocessor_options.extend(['-I', options.__next__()])
+
+            options_map[item['file']] = {"directory": item['directory'], "options": preprocessor_options}
 
     # Initialize the output report
     report = defaultdict(list)
 
-    # Invoke cobra on each group
-    for root in sorted(groups.keys()):
-        arguments = list(cmd)
-        files = groups[root]
+    if args.xunit_file:
+        start_time = time.time()
 
-        # Even though we use a defaultdict, explicitly add known files so they are listed
-        for filename in files:
+    # Invoke cobra for each source file
+    for group_name in sorted(groups.keys()):
+        files_in_group = groups[group_name]
+
+        for filename in files_in_group:
             report[filename] = []
 
-        arguments.extend(files)
+            if filename in options_map and options_map[filename]['options']:
+                arguments = cmd + options_map[filename]['options'] + [filename]
+            else:
+                arguments = cmd + [filename]
 
-        if args.xunit_file:
-            start_time = time.time()
+            try:
+                p = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                cmd_output = p.communicate()[0]
+            except subprocess.CalledProcessError as e:
+                print("The invocation of 'cobra' failed with error code %d: %s" %
+                      (e.returncode, e), file=sys.stderr)
+                return 1
 
-        try:
-            p = subprocess.Popen(arguments, stdout=subprocess.PIPE)
-            cmd_output = p.communicate()[0]
-        except subprocess.CalledProcessError as e:
-            print("The invocation of 'cobra' failed with error code %d: %s" %
-                  (e.returncode, e), file=sys.stderr)
-            return 1
+            test_failures = []
+            try:
+                lines = cmd_output.decode("utf-8").split('\n')
+                for line in lines:
+                    print(line)
+                    # TODO(mjeronimo): Parse the cobra output
+                    #
+                    # if line.startswith('cobra:'):
+                    #   [ cobra_name, filename, lineno, message ] = line.split(':', 4)
 
-        test_failures = []
-        try:
-            lines = cmd_output.decode("utf-8").split('\n')
-            for line in lines:
-              print(line)
-
-              # TODO(mjeronimo): Parse the cobra output
-              #
-              # if line.startswith('cobra:'):
-              #   [ cobra_name, filename, lineno, message ] = line.split(':', 4)
-
-            # Add one example failure for now. TODO(mjeronimo): remove when parsing has been implemented
-            failure = {}
-            filename = "/home/michael/src/ros2/src/ros2/rcutils/src/logging.c"
-            failure['filename'] = filename
-            failure['line'] = 895
-            failure['severity'] = 'error'
-            failure['msg'] = "Macro argument not enclosed in parentheses"
-            report[filename].append(failure)
-        except ElementTree.ParseError as e:
-            print('Invalid XML in cobra output: %s' % str(e),
-                  file=sys.stderr)
-            return 1
-
-        for failure in test_failures:
-            for key in report.keys():
-                if os.path.samefile(key, filename):
-                    filename = key
-                    break
-
-            # In the case where relative and absolute paths are mixed for paths and
-            # include_dirs cobra might return duplicate results
-            if failure not in report[filename]:
+                # Add one example failure for now.
+                # TODO(mjeronimo): remove when parsing has been implemented
+                failure = {}
+                filename = "/home/michael/src/ros2/src/ros2/rcutils/src/logging.c"
+                failure['filename'] = filename
+                failure['line'] = 895
+                failure['severity'] = 'error'
+                failure['msg'] = "Macro argument not enclosed in parentheses"
                 report[filename].append(failure)
+            except ElementTree.ParseError as e:
+                print('Invalid XML in cobra output: %s' % str(e),
+                      file=sys.stderr)
+                return 1
+
+            for failure in test_failures:
+                for key in report.keys():
+                    if os.path.samefile(key, filename):
+                        filename = key
+                        break
+
+                # In the case where relative and absolute paths are mixed for paths and
+                # include_dirs cobra might return duplicate results
+                if failure not in report[filename]:
+                    report[filename].append(failure)
 
     # Output a summary
     error_count = sum(len(r) for r in report.values())
@@ -269,10 +304,10 @@ def get_xunit_content(report, testname, elapsed, skip=None):
 
         if skip:
             data = {
-              'quoted_name': quoteattr(filename),
-              'testname': testname,
-              'quoted_message': quoteattr(''),
-              'skip': skip,
+                'quoted_name': quoteattr(filename),
+                'testname': testname,
+                'quoted_message': quoteattr(''),
+                'skip': skip,
             }
             xml += """  <testcase
     name=%(quoted_name)s
@@ -288,9 +323,8 @@ def get_xunit_content(report, testname, elapsed, skip=None):
             for error in errors:
                 data = {
                     'quoted_name': quoteattr(
-                        #'%s: %s (%s:%s)' % (
                         '%s: (%s:%s)' % (
-                            error['severity'], # error['id'],
+                            error['severity'],
                             filename, error['line'])),
                     'testname': testname,
                     'quoted_message': quoteattr(error['msg']),
