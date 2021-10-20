@@ -168,13 +168,11 @@ def main(argv=sys.argv[1:]):
             try:
                 lines = cmd_output.decode("utf-8").split('\n')
                 for line in lines:
-                    print(line)
                     # TODO(mjeronimo): Parse the cobra output
-                    #
-                    # if line.startswith('cobra:'):
-                    #   [ cobra_name, filename, lineno, message ] = line.split(':', 4)
+                    if line != "":
+                        print(line)
 
-                # Add one example failure for now.
+                # Add one example failure (per file) for now
                 # TODO(mjeronimo): remove when parsing has been implemented
                 failure = {}
                 filename = "/home/michael/src/ros2/src/ros2/rcutils/src/logging.c"
