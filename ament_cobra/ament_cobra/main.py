@@ -93,6 +93,10 @@ def main(argv=sys.argv[1:]):
         '--cobra-version',
         action='store_true',
         help='Get the cobra version, print it, and then exit')
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='Display verbose output')
 
     args = parser.parse_args(argv)
 
@@ -171,14 +175,14 @@ def main(argv=sys.argv[1:]):
                 else:
                     arguments = cmd + [filename]
 
-                invoke_cobra(arguments, report)
+                invoke_cobra(arguments, report, args.verbose)
         # Otherwise, run Cobra on this group of files
         else:
             arguments = cmd
             for include_dir in (args.include_dirs or []):
                 cmd.extend(['-I' + include_dir])
             arguments.extend(files_in_group)
-            invoke_cobra(arguments, report)
+            invoke_cobra(arguments, report, args.verbose)
 
     # Output a summary
     error_count = sum(len(r) for r in report.values())
@@ -204,10 +208,11 @@ def find_executable(file_name, additional_paths=None):
     return which(file_name, path=path)
 
 
-def invoke_cobra(arguments, report):
+def invoke_cobra(arguments, report, verbose):
     """Invoke Cobra and log any issues."""
     try:
-        print(' '.join(arguments))
+        if verbose:
+            print(' '.join(arguments))
         p = subprocess.Popen(arguments, stdout=subprocess.PIPE)
         cmd_output = p.communicate()[0]
     except subprocess.CalledProcessError as e:

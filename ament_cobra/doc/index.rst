@@ -38,6 +38,7 @@ The ament_cobra tool has the following command line:
       --xunit-file XUNIT_FILE
                             Generate a xunit compliant XML file (default: None)
       --cobra-version       Get the cobra version, print it, and then exit (default: False)
+      --verbose             Display verbose output (default: False)
 
 Adding ament_cobra to unit tests
 --------------------------------
