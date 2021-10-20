@@ -18,7 +18,9 @@ find_package(ament_cmake_core REQUIRED)
 
 file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
   "*.c" 
-  # "*.h"
+  "*.cc"
+  "*.cpp"
+  "*.cxx"
 )
 if(_source_files)
   message(STATUS "Added test 'cobra' to perform static code analysis on C/C++ code")
