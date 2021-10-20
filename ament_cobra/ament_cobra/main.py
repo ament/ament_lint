@@ -102,7 +102,7 @@ def main(argv=sys.argv[1:]):
 
     cobra_bin = find_executable('cobra')
     if not cobra_bin:
-        print("Could not find 'cobra' executable", file=sys.stderr)
+        print("Error: Could not find the 'cobra' executable", file=sys.stderr)
         return 1
 
     cobra_version = get_cobra_version(cobra_bin)
@@ -122,8 +122,12 @@ def main(argv=sys.argv[1:]):
         cmd.extend(['-f', args.ruleset])
         cmd.extend(associated_args[args.ruleset])
     else:
-        print(f'Invalid ruleset specified: {args.ruleset}')
+        print(f'Error: Invalid ruleset specified: {args.ruleset}', file=sys.stderr)
         return 1
+
+    if args.compile_cmds and args.include_dirs:
+        print(f'Warning: The include directories from the compile commands file will '
+              'be used instead of the directories specified using --include_dirs')
 
     # Get the preprocessor options to use for each file from the
     # input compile_commands.json file
