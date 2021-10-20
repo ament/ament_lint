@@ -81,7 +81,10 @@ def main(argv=sys.argv[1:]):
         help="The cobra rule set to use to analyze the code: basic, cwe, p10, jpl, or misra2012.")
     parser.add_argument(
         '--compile_cmds',
-        help="The compile_commands.json file from which to gather preprocessor directives.")
+        help="The compile_commands.json file from which to gather preprocessor directives. This "
+        "option will take precedence over the --include_dirs options and any directories "
+        "specified using --include_dirs will be ignored. Instead, ament_cobra will gather all "
+        "preprocessor options from the compile_commands.json file.")
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
@@ -127,16 +130,23 @@ def main(argv=sys.argv[1:]):
         for item in compile_data:
             compile_options = item['command'].split()
 
-            # With some rulesets, preprocessor directives aren't required
-            preprocessor_options = None
+            # With some rulesets, preprocessor directives aren't required (and shouldn't
+            # be provided or else Cobra will hang)
+            preprocessor_options = []
             if args.ruleset not in ['basic', 'p10']:
-                preprocessor_options = [o for o in compile_options if o.startswith(('-D', '-I', '-U'))]
                 options = iter(compile_options)
                 for option in options:
-                    if option == '-isystem':
-                        preprocessor_options.extend(['-I', options.__next__()])
+                    if option in ['-D', '-I', '-U']:
+                        preprocessor_options.extend([option, options.__next__()])
+                    elif option == '-isystem':
+                        preprocessor_options.extend(['-I' + options.__next__()])
+                    elif option.startswith(('-D', '-I', '-U')):
+                        preprocessor_options.extend([option])
 
-            options_map[item['file']] = {"directory": item['directory'], "options": preprocessor_options}
+            options_map[item['file']] = {
+                "directory": item['directory'],
+                "options": preprocessor_options
+            }
 
     # Initialize the output report
     report = defaultdict(list)
@@ -157,7 +167,7 @@ def main(argv=sys.argv[1:]):
                 arguments = cmd + [filename]
 
             try:
-                p = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p = subprocess.Popen(arguments, stdout=subprocess.PIPE)
                 cmd_output = p.communicate()[0]
             except subprocess.CalledProcessError as e:
                 print("The invocation of 'cobra' failed with error code %d: %s" %
