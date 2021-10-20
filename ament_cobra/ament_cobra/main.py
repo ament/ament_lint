@@ -47,7 +47,7 @@ def main(argv=sys.argv[1:]):
     # The Cobra rulesets
     rulesets = ['basic', 'cwe', 'p10', 'jpl', 'misra2012']
 
-    # Some rulesets require additional arguments
+    # Some rulesets may require additional arguments
     associated_args = {
         'basic': [],
         'cwe': [],
@@ -56,6 +56,7 @@ def main(argv=sys.argv[1:]):
         'misra2012': ['-cpp']
     }
 
+    # Define and parse the command-line options
     parser = argparse.ArgumentParser(
         description='Analyze source code using the cobra static analyzer.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -154,58 +155,30 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
-    # Invoke cobra for each source file
+    # For each group of files
     for group_name in sorted(groups.keys()):
         files_in_group = groups[group_name]
 
         for filename in files_in_group:
             report[filename] = []
 
-            if filename in options_map and options_map[filename]['options']:
-                arguments = cmd + options_map[filename]['options'] + [filename]
-            else:
-                arguments = cmd + [filename]
+        # If a compile_commands.json is provided, process each source file
+        # separately, with its associated preprocessor directives
+        if args.compile_cmds:
+            for filename in files_in_group:
+                if filename in options_map and options_map[filename]['options']:
+                    arguments = cmd + options_map[filename]['options'] + [filename]
+                else:
+                    arguments = cmd + [filename]
 
-            try:
-                p = subprocess.Popen(arguments, stdout=subprocess.PIPE)
-                cmd_output = p.communicate()[0]
-            except subprocess.CalledProcessError as e:
-                print("The invocation of 'cobra' failed with error code %d: %s" %
-                      (e.returncode, e), file=sys.stderr)
-                return 1
-
-            test_failures = []
-            try:
-                lines = cmd_output.decode("utf-8").split('\n')
-                for line in lines:
-                    # TODO(mjeronimo): Parse the cobra output
-                    if line != "":
-                        print(line)
-
-                # Add one example failure (per file) for now
-                # TODO(mjeronimo): remove when parsing has been implemented
-                failure = {}
-                filename = "/home/michael/src/ros2/src/ros2/rcutils/src/logging.c"
-                failure['filename'] = filename
-                failure['line'] = 895
-                failure['severity'] = 'error'
-                failure['msg'] = "Macro argument not enclosed in parentheses"
-                report[filename].append(failure)
-            except ElementTree.ParseError as e:
-                print('Invalid XML in cobra output: %s' % str(e),
-                      file=sys.stderr)
-                return 1
-
-            for failure in test_failures:
-                for key in report.keys():
-                    if os.path.samefile(key, filename):
-                        filename = key
-                        break
-
-                # In the case where relative and absolute paths are mixed for paths and
-                # include_dirs cobra might return duplicate results
-                if failure not in report[filename]:
-                    report[filename].append(failure)
+                invoke_cobra(arguments, report)
+        # Otherwise, run Cobra on this group of files
+        else:
+            arguments = cmd
+            for include_dir in (args.include_dirs or []):
+                cmd.extend(['-I' + include_dir])
+            arguments.extend(files_in_group)
+            invoke_cobra(arguments, report)
 
     # Output a summary
     error_count = sum(len(r) for r in report.values())
@@ -229,6 +202,51 @@ def find_executable(file_name, additional_paths=None):
         path = os.getenv('PATH', os.defpath)
         path += os.path.pathsep + os.path.pathsep.join(additional_paths)
     return which(file_name, path=path)
+
+
+def invoke_cobra(arguments, report):
+    """Invoke Cobra and log any issues."""
+    try:
+        print(' '.join(arguments))
+        p = subprocess.Popen(arguments, stdout=subprocess.PIPE)
+        cmd_output = p.communicate()[0]
+    except subprocess.CalledProcessError as e:
+        print("The invocation of 'cobra' failed with error code %d: %s" %
+              (e.returncode, e), file=sys.stderr)
+        return 1
+
+    test_failures = []
+    try:
+        lines = cmd_output.decode("utf-8").split('\n')
+        for line in lines:
+            # TODO(mjeronimo): Parse the cobra output
+            if line != "":
+                print(line)
+
+        # Add one example failure (per file) for now
+        # TODO(mjeronimo): remove when parsing has been implemented
+        failure = {}
+        filename = "/home/michael/src/ros2/src/ros2/rcutils/src/logging.c"
+        failure['filename'] = filename
+        failure['line'] = 895
+        failure['severity'] = 'error'
+        failure['msg'] = "Macro argument not enclosed in parentheses"
+        report[filename].append(failure)
+    except ElementTree.ParseError as e:
+        print('Invalid XML in cobra output: %s' % str(e),
+              file=sys.stderr)
+        return 1
+
+    for failure in test_failures:
+        for key in report.keys():
+            if os.path.samefile(key, filename):
+                filename = key
+                break
+
+        # In the case where relative and absolute paths are mixed for paths and
+        # include_dirs cobra might return duplicate results
+        if failure not in report[filename]:
+            report[filename].append(failure)
 
 
 def get_files(paths, extensions):
