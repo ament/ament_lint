@@ -82,6 +82,9 @@ def main_with_errors(argv=sys.argv[1:]):
         if 'AMENT_IGNORE' in dirnames + filenames:
             dirnames[:] = []
             args.excludes.append(dirpath)
+        else:
+            # ignore folder starting with . or _
+            args.excludes.extend(d for d in dirnames if d[0] in ['.', '_'])
 
     report = generate_flake8_report(
         args.config_file, args.paths, args.excludes,
