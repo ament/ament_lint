@@ -32,8 +32,6 @@ import yaml
 
 
 def main(argv=sys.argv[1:]):
-    config_file = os.path.join(
-        os.path.dirname(__file__), 'configuration', '.clang-tidy')
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
     parser = argparse.ArgumentParser(
@@ -42,7 +40,7 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--config',
         metavar='path',
-        default=config_file,
+        default=None,
         dest='config_file',
         help='The config file')
     parser.add_argument(
@@ -91,7 +89,7 @@ def main(argv=sys.argv[1:]):
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
-    if not os.path.exists(args.config_file):
+    if args.config_file is not None and not os.path.exists(args.config_file):
         print("Could not find config file '%s'" % args.config_file,
               file=sys.stderr)
         return 1
@@ -129,13 +127,15 @@ def main(argv=sys.argv[1:]):
         package_dir = os.path.dirname(compilation_db_path)
         package_name = os.path.basename(package_dir)
 
-        with open(args.config_file, 'r') as h:
-            content = h.read()
-        data = yaml.safe_load(content)
-        style = yaml.dump(data, default_flow_style=True, width=float('inf'))
         cmd = [clang_tidy_bin,
-               '--config=%s' % style,
                '-p', package_dir]
+
+        if args.config_file is not None:
+            with open(args.config_file, 'r') as h:
+                content = h.read()
+            data = yaml.safe_load(content)
+            style = yaml.dump(data, default_flow_style=True, width=float('inf'))
+            cmd.append('--config=%s' % style)
         if args.explain_config:
             cmd.append('--explain-config')
         if args.export_fixes:
