@@ -192,7 +192,9 @@ def main(argv=sys.argv[1:]):
 
         output = ''
         for async_output in async_outputs:
-            output += async_output.get()
+            out = async_output.get()
+            if out:
+                output += out + '\n'
 
         return (files, output)
 
