@@ -284,7 +284,7 @@ def invoke_uncrustify(
         if e.output:
             print(e.output.decode(), file=sys.stderr)
         print("The invocation of 'uncrustify' failed with error code %d: %s" %
-            (e.returncode, e), file=sys.stderr)
+              (e.returncode, e), file=sys.stderr)
         return None
 
     if cwd:
@@ -298,8 +298,7 @@ def invoke_uncrustify(
         output_files = [
             os.path.join(
                 temp_path,
-                os.sep.join(f.split(os.sep)[1:]) +
-                suffix
+                os.sep.join(f.split(os.sep)[1:]) + suffix
             ) for f in input_files
         ]
 
