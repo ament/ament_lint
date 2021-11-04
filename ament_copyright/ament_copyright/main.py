@@ -58,6 +58,7 @@ def main(argv=sys.argv[1:]):
         '--exclude',
         metavar='filename',
         nargs='*',
+        default=[],
         dest='excludes',
         help='The filenames to exclude.')
     group = parser.add_mutually_exclusive_group()
@@ -107,9 +108,7 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
-    filenames = get_files(args.paths, extensions)
-    if args.excludes:
-        filenames = [f for f in filenames if os.path.basename(f) not in args.excludes]
+    filenames = get_files(args.paths, extensions, args.excludes)
     if not filenames:
         print('No repository roots and files found')
 
