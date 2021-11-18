@@ -7,12 +7,16 @@
     The ability to check code against the style conventions in PEP 8 and
     generate xUnit test result files.
   </description>
-  <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
+
+  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+
   <license>Apache License 2.0</license>
   <license>MIT</license>
 
-  <author>Dirk Thomas</author>
+  <author email="audrow@openrobotics.org">Audrow Nash</author>
   <author>Claire Wang</author>
+  <author>Dirk Thomas</author>
 
   <exec_depend>ament_lint</exec_depend>
   <exec_depend>pydocstyle</exec_depend>

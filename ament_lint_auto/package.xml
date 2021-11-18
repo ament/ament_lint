@@ -4,11 +4,15 @@
   <name>ament_lint_auto</name>
   <version>0.11.2</version>
   <description>The auto-magic functions for ease to use of the ament linters in CMake.</description>
-  <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
+
+  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+
   <license>Apache License 2.0</license>
 
-  <author>Dirk Thomas</author>
+  <author email="audrow@openrobotics.org">Audrow Nash</author>
   <author>Claire Wang</author>
+  <author>Dirk Thomas</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>

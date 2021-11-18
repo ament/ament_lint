@@ -6,9 +6,13 @@
   <description>
     The CMake API for ament_clang_tidy to lint C / C++ code using clang tidy.
   </description>
-  <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
+
+  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+
   <license>Apache License 2.0</license>
 
+  <author email="audrow@openrobotics.org">Audrow Nash</author>
   <author>Claire Wang</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>

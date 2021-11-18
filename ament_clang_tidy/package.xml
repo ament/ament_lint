@@ -6,9 +6,13 @@
   <description>
     The ability to check code against style conventions using
     clang-tidy and generate xUnit test result files.</description>
-  <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
+
+  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+
   <license>Apache License 2.0</license>
 
+  <author email="audrow@openrobotics.org">Audrow Nash</author>
   <author>Claire Wang</author>
 
   <exec_depend>clang-tidy</exec_depend>
