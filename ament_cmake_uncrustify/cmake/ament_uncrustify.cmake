@@ -31,13 +31,15 @@
 # :param LANGUAGE: a specific language argument for uncrustify instead of
 #   deriving the language from the file extension, either 'C' or 'C++'
 # :type LANGUAGE: string
+# :param EXCLUDE: an optional list of exclude files or directories for uncrustify
+# :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_uncrustify)
-  cmake_parse_arguments(ARG "" "CONFIG_FILE;LANGUAGE;MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "CONFIG_FILE;LANGUAGE;MAX_LINE_LENGTH;TESTNAME" "EXCLUDE" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "uncrustify")
   endif()
@@ -58,6 +60,9 @@ function(ament_uncrustify)
   if(ARG_LANGUAGE)
     string(TOUPPER ${ARG_LANGUAGE} ARG_LANGUAGE)
     list(APPEND cmd "--language" "${ARG_LANGUAGE}")
+  endif()
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
