@@ -7,11 +7,15 @@
     The CMake API for ament_flake8 to check code syntax and style conventions
     with flake8.
   </description>
-  <maintainer email="audrow@openrobotics.org">Audrow Nash</maintainer>
+
+  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+
   <license>Apache License 2.0</license>
 
-  <author>D. Hood</author>
+  <author email="audrow@openrobotics.org">Audrow Nash</author>
   <author>Claire Wang</author>
+  <author>D. Hood</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>
