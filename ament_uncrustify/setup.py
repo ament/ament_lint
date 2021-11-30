@@ -40,5 +40,8 @@ and generate xUnit test result files.""",
         'console_scripts': [
             'ament_uncrustify = ament_uncrustify.main:main',
         ],
+        'pytest11': [
+            'ament_uncrustify = ament_uncrustify.pytest_marker',
+        ],
     },
 )
