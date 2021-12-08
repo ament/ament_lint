@@ -35,7 +35,7 @@
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "EXCLUDE;LANGUAGE;TESTNAME" "LIBRARIES;INCLUDE_DIRS" ${ARGN})
+  cmake_parse_arguments(ARG "" "LANGUAGE;TESTNAME" "EXCLUDE;LIBRARIES;INCLUDE_DIRS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
