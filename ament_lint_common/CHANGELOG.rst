@@ -2,6 +2,12 @@
 Changelog for package ament_lint_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
+* Fix typo in ament_lint_common/package.xml (`#336 <https://github.com/ament/ament_lint/issues/336>`_)
+* Contributors: Audrow Nash, Kenji Miyake
+
 0.11.2 (2021-06-18)
 -------------------
 

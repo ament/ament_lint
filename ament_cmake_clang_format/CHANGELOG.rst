@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_clang_format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
+* Contributors: Audrow Nash
+
 0.11.2 (2021-06-18)
 -------------------
 

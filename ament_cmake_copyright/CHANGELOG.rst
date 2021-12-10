@@ -2,6 +2,17 @@
 Changelog for package ament_cmake_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [ament_cmake_copyright] Add file exclusion support (`#328 <https://github.com/ament/ament_lint/issues/328>`_)
+  * [ament_cmake_copyright] Add file exclusion support
+  In the `ament_copyright` CMake function, the optional list
+  argument `EXCLUDE` can now be used as an exclusion specifier.
+  * [ament_cmake_copyright] Fix function header typo
+  Remove reference to `cppcheck` in the `EXCLUDE` arg description.
+* Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
+* Contributors: Abrar Rahman Protyasha, Audrow Nash
+
 0.11.2 (2021-06-18)
 -------------------
 

@@ -2,6 +2,30 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
+* [ament_copyright] Fix file exclusion behavior (`#327 <https://github.com/ament/ament_lint/issues/327>`_)
+  * [ament_copyright] Fix file exclusion behavior
+  This commit fixes the faulty file exclusion behavior reported in
+  https://github.com/ament/ament_lint/issues/326.
+  Specifically, the exclusion list is matched against traversed
+  files in the `crawler` module.
+  Changes inspired by https://github.com/ament/ament_lint/pull/299/.
+  * Update excluded file path in copyright tests
+  Since file names are not indiscriminately matched throughout the
+  search tree anymore, the excluded files listed in the copyright
+  tests need to be updated relative to the root of the package.
+  * Add test cases to check exclusion behavior
+  Specifically, these tests check for:
+  - Incorrect exclusion of single filenames.
+  - Correct exclusion of relatively/absolutely addressed filenames.
+  - Correct exclusion of wildcarded paths.
+  * Add unit tests for crawler module
+  These unit tests make sure both search and exclusion behaviors are
+  correctly demonstrated by the `ament_copyright.crawler` module.
+* Contributors: Abrar Rahman Protyasha, Audrow Nash
+
 0.11.2 (2021-06-18)
 -------------------
 

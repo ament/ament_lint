@@ -2,6 +2,22 @@
 Changelog for package ament_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [ament_uncrustify] Fix file exclusion behavior (`#334 <https://github.com/ament/ament_lint/issues/334>`_)
+  * [ament_uncrustify] Fix file exclusion behavior
+  This PR fixes the file exclusion behavior reported in `#326 <https://github.com/ament/ament_lint/issues/326>`_.
+  Specifically, the exclusion list is matched against
+  files/directories as the search path is traversed.
+  Tries to maintain consistency with `#327 <https://github.com/ament/ament_lint/issues/327>`_.
+  * [ament_uncrustify] Add file exclusion tests
+  * [ament_uncrustify] Remove erroneous pytest marker
+* Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
+* [ament_uncrustify] Add ament_lint tests (`#338 <https://github.com/ament/ament_lint/issues/338>`_)
+  * Add `ament_lint` tests on `ament_uncrustify`
+  * Address linter warnings in `ament_uncrustify`
+* Contributors: Abrar Rahman Protyasha, Audrow Nash
+
 0.11.2 (2021-06-18)
 -------------------
 

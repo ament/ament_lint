@@ -2,6 +2,12 @@
 Changelog for package ament_cmake_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
+* Improvements to ament_lint_clang_tidy. (`#316 <https://github.com/ament/ament_lint/issues/316>`_)
+* Contributors: Audrow Nash, Steven! Ragnarök
+
 0.11.2 (2021-06-18)
 -------------------
 
