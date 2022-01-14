@@ -2,6 +2,16 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.11.4 (2022-01-14)
+-------------------
+* Update forthcoming version in changelogs
+* Reapply patches
+  Reapply parts of 232428752251de61e84ef013bcd643e35eb9038d that are still relevant.
+* Update cpplint version
+  Point to the fork https://github.com/cpplint/cpplint
+  Contains updates for modern C++ standards (e.g. C++14 and C++17).
+* Contributors: Audrow Nash, Dirk Thomas, Jacob Perron
+
 0.11.3 (2022-01-14)
 -------------------
 * Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)

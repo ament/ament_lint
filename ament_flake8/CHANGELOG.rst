@@ -2,6 +2,11 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.11.4 (2022-01-14)
+-------------------
+* Update forthcoming version in changelogs
+* Contributors: Audrow Nash
+
 0.11.3 (2022-01-14)
 -------------------
 * Ignore .*/_* dirs in ament_flake8 (`#335 <https://github.com/ament/ament_lint/issues/335>`_)

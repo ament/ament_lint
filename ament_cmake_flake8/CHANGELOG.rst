@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.11.4 (2022-01-14)
+-------------------
+* Update forthcoming version in changelogs
+* Contributors: Audrow Nash
+
 0.11.3 (2022-01-14)
 -------------------
 * Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
