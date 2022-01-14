@@ -127,7 +127,7 @@ def main(argv=sys.argv[1:]):
         if cppcheck_version == '1.88' or cppcheck_version.startswith('2.'):
             print(
                 f'cppcheck {cppcheck_version} has known performance issues and therefore will not '
-                'be used, set the AMENT_CPPCHECK_ALLOW_1_88 environment variable to override this.',
+                'be used, set the AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS environment variable to override this.',
                 file=sys.stderr,
             )
 
