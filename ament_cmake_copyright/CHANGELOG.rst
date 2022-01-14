@@ -2,8 +2,8 @@
 Changelog for package ament_cmake_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * [ament_cmake_copyright] Add file exclusion support (`#328 <https://github.com/ament/ament_lint/issues/328>`_)
   * [ament_cmake_copyright] Add file exclusion support
   In the `ament_copyright` CMake function, the optional list

@@ -2,8 +2,8 @@
 Changelog for package ament_cppcheck
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
 * Add cppcheck libraries option (`#323 <https://github.com/ament/ament_lint/issues/323>`_)
   * adding ament_cppcheck libraries option

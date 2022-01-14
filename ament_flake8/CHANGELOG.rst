@@ -2,8 +2,8 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * Ignore .*/_* dirs in ament_flake8 (`#335 <https://github.com/ament/ament_lint/issues/335>`_)
   Other ament\_* linters specifically ignore directories starting with a
   dot or underscore when crawling for files to lint. They also do so

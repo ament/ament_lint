@@ -2,8 +2,8 @@
 Changelog for package ament_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
 * remove google style from clang-tidy default settings, removing need for default config file (`#337 <https://github.com/ament/ament_lint/issues/337>`_)
 * Improvements to ament_lint_clang_tidy. (`#316 <https://github.com/ament/ament_lint/issues/316>`_)

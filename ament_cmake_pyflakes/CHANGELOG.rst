@@ -2,8 +2,8 @@
 Changelog for package ament_cmake_pyflakes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
 * Contributors: Audrow Nash
 

@@ -2,8 +2,8 @@
 Changelog for package ament_cmake_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * Update maintainers to Michael Jeronimo and Michel Hidalgo (`#340 <https://github.com/ament/ament_lint/issues/340>`_)
 * [ament_cmake_uncrustify] Add file exclude support (`#330 <https://github.com/ament/ament_lint/issues/330>`_)
   In the `ament_uncrustify` CMake function, the optional list

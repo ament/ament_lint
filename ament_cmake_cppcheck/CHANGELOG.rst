@@ -2,8 +2,8 @@
 Changelog for package ament_cmake_cppcheck
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * [ament_cmake_cppcheck] Fix file exclusion behavior (`#329 <https://github.com/ament/ament_lint/issues/329>`_)
   The `EXCLUDE` argument of the `ament_cppcheck` CMake function is
   a list, i.e. a multi-value keyword. As such, it needs to be placed

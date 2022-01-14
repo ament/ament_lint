@@ -2,8 +2,8 @@
 Changelog for package ament_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.11.3 (2022-01-14)
+-------------------
 * [ament_uncrustify] Fix file exclusion behavior (`#334 <https://github.com/ament/ament_lint/issues/334>`_)
   * [ament_uncrustify] Fix file exclusion behavior
   This PR fixes the file exclusion behavior reported in `#326 <https://github.com/ament/ament_lint/issues/326>`_.
