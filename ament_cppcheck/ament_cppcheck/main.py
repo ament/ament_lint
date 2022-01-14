@@ -122,8 +122,8 @@ def main(argv=sys.argv[1:]):
         # the number of cores cannot be determined, do not extend args
         pass
 
-    # detect cppcheck 1.88 which caused issues
-    if 'AMENT_CPPCHECK_ALLOW_1_88' not in os.environ:
+    # detect cppcheck 1.88 or 2.x which are much too slow
+    if 'AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS' not in os.environ:
         if cppcheck_version == '1.88' or cppcheck_version.startswith('2.'):
             print(
                 f'cppcheck {cppcheck_version} has known performance issues and therefore will not '
