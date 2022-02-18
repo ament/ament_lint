@@ -2,8 +2,8 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.12.0 (2022-02-18)
+-------------------
 * Remove use of distutils.version.LooseVersion. (`#346 <https://github.com/ament/ament_lint/issues/346>`_)
 * Contributors: Chris Lalancette
 
