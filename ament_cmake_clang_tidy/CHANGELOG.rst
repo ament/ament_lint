@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.11.4 (2022-01-14)
 -------------------
 * Update forthcoming version in changelogs
