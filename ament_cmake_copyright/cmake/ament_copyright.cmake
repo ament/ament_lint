@@ -32,7 +32,7 @@ function(ament_copyright)
     set(ARG_TESTNAME "copyright")
   endif()
   if(NOT ARG_TIMEOUT)
-    set(ARG_TIMEOUT 120)
+    set(ARG_TIMEOUT 200)
   endif()
 
   find_program(ament_copyright_BIN NAMES "ament_copyright")
