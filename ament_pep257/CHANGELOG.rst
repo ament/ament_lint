@@ -2,6 +2,9 @@
 Changelog for package ament_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.12.0 (2022-02-18)
 -------------------
 * Remove use of distutils.version.LooseVersion. (`#346 <https://github.com/ament/ament_lint/issues/346>`_)

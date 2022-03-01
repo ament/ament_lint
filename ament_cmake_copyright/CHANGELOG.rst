@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Increase the ament_cmake_copyright default timeout. (`#355 <https://github.com/ament/ament_lint/issues/355>`_)
+* Contributors: Chris Lalancette
+
 0.12.0 (2022-02-18)
 -------------------
 

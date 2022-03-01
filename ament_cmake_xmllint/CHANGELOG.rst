@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_xmllint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.12.0 (2022-02-18)
 -------------------
 
