@@ -28,7 +28,7 @@ import mypy.api  # type: ignore
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
-    """Command line tool for linting files with mypy."""
+    """Command line tool for static type analysis with mypy."""
     parser = argparse.ArgumentParser(
         description='Check code using mypy',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
