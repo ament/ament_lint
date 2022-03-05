@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Add a test to perform static code analysis with pclint.
+# Add a test to perform static code analysis with PC-lint.
 #
 # :param TESTNAME: the name of the test, default: "pclint"
 # :type TESTNAME: string

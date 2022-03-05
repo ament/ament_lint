@@ -5,7 +5,7 @@
   <version>0.12.1</version>
   <description>
     The CMake API for ament_pclint to perform static code analysis on C/C++
-    code using PCLint.
+    code using PC-lint.
   </description>
 
   <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
