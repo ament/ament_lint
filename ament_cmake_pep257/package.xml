@@ -4,7 +4,7 @@
   <name>ament_cmake_pep257</name>
   <version>0.12.1</version>
   <description>
-    The CMake API for ament_pep257 to check code against the style conventions in
+    The CMake API for ament_pep257 to check code against the docstring style conventions in
     PEP 257.
   </description>
 

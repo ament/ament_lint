@@ -14,6 +14,6 @@
 
 file(GLOB_RECURSE _python_files FOLLOW_SYMLINKS "*.py")
 if(_python_files)
-  message(STATUS "Added test 'pep257' to check Python code against some of the style conventions in PEP 257")
+  message(STATUS "Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257")
   ament_pep257()
 endif()
