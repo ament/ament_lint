@@ -64,7 +64,8 @@ class FileDescriptor:
             for template in templates:
                 formatted_template = remove_formatting(template)
                 last_index = -1
-                for license_section in formatted_template.split('{copyright_holder}'):
+                template_sections = split_template(formatted_template, ['{copyright_holder}', '{copyright}'])
+                for license_section in template_sections:
                     # OK, now look for each section of the license in the incoming
                     # content.
                     index = remove_formatting(content).find(license_section.strip())
@@ -286,3 +287,14 @@ def is_empty_line(content, index):
 
 def remove_formatting(text):
     return ' '.join(filter(None, text.split()))
+
+# Flat list of sections split on all separators provided
+def split_template(sections, separators):
+    if type(sections) != list:
+        return split_template([sections], separators)
+    elif len(separators) > 1:
+        return sum([split_template([section], separators[0:1]) for section
+                    in sum([split_template([section], separators[1:]) for section in sections], [])], [])
+    else:
+        return list(filter(lambda s: len(s) > 0,
+            sum([section.split(separators[0]) for section in sections], [])))
