@@ -58,17 +58,18 @@ class FileDescriptor:
     def identify_license(self, content, license_part):
         if content is None:
             return
+        formatted_content = remove_formatting(content)
 
         for name, license_ in get_licenses().items():
             templates = getattr(license_, license_part)
             for template in templates:
-                formatted_template = remove_formatting(template)
                 last_index = -1
+                formatted_template = remove_formatting(template)
                 template_sections = split_template(formatted_template, ['{copyright_holder}', '{copyright}'])
                 for license_section in template_sections:
                     # OK, now look for each section of the license in the incoming
                     # content.
-                    index = remove_formatting(content).find(license_section.strip())
+                    index = formatted_content.find(license_section.strip())
                     if index == -1 or index <= last_index:
                         # Some part of the license is not in the content, or the license
                         # is rearranged, this license doesn't match.
