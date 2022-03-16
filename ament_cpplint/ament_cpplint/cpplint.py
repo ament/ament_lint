@@ -614,7 +614,7 @@ def ParseNolintSuppressions(filename, raw_line, linenum, error):
         category = category[1:-1]
         if category in _ERROR_CATEGORIES:
           _error_suppressions.setdefault(category, set()).add(suppressed_line)
-        elif any([c for c in _OTHER_NOLINT_CATEGORY_PREFIXES if category.startswith(c)]):
+        elif any(c for c in _OTHER_NOLINT_CATEGORY_PREFIXES if category.startswith(c)):
           # Ignore any categories from other tools.
           pass
         elif category not in _LEGACY_ERROR_CATEGORIES:
