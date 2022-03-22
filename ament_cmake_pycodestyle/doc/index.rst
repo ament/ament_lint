@@ -1,7 +1,8 @@
 ament_cmake_pycodestyle
 =======================
 
-Checks the code style of Python source files using `pycodestyle
+Checks the code of Python source files against some of the style
+conventions in PEP 8 using `pycodestyle
 <http://pycodestyle.readthedocs.org/>`_.
 Files with the following extensions are being considered: ``.py``.
 
