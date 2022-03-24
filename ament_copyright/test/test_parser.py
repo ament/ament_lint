@@ -15,7 +15,7 @@
 from ament_copyright.parser import search_copyright_information
 
 
-def test_search_copyright_information_incorrect():
+def test_search_copyright_information_incorrect_typo():
     """Test searching for copyright information with a typo in the copyright information."""
     copyrights, remaining_block = search_copyright_information(
         'CopyrightTypo 2020 Open Source Robotics Foundation, Inc.'
@@ -23,15 +23,25 @@ def test_search_copyright_information_incorrect():
     assert len(copyrights) == 0
 
 
+def test_search_copyright_information_repeated():
+    """Test searching with repeated 'copyright' in the copyright information."""
+    copyrights, remaining_block = search_copyright_information(
+        '\\copyright Copyright 2020 Open Source Robotics Foundation, Inc.'
+    )
+    assert len(copyrights) > 0
+
+
 def test_search_copyright_information_capitalization1():
     """
     Test searching for copyright information with capitalized copyright information.
 
     Word 'copyright': capitalized
-    Abbreviation '(c)': present and lowercase
+    Abbreviation '(c)': absent
     """
     copyrights, remaining_block = search_copyright_information(
-        'Copyright 2020 Open Source Robotics Foundation, Inc.')
+        '  Copyright 2020 Open Source Robotics Foundation, Inc.')
+    print(copyrights[0].name)
+    assert copyrights[0].name == 'Open Source Robotics Foundation, Inc.'
     assert len(copyrights) > 0
 
 
@@ -40,7 +50,7 @@ def test_search_copyright_information_capitalization2():
     Test searching for copyright information with capitalized copyright information.
 
     Word 'copyright': capitalized
-    Abbrebiation '(c)': present and lowercase
+    Abbreviation '(c)': lowercase
     """
     copyrights, remaining_block = search_copyright_information(
         'Copyright (c) 2020 Open Source Robotics Foundation, Inc.')
@@ -52,7 +62,7 @@ def test_search_copyright_information_capitalization3():
     Test searching for copyright information with capitalized copyright information.
 
     Word 'copyright': capitalized
-    Abbrebiation '(c)': present and uppercase
+    Abbreviation '(c)': uppercase
     """
     copyrights, remaining_block = search_copyright_information(
         'Copyright (C) 2020 Open Source Robotics Foundation, Inc.')
@@ -64,7 +74,7 @@ def test_search_copyright_information_lowercase1():
     Test searching for copyright information with lowercase copyright information.
 
     Word 'copyright': lowercase
-    Abbrebiation '(c)': absent
+    Abbreviation '(c)': absent
     """
     copyrights, remaining_block = search_copyright_information(
         'copyright 2020 Open Source Robotics Foundation, Inc.')
@@ -76,8 +86,32 @@ def test_search_copyright_information_lowercase2():
     Test searching for copyright information with lowercase copyright information and abbreviation.
 
     Word 'copyright': lowercase
-    Abbrebiation '(c)': lowercase
+    Abbreviation '(c)': lowercase
     """
     copyrights, remaining_block = search_copyright_information(
         'copyright (c) 2020 Open Source Robotics Foundation, Inc.')
+    assert len(copyrights) > 0
+
+
+def test_search_copyright_information_uppercase1():
+    """
+    Test searching for copyright information with uppercase copyright information.
+
+    Word 'copyright': uppercase
+    Abbreviation '(c)': absent
+    """
+    copyrights, remaining_block = search_copyright_information(
+        'COPYRIGHT 2020 Open Source Robotics Foundation, Inc.')
+    assert len(copyrights) > 0
+
+
+def test_search_copyright_information_uppercase2():
+    """
+    Test searching for copyright information with uppercase copyright information.
+
+    Word 'copyright': uppercase
+    Abbreviation '(c)': uppercase
+    """
+    copyrights, remaining_block = search_copyright_information(
+        'COPYRIGHT (C) 2020 Open Source Robotics Foundation, Inc.')
     assert len(copyrights) > 0
