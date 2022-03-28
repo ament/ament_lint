@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Improve documentation by clarifying the purpose of different tools (`#357 <https://github.com/ament/ament_lint/issues/357>`_)
+* Contributors: Bi0T1N
+
 0.12.1 (2022-03-01)
 -------------------
 

@@ -2,6 +2,11 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* ignore NOLINT comments with categories that come from clang-tidy (`#339 <https://github.com/ament/ament_lint/issues/339>`_)
+* Contributors: William Woodall
+
 0.12.1 (2022-03-01)
 -------------------
 
