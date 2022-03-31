@@ -28,7 +28,7 @@ def test_search_copyright_information_repeated():
     copyrights, remaining_block = search_copyright_information(
         '\\copyright Copyright 2020 Open Source Robotics Foundation, Inc.'
     )
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
 
 
 def test_search_copyright_information_capitalization1():
@@ -42,7 +42,7 @@ def test_search_copyright_information_capitalization1():
         '  Copyright 2020 Open Source Robotics Foundation, Inc.')
     print(copyrights[0].name)
     assert copyrights[0].name == 'Open Source Robotics Foundation, Inc.'
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
 
 
 def test_search_copyright_information_capitalization2():
@@ -54,7 +54,7 @@ def test_search_copyright_information_capitalization2():
     """
     copyrights, remaining_block = search_copyright_information(
         'Copyright (c) 2020 Open Source Robotics Foundation, Inc.')
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
 
 
 def test_search_copyright_information_capitalization3():
@@ -66,7 +66,7 @@ def test_search_copyright_information_capitalization3():
     """
     copyrights, remaining_block = search_copyright_information(
         'Copyright (C) 2020 Open Source Robotics Foundation, Inc.')
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
 
 
 def test_search_copyright_information_lowercase1():
@@ -78,7 +78,7 @@ def test_search_copyright_information_lowercase1():
     """
     copyrights, remaining_block = search_copyright_information(
         'copyright 2020 Open Source Robotics Foundation, Inc.')
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
 
 
 def test_search_copyright_information_lowercase2():
@@ -90,7 +90,7 @@ def test_search_copyright_information_lowercase2():
     """
     copyrights, remaining_block = search_copyright_information(
         'copyright (c) 2020 Open Source Robotics Foundation, Inc.')
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
 
 
 def test_search_copyright_information_uppercase1():
@@ -102,7 +102,7 @@ def test_search_copyright_information_uppercase1():
     """
     copyrights, remaining_block = search_copyright_information(
         'COPYRIGHT 2020 Open Source Robotics Foundation, Inc.')
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
 
 
 def test_search_copyright_information_uppercase2():
@@ -114,4 +114,4 @@ def test_search_copyright_information_uppercase2():
     """
     copyrights, remaining_block = search_copyright_information(
         'COPYRIGHT (C) 2020 Open Source Robotics Foundation, Inc.')
-    assert len(copyrights) > 0
+    assert len(copyrights) == 1
