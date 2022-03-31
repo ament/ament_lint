@@ -31,6 +31,15 @@ def test_search_copyright_information_repeated():
     assert len(copyrights) == 1
 
 
+def test_search_copyright_information_multiple_holders():
+    """Test searching multiple holders."""
+    copyrights, remaining_block = search_copyright_information(
+        """Copyright 2020 Open Source Robotics Foundation, Inc.
+           Copyright (c) 2009, Willow Garage, Inc."""
+    )
+    assert len(copyrights) == 2
+
+
 def test_search_copyright_information_capitalization1():
     """
     Test searching for copyright information with capitalized copyright information.
