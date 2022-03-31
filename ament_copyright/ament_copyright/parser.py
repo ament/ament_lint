@@ -282,32 +282,35 @@ def get_comment_block(content, index):
 
 
 def get_multiline_comment_block(content, index):
-    # find the first match of the comment start token
-    start_pattern = '^(/[*]|<!--)'
-    # also accept BOM if present
-    if index == 0 and content[0] == '\ufeff':
-        start_pattern = start_pattern[0] + '\ufeff' + start_pattern[1:]
-    start_regex = re.compile(start_pattern, re.MULTILINE)
-    start_match = start_regex.search(content, index)
-    if not start_match:
-        return None
-    start_index = start_match.start(1)
+    patterns = [('^(/[*])', '([*]/)$'),
+                ('^(<!--)', '(-->)$')]
+    for pattern_pair in patterns:
+        start_pattern, end_pattern = pattern_pair
+        # find the first match of the comment start token
+        # also accept BOM if present
+        if index == 0 and content[0] == '\ufeff':
+            start_pattern = start_pattern[0] + '\ufeff' + start_pattern[1:]
+        start_regex = re.compile(start_pattern, re.MULTILINE)
+        start_match = start_regex.search(content, index)
+        if not start_match:
+            continue
+        start_index = start_match.start(1)
 
-    # find the first match of the comment end token
-    end_pattern = '([*]/|-->)$'
-    end_regex = re.compile(end_pattern, re.MULTILINE)
-    end_match = end_regex.search(content, index)
-    if not end_match:
-        return None
-    end_index = end_match.start(1)
+        # find the first match of the comment end token
+        end_regex = re.compile(end_pattern, re.MULTILINE)
+        end_match = end_regex.search(content, index)
+        if not end_match:
+            continue
+        end_index = end_match.start(1)
 
-    # collect all lines between start and end (open interval) and strip out any common prefix
-    block = content[start_index:end_index]
-    prefixed_lines = block.splitlines()[1:-1]
-    line_prefix = os.path.commonprefix(prefixed_lines)
-    lines = [line[len(line_prefix) + 1:] for line in prefixed_lines]
+        # collect all lines between start and end (open interval) and strip out any common prefix
+        block = content[start_index:end_index]
+        prefixed_lines = block.splitlines()[1:-1]
+        line_prefix = os.path.commonprefix(prefixed_lines)
+        lines = [line[len(line_prefix) + 1:] for line in prefixed_lines]
 
-    return '\n'.join(lines)
+        return '\n'.join(lines)
+    return None
 
 
 def scan_past_empty_lines(content, index):
