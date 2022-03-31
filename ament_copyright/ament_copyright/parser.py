@@ -178,9 +178,9 @@ def search_copyright_information(content):
     year_range = '%s-%s' % (year, year)
     year_or_year_range = '(?:%s|%s)' % (year, year_range)
     pattern = r'^[^\n\r]?\s*(?:\\copyright\s*)?' \
-              r'Copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
+              r'copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
         (year_or_year_range, year_or_year_range)
-    regex = re.compile(pattern, re.DOTALL | re.MULTILINE)
+    regex = re.compile(pattern, re.DOTALL | re.MULTILINE | re.IGNORECASE)
 
     copyrights = []
     while True:
