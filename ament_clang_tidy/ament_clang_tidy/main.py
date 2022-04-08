@@ -263,10 +263,7 @@ def main(argv=sys.argv[1:]):
             f.write(xml)
 
     if args.sarif_file:
-        folder_name = os.path.basename(os.path.dirname(args.sarif_file))
-        file_name = os.path.basename(args.sarif_file)
-        testname = '%s.%s' % (folder_name, file_name)
-        sarif = get_sarif_content(report)
+        sarif = get_sarif_content(report, get_clang_tidy_version(clang_tidy_bin))
         path = os.path.dirname(os.path.abspath(args.sarif_file))
         if not os.path.exists(path):
             os.makedirs(path)
@@ -391,14 +388,29 @@ def get_xunit_content(report, testname, elapsed):
     return xml
 
 
-def get_sarif_content(report):
-    """Transform the report to SARIF."""
+def get_clang_tidy_version(clang_tidy_bin):
+    version = ''
+    try:
+        cmd_args = [ clang_tidy_bin, '--version' ]
+        output = subprocess.check_output(cmd_args, stderr=subprocess.DEVNULL).strip().decode()
+        m = re.search('.*LLVM version (.*)\n', output)
+        if m:
+            version = m.group(1)
+    except Exception as e:
+        print(f'Failed to get the clang tidy version number: {e}', file=sys.stderr)
+    return version
+
+
+def get_sarif_content(report, clang_tidy_version):
+    """Transform the generic issue report format to SARIF."""
 
     # Heading information
     sarif = {}
     sarif['version'] = '2.1.0'
     sarif['$schema'] = 'http://json.schemastore.org/sarif-2.1.0-rtm.5'
-    sarif['properties'] = { 'comment': 'clang-tidy output converted to SARIF by ament_clang_tidy' }
+    sarif['properties'] = {
+        'comment': 'clang-tidy output converted to SARIF by ament_clang_tidy'
+    }
 
     # Initialize the basic structure (one run with tool, artifacts, and results)
     sarif['runs'] = []
@@ -410,20 +422,24 @@ def get_sarif_content(report):
     # Populate information about clang-tidy
     tool = sarif['runs'][0]['tool']
     tool['driver'] = {}
-    tool['driver']['name'] = f'clang-tidy'
-    tool['driver']['version'] = '1.0-TODO'
+    tool['driver']['name'] = 'clang-tidy'
+    tool['driver']['version'] = clang_tidy_version
     tool['driver']['informationUri'] = 'https://clang.llvm.org/extra/clang-tidy/'
     tool['driver']['rules'] = []
     rules = tool['driver']['rules']
     for filename in sorted(report.keys()):
         for error in report[filename]:
-            description, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
-            rules.append({ 'id': rule_id, 'shortDescription': description.rstrip() })
+            description, rule_id = filter(
+                None, re.split('\[|\]', error['error_msg']))
+            rules.append({
+                'id': rule_id,
+                'shortDescription': description.rstrip()
+            })
 
     # Populate the artifact information (source files analyzed)
     artifacts = sarif['runs'][0]['artifacts']
     for filename in sorted(report.keys()):
-        artifact = { 'location': { 'uri': filename } }
+        artifact = {'location': {'uri': filename}}
         artifacts.append(artifact)
 
     # Populate the results of the analysis
@@ -433,19 +449,29 @@ def get_sarif_content(report):
         for error in errors:
             results_dict = {}
 
+            # Grab the symbolic rule name (it's the part in brackets)
             _, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
             msg = error['code_correct_rec']
 
             results_dict['ruleId'] = rule_id
             results_dict['level'] = 'warning'
-            results_dict['message'] = { 'text': msg }
+            results_dict['message'] = {'text': msg}
             results_dict['locations'] = []
 
             location = {}
             start_line = error['line_no']
             start_column = error['offset_in_line']
-            index = artifacts.index({ 'location': { 'uri': filename }})
-            location['physicalLocation'] = { 'artifactLocation': { 'uri': filename, 'index': index }, 'region': { 'startLine': start_line, 'startColumn': start_column } }
+            index = artifacts.index({'location': {'uri': filename}})
+            location['physicalLocation'] = {
+                'artifactLocation': {
+                    'uri': filename,
+                    'index': index
+                },
+                'region': {
+                    'startLine': start_line,
+                    'startColumn': start_column
+                }
+            }
 
             results_dict['locations'].append(location)
             results.append(results_dict)
