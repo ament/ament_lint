@@ -391,8 +391,8 @@ def get_xunit_content(report, testname, elapsed):
 def get_clang_tidy_version(clang_tidy_bin):
     version = ''
     try:
-        cmd_args = [ clang_tidy_bin, '--version' ]
-        output = subprocess.check_output(cmd_args, stderr=subprocess.DEVNULL).strip().decode()
+        cmd_args = [clang_tidy_bin, '--version']
+        output = subprocess.check_output(cmd_args).decode()
         m = re.search('.*LLVM version (.*)\n', output)
         if m:
             version = m.group(1)
@@ -404,29 +404,34 @@ def get_clang_tidy_version(clang_tidy_bin):
 def get_sarif_content(report, clang_tidy_version):
     """Transform the generic issue report format to SARIF."""
 
-    # Heading information
-    sarif = {}
-    sarif['version'] = '2.1.0'
-    sarif['$schema'] = 'http://json.schemastore.org/sarif-2.1.0-rtm.5'
-    sarif['properties'] = {
-        'comment': 'clang-tidy output converted to SARIF by ament_clang_tidy'
+    # Lay out the basic structure of the SARIF file (a single run that has 'tool',
+    # 'artifacts', and 'results' entries)
+    sarif = {
+        'version':
+        '2.1.0',
+        '$schema':
+        'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'properties': {
+            'comment':
+            'clang-tidy output converted to SARIF by ament_clang_tidy'
+        },
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'clang-tidy',
+                    'version': clang_tidy_version,
+                    'informationUri':
+                    'https://clang.llvm.org/extra/clang-tidy/',
+                    'rules': []
+                }
+            },
+            'artifacts': [],
+            'results': []
+        }]
     }
 
-    # Initialize the basic structure (one run with tool, artifacts, and results)
-    sarif['runs'] = []
-    sarif['runs'].append({})
-    sarif['runs'][0]['tool'] = {}
-    sarif['runs'][0]['artifacts'] = []
-    sarif['runs'][0]['results'] = []
-
-    # Populate information about clang-tidy
-    tool = sarif['runs'][0]['tool']
-    tool['driver'] = {}
-    tool['driver']['name'] = 'clang-tidy'
-    tool['driver']['version'] = clang_tidy_version
-    tool['driver']['informationUri'] = 'https://clang.llvm.org/extra/clang-tidy/'
-    tool['driver']['rules'] = []
-    rules = tool['driver']['rules']
+    # Populate rules that fired in this analysis
+    rules = sarif['runs'][0]['tool']['driver']['rules']
     for filename in sorted(report.keys()):
         for error in report[filename]:
             description, rule_id = filter(
@@ -442,38 +447,37 @@ def get_sarif_content(report, clang_tidy_version):
         artifact = {'location': {'uri': filename}}
         artifacts.append(artifact)
 
-    # Populate the results of the analysis
+    # Populate the results of the analysis (issues discovered)
     results = sarif['runs'][0]['results']
     for filename in sorted(report.keys()):
         errors = report[filename]
         for error in errors:
-            results_dict = {}
-
-            # Grab the symbolic rule name (it's the part in brackets)
+            # Get the symbolic rule name (it's the part in brackets)
             _, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
-            msg = error['code_correct_rec']
 
-            results_dict['ruleId'] = rule_id
-            results_dict['level'] = 'warning'
-            results_dict['message'] = {'text': msg}
-            results_dict['locations'] = []
-
-            location = {}
             start_line = error['line_no']
             start_column = error['offset_in_line']
             index = artifacts.index({'location': {'uri': filename}})
-            location['physicalLocation'] = {
-                'artifactLocation': {
-                    'uri': filename,
-                    'index': index
-                },
-                'region': {
-                    'startLine': start_line,
-                    'startColumn': start_column
-                }
-            }
 
-            results_dict['locations'].append(location)
+            results_dict = {
+                'ruleId': rule_id,
+                'level': 'warning',
+                'message': {
+                    'text': error['code_correct_rec']
+                },
+                'locations': [{
+                    'physicalLocation': {
+                        'artifactLocation': {
+                            'uri': filename,
+                            'index': index
+                        },
+                        'region': {
+                            'startLine': start_line,
+                            'startColumn': start_column
+                        }
+                    }
+                }]
+            }
             results.append(results_dict)
 
     return json.dumps(sarif, indent=2)
