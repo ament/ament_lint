@@ -407,10 +407,8 @@ def get_sarif_content(report, clang_tidy_version):
     # Lay out the basic structure of the SARIF file (a single run that has 'tool',
     # 'artifacts', and 'results' entries)
     sarif = {
-        'version':
-        '2.1.0',
-        '$schema':
-        'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'version': '2.1.0',
+        '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
         'properties': {
             'comment':
             'clang-tidy output converted to SARIF by ament_clang_tidy'
