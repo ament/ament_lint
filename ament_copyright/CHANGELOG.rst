@@ -2,8 +2,8 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.12.3 (2022-04-08)
+-------------------
 * Fix importlib_metadata warning on Python 3.10. (`#365 <https://github.com/ament/ament_lint/issues/365>`_)
 * Contributors: Chris Lalancette
 
