@@ -89,6 +89,9 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argument(
+        '--sarif-file',
+        help='Generate a SARIF file')
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
@@ -96,9 +99,7 @@ def main(argv=sys.argv[1:]):
               file=sys.stderr)
         return 1
 
-    if args.xunit_file:
-        start_time = time.time()
-
+    start_time = time.time()
     compilation_dbs = get_compilation_db_files(args.paths)
 
     if args.packages_select is not None:
@@ -242,6 +243,8 @@ def main(argv=sys.argv[1:]):
         if current_file is not None:
             report[current_file].append(copy.deepcopy(data))
 
+    elapsed_time = time.time() - start_time
+
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
         file_name = os.path.basename(args.xunit_file)
@@ -252,12 +255,20 @@ def main(argv=sys.argv[1:]):
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
         testname = '%s.%s' % (folder_name, file_name)
-        xml = get_xunit_content(report, testname, time.time() - start_time)
+        xml = get_xunit_content(report, testname, elapsed_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
+
+    if args.sarif_file:
+        sarif = get_sarif_content(report, get_clang_tidy_version(clang_tidy_bin))
+        path = os.path.dirname(os.path.abspath(args.sarif_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.sarif_file, 'w') as f:
+            f.write(sarif)
 
 
 def find_executable(file_names):
@@ -375,6 +386,106 @@ def get_xunit_content(report, testname, elapsed):
 
     xml += '</testsuite>\n'
     return xml
+
+
+def get_clang_tidy_version(clang_tidy_bin):
+    version = ''
+    try:
+        cmd_args = [clang_tidy_bin, '--version']
+        output = subprocess.check_output(cmd_args).decode()
+        m = re.search('.*LLVM version (.*)\n', output)
+        if m:
+            version = m.group(1)
+    except Exception as e:
+        print(f'Failed to get the clang tidy version number: {e}', file=sys.stderr)
+    return version
+
+
+def get_sarif_content(report, clang_tidy_version):
+    """Transform the generic issue report format to SARIF."""
+
+    with open('1.yaml', 'w') as file:
+        yaml.dump(report, file)
+
+    # Lay out the basic structure of the SARIF file (a single run that has 'tool',
+    # 'artifacts', and 'results' entries)
+    sarif = {
+        'version': '2.1.0',
+        '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'properties': {
+            'comment':
+            'clang-tidy output converted to SARIF by ament_clang_tidy'
+        },
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'clang-tidy',
+                    'version': clang_tidy_version,
+                    'informationUri':
+                    'https://clang.llvm.org/extra/clang-tidy/',
+                    'rules': []
+                }
+            },
+            'artifacts': [],
+            'results': []
+        }]
+    }
+
+    # Populate rules that fired in this analysis
+    rules = sarif['runs'][0]['tool']['driver']['rules']
+    for filename in sorted(report.keys()):
+        for error in report[filename]:
+            description, rule_id = filter(
+                None, re.split('\[|\]', error['error_msg']))
+            rules.append({
+                'id': rule_id,
+                'shortDescription': {
+                    'text': description.rstrip()
+                },
+                'helpUri': 'https://clang.llvm.org/extra/clang-tidy/checks/list.html',
+            })
+
+    # Populate the artifact information (source files analyzed)
+    artifacts = sarif['runs'][0]['artifacts']
+    for filename in sorted(report.keys()):
+        artifact = {'location': {'uri': filename}}
+        artifacts.append(artifact)
+
+    # Populate the results of the analysis (issues discovered)
+    results = sarif['runs'][0]['results']
+    for filename in sorted(report.keys()):
+        errors = report[filename]
+        for error in errors:
+            # Get the symbolic rule name (it's the part in brackets)
+            _, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
+
+            start_line = error['line_no']
+            start_column = error['offset_in_line']
+            index = artifacts.index({'location': {'uri': filename}})
+
+            results_dict = {
+                'ruleId': rule_id,
+                'level': 'warning',
+                'kind': 'review',
+                'message': {
+                    'text': error['code_correct_rec']
+                },
+                'locations': [{
+                    'physicalLocation': {
+                        'artifactLocation': {
+                            'uri': filename,
+                            'index': index
+                        },
+                        'region': {
+                            'startLine': start_line,
+                            'startColumn': start_column
+                        }
+                    }
+                }]
+            }
+            results.append(results_dict)
+
+    return json.dumps(sarif, indent=2)
 
 
 if __name__ == '__main__':
