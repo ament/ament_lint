@@ -2,6 +2,9 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.12.2 (2022-03-28)
 -------------------
 * ignore NOLINT comments with categories that come from clang-tidy (`#339 <https://github.com/ament/ament_lint/issues/339>`_)
