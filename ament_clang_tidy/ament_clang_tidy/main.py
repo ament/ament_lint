@@ -87,6 +87,9 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argument(
+        '--sarif-file',
+        help='Generate a SARIF file')
     args = parser.parse_args(argv)
 
     if args.config_file is not None and not os.path.exists(args.config_file):
@@ -94,9 +97,7 @@ def main(argv=sys.argv[1:]):
               file=sys.stderr)
         return 1
 
-    if args.xunit_file:
-        start_time = time.time()
-
+    start_time = time.time()
     compilation_dbs = get_compilation_db_files(args.paths)
 
     if args.packages_select is not None:
@@ -242,6 +243,8 @@ def main(argv=sys.argv[1:]):
         if current_file is not None:
             report[current_file].append(copy.deepcopy(data))
 
+    elapsed_time = time.time() - start_time
+
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
         file_name = os.path.basename(args.xunit_file)
@@ -252,12 +255,23 @@ def main(argv=sys.argv[1:]):
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
         testname = '%s.%s' % (folder_name, file_name)
-        xml = get_xunit_content(report, testname, time.time() - start_time)
+        xml = get_xunit_content(report, testname, elapsed_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
+
+    if args.sarif_file:
+        folder_name = os.path.basename(os.path.dirname(args.sarif_file))
+        file_name = os.path.basename(args.sarif_file)
+        testname = '%s.%s' % (folder_name, file_name)
+        sarif = get_sarif_content(report)
+        path = os.path.dirname(os.path.abspath(args.sarif_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.sarif_file, 'w') as f:
+            f.write(sarif)
 
 
 def find_executable(file_names):
@@ -375,6 +389,68 @@ def get_xunit_content(report, testname, elapsed):
 
     xml += '</testsuite>\n'
     return xml
+
+
+def get_sarif_content(report):
+    """Transform the report to SARIF."""
+
+    # Heading information
+    sarif = {}
+    sarif['version'] = '2.1.0'
+    sarif['$schema'] = 'http://json.schemastore.org/sarif-2.1.0-rtm.5'
+    sarif['properties'] = { 'comment': 'clang-tidy output converted to SARIF by ament_clang_tidy' }
+
+    # Initialize the basic structure (one run with tool, artifacts, and results)
+    sarif['runs'] = []
+    sarif['runs'].append({})
+    sarif['runs'][0]['tool'] = {}
+    sarif['runs'][0]['artifacts'] = []
+    sarif['runs'][0]['results'] = []
+
+    # Populate information about clang-tidy
+    tool = sarif['runs'][0]['tool']
+    tool['driver'] = {}
+    tool['driver']['name'] = f'clang-tidy'
+    tool['driver']['version'] = '1.0-TODO'
+    tool['driver']['informationUri'] = 'https://clang.llvm.org/extra/clang-tidy/'
+    tool['driver']['rules'] = []
+    rules = tool['driver']['rules']
+    for filename in sorted(report.keys()):
+        for error in report[filename]:
+            description, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
+            rules.append({ 'id': rule_id, 'shortDescription': description.rstrip() })
+
+    # Populate the artifact information (source files analyzed)
+    artifacts = sarif['runs'][0]['artifacts']
+    for filename in sorted(report.keys()):
+        artifact = { 'location': { 'uri': filename } }
+        artifacts.append(artifact)
+
+    # Populate the results of the analysis
+    results = sarif['runs'][0]['results']
+    for filename in sorted(report.keys()):
+        errors = report[filename]
+        for error in errors:
+            results_dict = {}
+
+            _, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
+            msg = error['code_correct_rec']
+
+            results_dict['ruleId'] = rule_id
+            results_dict['level'] = 'warning'
+            results_dict['message'] = { 'text': msg }
+            results_dict['locations'] = []
+
+            location = {}
+            start_line = error['line_no']
+            start_column = error['offset_in_line']
+            index = artifacts.index({ 'location': { 'uri': filename }})
+            location['physicalLocation'] = { 'artifactLocation': { 'uri': filename, 'index': index }, 'region': { 'startLine': start_line, 'startColumn': start_column } }
+
+            results_dict['locations'].append(location)
+            results.append(results_dict)
+
+    return json.dumps(sarif, indent=2)
 
 
 if __name__ == '__main__':
