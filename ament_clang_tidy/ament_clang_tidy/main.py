@@ -399,7 +399,7 @@ def get_clang_tidy_version(clang_tidy_bin):
     except Exception as e:
         pass
 
-    if not verison:
+    if not version:
         # In the unlikely event that we can't get the clang tidy version, emit a warning and continue
         print(f'Failed to get the clang tidy version: {e}', file=sys.stderr)
         version = 'unknown'
