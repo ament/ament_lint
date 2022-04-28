@@ -470,7 +470,7 @@ def write_xunit_file(xunit_file, report, duration, skip=None):
         suffix = '.xunit'
         if file_name.endswith(suffix):
             file_name = file_name[0:-len(suffix)]
-    testname = '%s.%s' % (folder_name, file_name)
+    testname = f'{folder_name}.{file_name}'
 
     xml = get_xunit_content(report, testname, duration, skip)
     path = os.path.dirname(os.path.abspath(xunit_file))
@@ -483,7 +483,7 @@ def write_xunit_file(xunit_file, report, duration, skip=None):
 def write_sarif_file(cppcheck_version, sarif_file, report, duration, skip=None):
     folder_name = os.path.basename(os.path.dirname(sarif_file))
     file_name = os.path.basename(sarif_file)
-    testname = '%s.%s' % (folder_name, file_name)
+    testname = f'{folder_name}.{file_name}'
     sarif = get_sarif_content(cppcheck_version, report, testname, duration, skip)
     path = os.path.dirname(os.path.abspath(sarif_file))
     if not os.path.exists(path):
