@@ -405,7 +405,7 @@ def get_sarif_content(cppcheck_version, report, testname, elapsed, skip=None):
             'shortDescription': {
                 'text': rule.attrib['msg'],
             },
-            'helpUri': 'https://clang.llvm.org/extra/clang-tidy/checks/list.html',
+            'helpUri': 'https://sourceforge.net/p/cppcheck/wiki/ListOfChecks/',
         })
 
     # Populate the artifact information (source files analyzed)
