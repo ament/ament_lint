@@ -364,6 +364,7 @@ def get_sarif_content(cppcheck_version, report, testname, elapsed, skip=None):
         '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
         'properties': {
             'comment': 'cppcheck output converted to SARIF by ament_cppcheck',
+            'test_name': testname,
             'test_count': test_count,
             'error_count': error_count,
             'execution_time': '%.3f' % round(elapsed, 3),
