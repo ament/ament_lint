@@ -16,6 +16,7 @@
 
 import argparse
 from collections import defaultdict
+import json
 import multiprocessing
 import os
 from shutil import which
@@ -79,6 +80,9 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argument(
+        '--sarif-file',
+        help='Generate a SARIF file')
     # option to just get the cppcheck version and print that
     parser.add_argument(
         '--cppcheck-version',
@@ -101,8 +105,7 @@ def main(argv=sys.argv[1:]):
         print(cppcheck_version)
         return 0
 
-    if args.xunit_file:
-        start_time = time.time()
+    start_time = time.time()
 
     files = get_files(args.paths, extensions)
     if not files:
@@ -126,13 +129,21 @@ def main(argv=sys.argv[1:]):
                 file=sys.stderr,
             )
 
+            elapsed_time = time.time() - start_time
+
             if args.xunit_file:
                 report = {input_file: [] for input_file in files}
                 write_xunit_file(
-                    args.xunit_file, report, time.time() - start_time,
-                    skip='cppcheck 1.88 performance issues'
+                    args.xunit_file, report, elapsed_time,
+                    skip=f'cppcheck {cppcheck_version} performance issues'
                 )
-                return 0
+
+            if args.sarif_file:
+                report = {input_file: [] for input_file in files}
+                write_sarif_file(
+                    cppcheck_version, args.sarif_file, report, elapsed_time,
+                    skip=f'cppcheck {cppcheck_version} performance issues',
+                )
 
             return 188
 
@@ -164,6 +175,8 @@ def main(argv=sys.argv[1:]):
         print("The invocation of 'cppcheck' failed with error code %d: %s" %
               (e.returncode, e), file=sys.stderr)
         return 1
+
+    elapsed_time = time.time() - start_time
 
     try:
         root = ElementTree.fromstring(xml)
@@ -197,8 +210,7 @@ def main(argv=sys.argv[1:]):
 
             data = dict(data)
             data['filename'] = filename
-            print('[%(filename)s:%(line)d]: (%(severity)s: %(id)s) %(msg)s' % data,
-                file=sys.stderr)
+            print('[%(filename)s:%(line)d]: (%(severity)s: %(id)s) %(msg)s' % data, file=sys.stderr)
 
     # output summary
     error_count = sum(len(r) for r in report.values())
@@ -211,7 +223,11 @@ def main(argv=sys.argv[1:]):
 
     # generate xunit file
     if args.xunit_file:
-        write_xunit_file(args.xunit_file, report, time.time() - start_time)
+        write_xunit_file(args.xunit_file, report, elapsed_time)
+
+    # generate SARIF file
+    if args.sarif_file:
+        write_sarif_file(cppcheck_version, args.sarif_file, report, elapsed_time)
 
     return rc
 
@@ -336,6 +352,115 @@ def get_xunit_content(report, testname, elapsed, skip=None):
     return xml
 
 
+def get_sarif_content(cppcheck_version, report, testname, elapsed, skip=None):
+    """Transform the generic issue report format to SARIF."""
+    test_count = sum(max(len(r), 1) for r in report.values())
+    error_count = sum(len(r) for r in report.values())
+
+    # Lay out the basic structure of the SARIF file (a single run that has 'tool',
+    # 'artifacts', and 'results' entries)
+    sarif = {
+        'version': '2.1.0',
+        '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'properties': {
+            'comment': 'cppcheck output converted to SARIF by ament_cppcheck',
+            'test_name': testname,
+            'test_count': test_count,
+            'error_count': error_count,
+            'execution_time': '%.3f' % round(elapsed, 3),
+            'tests_skipped': test_count if skip else 0,
+        },
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'cppcheck',
+                    'version': cppcheck_version,
+                    'informationUri':
+                    'https://cppcheck.sourceforge.io/',
+                    'rules': []
+                }
+            },
+            'artifacts': [],
+            'results': []
+        }]
+    }
+
+    # Get the rules that fired in this analysis
+    rules = sarif['runs'][0]['tool']['driver']['rules']
+    rules_that_fired = set()
+    for filename in sorted(report.keys()):
+        for error in report[filename]:
+            rules_that_fired.add(error['id'])
+
+    # Get the full list of error checks from cppcheck
+    cmd_args = ['cppcheck', '--errorlist']
+    output = subprocess.check_output(cmd_args).decode()
+    root = ElementTree.fromstring(output)
+    all_rules = root.findall('errors/error')
+
+    # Put together a rules list consisting of only those that fired
+    rules_used = [rule for rule in all_rules if rule.attrib['id'] in rules_that_fired]
+    for rule in rules_used:
+        rules.append({
+            'id': rule.attrib['id'],
+            'shortDescription': {
+                'text': rule.attrib['msg'],
+            },
+            'helpUri': 'https://sourceforge.net/p/cppcheck/wiki/ListOfChecks/',
+        })
+
+    # Populate the artifact information (source files analyzed)
+    artifacts = sarif['runs'][0]['artifacts']
+    for filename in sorted(report.keys()):
+        artifact = {'location': {'uri': filename}}
+        artifacts.append(artifact)
+
+    # Populate the results of the analysis (issues discovered)
+    results = sarif['runs'][0]['results']
+    for filename in sorted(report.keys()):
+        errors = report[filename]
+        for error in errors:
+            index = artifacts.index({'location': {'uri': filename}})
+            results_dict = {
+                'ruleId': error['id'],
+                'level': 'warning',
+                'kind': 'review',
+                'message': {
+                    'text': error['msg']
+                },
+                'locations': [{
+                    'physicalLocation': {
+                        'artifactLocation': {
+                            'uri': filename,
+                            'index': index
+                        },
+                        'region': {
+                            'startLine': error['line'],
+                        }
+                    }
+                }]
+            }
+            results.append(results_dict)
+
+    # MISRA rules aren't displayed when calling 'cppcheck --errorlist'. So, just in case
+    # the MISRA option was specified for this run, scan the results list for any rules applied
+    # that start with 'misra' and then create a rule entry for each unique rule
+    misra_rules_seen = set()
+    for result in results:
+        rule_id = result['ruleId']
+        if rule_id.startswith('misra') and not rule_id in misra_rules_seen:
+            rules.append({
+                'id': rule_id,
+                'shortDescription': {
+                    'text': result['message']['text'],
+                },
+                'helpUri': 'https://cppcheck.sourceforge.io/misra.php',
+            })
+            misra_rules_seen.add(rule_id)
+
+    return json.dumps(sarif, indent=2)
+
+
 def write_xunit_file(xunit_file, report, duration, skip=None):
     folder_name = os.path.basename(os.path.dirname(xunit_file))
     file_name = os.path.basename(xunit_file)
@@ -345,7 +470,7 @@ def write_xunit_file(xunit_file, report, duration, skip=None):
         suffix = '.xunit'
         if file_name.endswith(suffix):
             file_name = file_name[0:-len(suffix)]
-    testname = '%s.%s' % (folder_name, file_name)
+    testname = f'{folder_name}.{file_name}'
 
     xml = get_xunit_content(report, testname, duration, skip)
     path = os.path.dirname(os.path.abspath(xunit_file))
@@ -353,6 +478,18 @@ def write_xunit_file(xunit_file, report, duration, skip=None):
         os.makedirs(path)
     with open(xunit_file, 'w') as f:
         f.write(xml)
+
+
+def write_sarif_file(cppcheck_version, sarif_file, report, duration, skip=None):
+    folder_name = os.path.basename(os.path.dirname(sarif_file))
+    file_name = os.path.basename(sarif_file)
+    testname = f'{folder_name}.{file_name}'
+    sarif = get_sarif_content(cppcheck_version, report, testname, duration, skip)
+    path = os.path.dirname(os.path.abspath(sarif_file))
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open(sarif_file, 'w') as f:
+        f.write(sarif)
 
 
 if __name__ == '__main__':
