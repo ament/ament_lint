@@ -443,6 +443,22 @@ def get_sarif_content(cppcheck_version, report, testname, elapsed, skip=None):
             }
             results.append(results_dict)
 
+    # MISRA rules aren't displayed when calling 'cppcheck --errorlist'. So, just in case
+    # the MISRA option was specified for this run, scan the results list for any rules applied
+    # that start with 'misra' and then create a rule entry for each unique rule
+    misra_rules_seen = set()
+    for result in results:
+        rule_id = result['ruleId']
+        if rule_id.startswith('misra') and not rule_id in misra_rules_seen:
+            rules.append({
+                'id': rule_id,
+                'shortDescription': {
+                    'text': result['message']['text'],
+                },
+                'helpUri': 'https://cppcheck.sourceforge.io/misra.php',
+            })
+            misra_rules_seen.add(rule_id)
+
     return json.dumps(sarif, indent=2)
 
 
