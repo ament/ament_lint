@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_pyflakes</name>
-  <version>0.12.3</version>
+  <version>0.13.0</version>
   <description>
     The ability to check code using pyflakes and generate xUnit test
     result files.
