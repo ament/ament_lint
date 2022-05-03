@@ -16,6 +16,7 @@
 
 import argparse
 import glob
+import json
 import os
 import re
 import sys
@@ -94,10 +95,12 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argument(
+        '--sarif-file',
+        help='Generate a SARIF file')
     args = parser.parse_args(argv)
 
-    if args.xunit_file:
-        start_time = time.time()
+    start_time = time.time()
 
     argv = []
     # collect category based counts
@@ -171,6 +174,8 @@ def main(argv=sys.argv[1:]):
             report.append((filename, errors))
             print('')
 
+    elapsed_time = time.time() - start_time
+
     # output summary
     for category in sorted(_cpplint_state.errors_by_category.keys()):
         count = _cpplint_state.errors_by_category[category]
@@ -192,14 +197,29 @@ def main(argv=sys.argv[1:]):
             suffix = '.xunit'
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
-        testname = '%s.%s' % (folder_name, file_name)
+        testname = f'{folder_name}.{file_name}'
 
-        xml = get_xunit_content(report, testname, time.time() - start_time)
+        xml = get_xunit_content(report, testname, elapsed_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
+
+    if args.sarif_file:
+        folder_name = os.path.basename(os.path.dirname(args.sarif_file))
+        file_name = os.path.basename(args.sarif_file)
+        suffix = '.sarif'
+        if file_name.endswith(suffix):
+            file_name = file_name[0:-len(suffix)]
+        testname = f'{folder_name}.{file_name}'
+
+        sarif = get_sarif_content(report, testname, elapsed_time)
+        path = os.path.dirname(os.path.abspath(args.sarif_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.sarif_file, 'w') as f:
+            f.write(sarif)
 
     return 1 if _cpplint_state.error_count else 0
 
@@ -341,6 +361,92 @@ def get_xunit_content(report, testname, elapsed):
 
     xml += '</testsuite>\n'
     return xml
+
+
+def get_sarif_content(report, testname, elapsed):
+    test_count = sum(max(len(r[1]), 1) for r in report)
+    error_count = sum(len(r[1]) for r in report)
+
+    # Lay out the basic structure of the SARIF file (a single run that has 'tool',
+    # 'artifacts', and 'results' entries)
+    sarif = {
+        'version': '2.1.0',
+        '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'properties': {
+            'comment': 'cpplint output converted to SARIF by ament_cpplint',
+            'test_name': testname,
+            'test_count': test_count,
+            'error_count': error_count,
+            'execution_time': '%.3f' % round(elapsed, 3),
+        },
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'cpplint',
+                    'informationUri': 'https://github.com/cpplint/cpplint',
+                    'rules': []
+                }
+            },
+            'artifacts': [],
+            'results': []
+        }]
+    }
+
+    # For convenience, get entries to the 'rules', 'artifacts', and 'results' sections
+    rules = sarif['runs'][0]['tool']['driver']['rules']
+    artifacts = sarif['runs'][0]['artifacts']
+    results = sarif['runs'][0]['results']
+
+    # In order to populate the rules section, we'll need to keep track of which
+    # rules we've seen, without introducing duplicates
+    rules_that_fired = set()
+
+    for (filename, errors) in report:
+        # Populate the artifact information (source files analyzed)
+        artifacts.append({'location': {'uri': filename}})
+
+        # Process any associated error/warning info associated with this file
+        if errors:
+            for error in errors:
+                # Add any new rules that haven't been seen yet to the rule list
+                if error['category'] not in rules_that_fired:
+                    rules.append({
+                        'id': error['category'],
+                        'shortDescription': {
+                            'text': error['message'],
+                        },
+                        'helpUri': 'https://google.github.io/styleguide/cppguide.html',
+                    })
+                    rules_that_fired.add(error['category'])
+
+                # Populate the results of the analysis (issues discovered)
+                rule_id = error['category']
+                message = error['message']
+                line = error['linenum']
+                index = artifacts.index({'location': {'uri': filename}})
+
+                results_dict = {
+                    'ruleId': rule_id,
+                    'level': 'warning',
+                    'kind': 'review',
+                    'message': {
+                        'text': message,
+                    },
+                    'locations': [{
+                        'physicalLocation': {
+                            'artifactLocation': {
+                                'uri': filename,
+                                'index': index
+                            },
+                            'region': {
+                                'startLine': line,
+                            }
+                        }
+                    }]
+                }
+                results.append(results_dict)
+
+    return json.dumps(sarif, indent=2)
 
 
 if __name__ == '__main__':
