@@ -14,6 +14,7 @@
 
 import argparse
 from itertools import groupby
+import json
 import os
 import re
 import sys
@@ -90,6 +91,9 @@ def main(argv=sys.argv[1:]):
     group.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    group.add_argument(
+        '--sarif-file',
+        help='Generate a SARIF file')
     args = parser.parse_args(argv)
 
     names = get_copyright_names()
@@ -104,8 +108,7 @@ def main(argv=sys.argv[1:]):
             print('%s: %s' % (key, licenses[key].name))
         return 0
 
-    if args.xunit_file:
-        start_time = time.time()
+    start_time = time.time()
 
     filenames = get_files(args.paths, extensions)
     if args.excludes:
@@ -139,22 +142,27 @@ def main(argv=sys.argv[1:]):
     # check each directory for CONTRIBUTING.md and LICENSE files
     for path in sorted(file_descriptors.keys()):
         file_descriptor = file_descriptors[path]
+        rule_id = None
         message = None
         has_error = False
 
         if file_descriptor.filetype == SOURCE_FILETYPE:
             if not file_descriptor.exists:
+                rule_id = 'file-not-found'
                 message = 'file not found'
                 has_error = True
 
             elif not file_descriptor.content:
+                rule_id = 'file-empty'
                 message = 'file empty'
 
             elif not file_descriptor.copyright_identifiers:
+                rule_id = 'missing-copyright-notice'
                 message = 'could not find copyright notice'
                 has_error = True
 
             else:
+                rule_id = 'unknown-license'
                 message = 'copyright=%s, license=%s' % \
                     (', '.join([str(c) for c in file_descriptor.copyrights]),
                      file_descriptor.license_identifier)
@@ -162,14 +170,17 @@ def main(argv=sys.argv[1:]):
 
         elif file_descriptor.filetype in [CONTRIBUTING_FILETYPE, LICENSE_FILETYPE]:
             if not file_descriptor.exists:
+                rule_id = 'file-not-found'
                 message = 'file not found'
                 has_error = True
 
             elif not file_descriptor.content:
+                rule_id = 'file-empty'
                 message = 'file empty'
                 has_error = True
 
             elif file_descriptor.license_identifier:
+                rule_id = 'unknown-license'
                 message = file_descriptor.license_identifier
                 has_error = file_descriptor.license_identifier == UNKNOWN_IDENTIFIER
 
@@ -182,7 +193,9 @@ def main(argv=sys.argv[1:]):
         if args.verbose or has_error:
             print('%s: %s' % (file_descriptor.path, message),
                   file=sys.stderr if has_error else sys.stdout)
-        report.append((file_descriptor.path, not has_error, message))
+        report.append((file_descriptor.path, rule_id, not has_error, message))
+
+    elapsed_time = time.time() - start_time
 
     # output summary
     error_count = len([r for r in report if not r[1]])
@@ -203,14 +216,30 @@ def main(argv=sys.argv[1:]):
             suffix = '.xunit'
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
-        testname = '%s.%s' % (folder_name, file_name)
+        testname = f'{folder_name}.{file_name}'
 
-        xml = get_xunit_content(report, testname, time.time() - start_time)
+        xml = get_xunit_content(report, testname, elapsed_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w', encoding='utf-8') as f:
             f.write(xml)
+
+    # generate a SARIF file
+    if args.sarif_file:
+        folder_name = os.path.basename(os.path.dirname(args.sarif_file))
+        file_name = os.path.basename(args.sarif_file)
+        suffix = '.sarif'
+        if file_name.endswith(suffix):
+            file_name = file_name[0:-len(suffix)]
+        testname = f'{folder_name}.{file_name}'
+
+        sarif = get_sarif_content(report, testname, elapsed_time)
+        path = os.path.dirname(os.path.abspath(args.sarif_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.sarif_file, 'w', encoding='utf-8') as f:
+            f.write(sarif)
 
     return rc
 
@@ -429,7 +458,7 @@ def get_xunit_content(report, testname, elapsed):
 >
 """ % data
 
-    for (filename, no_error, message) in report:
+    for (filename, rule_id, no_error, message) in report:
 
         data = {
             'quoted_filename': quoteattr(filename),
@@ -462,6 +491,87 @@ def get_xunit_content(report, testname, elapsed):
 
     xml += '</testsuite>\n'
     return xml
+
+
+def get_sarif_content(report, testname, elapsed):
+    test_count = len(report)
+    error_count = len([r for r in report if not r[1]])
+
+    # Lay out the basic structure of the SARIF file (a single run that has 'tool',
+    # 'artifacts', and 'results' entries)
+    sarif = {
+        'version': '2.1.0',
+        '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'properties': {
+            'comment': 'Output generated by ament_copyright',
+            'test_name': testname,
+            'test_count': test_count,
+            'error_count': error_count,
+            'execution_time': '%.3f' % round(elapsed, 3),
+        },
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'ament_copyright',
+                    'informationUri': 'https://github.com/ament/ament_lint/blob/master/ament_copyright/doc/index.rst',
+                    'rules': []
+                }
+            },
+            'artifacts': [],
+            'results': []
+        }]
+    }
+
+    # For convenience, get entries to the 'rules', 'artifacts', and 'results' sections
+    rules = sarif['runs'][0]['tool']['driver']['rules']
+    artifacts = sarif['runs'][0]['artifacts']
+    results = sarif['runs'][0]['results']
+
+    # In order to populate the rules section, we'll need to keep track of which
+    # rules we've seen, without introducing duplicates
+    rules_that_fired = set()
+
+    for (filename, rule_id, no_error, message) in report:
+        # Populate the artifact information (source files analyzed)
+        artifacts.append({'location': {'uri': filename}})
+
+        # Process any associated error/warning info associated with this file
+        if not no_error:
+            # Add any new rules that haven't been seen yet to the rule list
+            if rule_id not in rules_that_fired:
+                rules.append({
+                    'id': rule_id,
+                    'shortDescription': {
+                        'text': message,
+                    },
+                })
+                rules_that_fired.add(rule_id)
+
+            # Populate the results of the analysis (issues discovered)
+            message = message
+            line = 1  # Indicate copyright issues at the start of the file since we don't have a line number
+            index = artifacts.index({'location': {'uri': filename}})
+
+            results.append({
+                'ruleId': rule_id,
+                'level': 'error',
+                'message': {
+                    'text': message,
+                },
+                'locations': [{
+                    'physicalLocation': {
+                        'artifactLocation': {
+                            'uri': filename,
+                            'index': index
+                        },
+                        'region': {
+                            'startLine': line,
+                        }
+                    }
+                }]
+            })
+
+    return json.dumps(sarif, indent=2)
 
 
 if __name__ == '__main__':
