@@ -469,7 +469,7 @@ def get_sarif_content(report, testname, elapsed, uncrustify_version):
         'runs': [{
             'tool': {
                 'driver': {
-                    'name': 'cpplint',
+                    'name': 'uncrustify',
                     'version': uncrustify_version,
                     'informationUri': 'http://uncrustify.sourceforge.net/',
                     'rules': []
