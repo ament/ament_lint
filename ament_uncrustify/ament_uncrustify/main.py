@@ -228,8 +228,10 @@ def main(argv=sys.argv[1:]):
             file_name = file_name[0:-len(suffix)]
         testname = f'{folder_name}.{file_name}'
 
-        uncrustify_version = '1.1'
-        sarif = get_sarif_content(report, testname, elapsed_time, get_uncrustify_version(uncrustify_bin))
+        sarif = get_sarif_content(report,
+                                  testname,
+                                  elapsed_time,
+                                  get_uncrustify_version(uncrustify_bin))
         path = os.path.dirname(os.path.abspath(args.sarif_file))
         if not os.path.exists(path):
             os.makedirs(path)
@@ -316,7 +318,7 @@ def invoke_uncrustify(
         if e.output:
             print(e.output.decode(), file=sys.stderr)
         print("The invocation of 'uncrustify' failed with error code %d: %s" %
-            (e.returncode, e), file=sys.stderr)
+              (e.returncode, e), file=sys.stderr)
         return None
 
     if cwd:
@@ -330,8 +332,7 @@ def invoke_uncrustify(
         output_files = [
             os.path.join(
                 temp_path,
-                os.sep.join(f.split(os.sep)[1:]) +
-                suffix
+                os.sep.join(f.split(os.sep)[1:]) + suffix
             ) for f in input_files
         ]
 
@@ -500,9 +501,9 @@ def get_sarif_content(report, testname, elapsed, uncrustify_version):
 
         # Process any associated error/warning info associated with this file
         if diff_lines:
-
             # Some data to keep track of for each violation
             starting_line = None
+            ending_line = None
             span = None
             code_segment = []
 
@@ -532,7 +533,7 @@ def get_sarif_content(report, testname, elapsed, uncrustify_version):
                                     'region': {
                                         'startLine': int(starting_line),
                                         'endLine': int(ending_line),
-                                        'message': { 'text': '\n'.join(code_segment) }
+                                        'message': {'text': '\n'.join(code_segment)}
                                     },
                                 }
                             }],
