@@ -19,6 +19,7 @@ from collections import defaultdict
 from configparser import ConfigParser
 import difflib
 import filecmp
+import json
 import os
 import re
 import shutil
@@ -28,6 +29,16 @@ import tempfile
 import time
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
+
+
+def get_uncrustify_version(uncrustify_bin):
+    version_cmd = [uncrustify_bin, '--version']
+    output = subprocess.check_output(version_cmd)
+    # expecting something like b'Uncrustify_d-0.72.0-dirty'
+    output = output.decode().strip()
+    if not output.startswith('Uncrustify'):
+        raise RuntimeError("unexpected uncrustify version string '{}'".format(output))
+    return output
 
 
 def main(argv=sys.argv[1:]):
@@ -77,6 +88,9 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argument(
+        '--sarif-file',
+        help='Generate a SARIF file')
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
@@ -101,8 +115,7 @@ def main(argv=sys.argv[1:]):
                 temp_config.write(config_str + '\ncode_width=%d' % args.linelength)
                 temp_config.close()
 
-        if args.xunit_file:
-            start_time = time.time()
+        start_time = time.time()
 
         # replace language set to 'C++' with 'CPP' to be more consistent with uncrustify
         if args.language == 'C++':
@@ -175,6 +188,8 @@ def main(argv=sys.argv[1:]):
             if not args.reformat:
                 print('')
 
+    elapsed_time = time.time() - start_time
+
     # output summary
     error_count = sum([1 if r[1] else 0 for r in report])
     if not error_count:
@@ -195,14 +210,31 @@ def main(argv=sys.argv[1:]):
             suffix = '.xunit'
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
-        testname = '%s.%s' % (folder_name, file_name)
+        testname = f'{folder_name}.{file_name}'
 
-        xml = get_xunit_content(report, testname, time.time() - start_time)
+        xml = get_xunit_content(report, testname, elapsed_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
+
+    # generate a SARIF file
+    if args.sarif_file:
+        folder_name = os.path.basename(os.path.dirname(args.sarif_file))
+        file_name = os.path.basename(args.sarif_file)
+        suffix = '.sarif'
+        if file_name.endswith(suffix):
+            file_name = file_name[0:-len(suffix)]
+        testname = f'{folder_name}.{file_name}'
+
+        uncrustify_version = '1.1'
+        sarif = get_sarif_content(report, testname, elapsed_time, get_uncrustify_version(uncrustify_bin))
+        path = os.path.dirname(os.path.abspath(args.sarif_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.sarif_file, 'w') as f:
+            f.write(sarif)
 
     return rc
 
@@ -415,6 +447,109 @@ def get_xunit_content(report, testname, elapsed):
 
     xml += '</testsuite>\n'
     return xml
+
+
+def get_sarif_content(report, testname, elapsed, uncrustify_version):
+    test_count = len(report)
+    error_count = sum([1 if r[1] else 0 for r in report])
+
+    # Lay out the basic structure of the SARIF file (a single run that has 'tool',
+    # 'artifacts', and 'results' entries)
+    sarif = {
+        'version': '2.1.0',
+        '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'properties': {
+            'comment': 'uncrustify output converted to SARIF by ament_uncrustify',
+            'test_name': testname,
+            'test_count': test_count,
+            'error_count': error_count,
+            'execution_time': '%.3f' % round(elapsed, 3),
+        },
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'cpplint',
+                    'version': uncrustify_version,
+                    'informationUri': 'http://uncrustify.sourceforge.net/',
+                    'rules': []
+                }
+            },
+            'artifacts': [],
+            'results': []
+        }]
+    }
+
+    # For convenience, get entries to the 'rules', 'artifacts', and 'results' sections
+    rules = sarif['runs'][0]['tool']['driver']['rules']
+    artifacts = sarif['runs'][0]['artifacts']
+    results = sarif['runs'][0]['results']
+
+    # There is only one rule that this utility checks
+    rule_id = 'non-compliant-code-formatting'
+    message = 'Source code does not comply with code formatting standards'
+    rules.append({
+        'id': rule_id,
+        'shortDescription': {
+            'text': message
+        },
+    })
+
+    for (filename, diff_lines) in report:
+        # Populate the artifact information (source files analyzed)
+        artifacts.append({'location': {'uri': filename}})
+
+        # Process any associated error/warning info associated with this file
+        if diff_lines:
+
+            # Some data to keep track of for each violation
+            starting_line = None
+            span = None
+            code_segment = []
+
+            # Split the output into separate formatting violations
+            for line in diff_lines:
+                # Skip the diff lines containing the filenames
+                if line.startswith('---') or line.startswith('+++'):
+                    continue
+
+                # The '@@' begins a formatting issue
+                if line.startswith('@@'):
+                    # If we've been collecting an issue (true for all but the first time)
+                    if code_segment:
+                        # Populate the results with this code formatting issue
+                        results.append({
+                            'ruleId': rule_id,
+                            'level': 'error',
+                            'message': {
+                                'text': message,
+                            },
+                            'locations': [{
+                                'physicalLocation': {
+                                    'artifactLocation': {
+                                        'uri': filename,
+                                        'index': artifacts.index({'location': {'uri': filename}}),
+                                    },
+                                    'region': {
+                                        'startLine': int(starting_line),
+                                        'endLine': int(ending_line),
+                                        'message': { 'text': '\n'.join(code_segment) }
+                                    },
+                                }
+                            }],
+                        })
+                        code_segment = [line]
+
+                    # Update the info for the next issue
+                    m = re.search('@@ -([0-9]+)(,([0-9]+))?', line)
+                    starting_line = m.group(1)
+                    # If the issue is multi-line, it will have a second number
+                    span = m.group(3) if m.group(3) else 1
+                    ending_line = str(int(starting_line) + int(span) - 1)
+                else:
+                    # Continue to accumulate the code in this segment
+                    code_segment.append(line)
+
+    return json.dumps(sarif, indent=2)
 
 
 if __name__ == '__main__':
