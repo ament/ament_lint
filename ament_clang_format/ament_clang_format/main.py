@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -24,6 +25,17 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 import yaml
+
+
+def get_clang_format_version(clang_format_bin):
+    version_cmd = [clang_format_bin, '--version']
+    output = subprocess.check_output(version_cmd)
+    # expecting something like b'clang-format version 10.0.0-4ubuntu1 '
+    output = output.decode().strip()
+    prefix = 'clang-format version '
+    if not output.startswith(prefix):
+        raise RuntimeError("unexpected uncrustify version string '{}'".format(output))
+    return output[len(prefix):]
 
 
 def main(argv=sys.argv[1:]):
@@ -59,6 +71,9 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argument(
+        '--sarif-file',
+        help='Generate a SARIF file')
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.config_file):
@@ -66,8 +81,7 @@ def main(argv=sys.argv[1:]):
               file=sys.stderr)
         return 1
 
-    if args.xunit_file:
-        start_time = time.time()
+    start_time = time.time()
 
     files = get_files(args.paths, extensions)
     if not files:
@@ -212,6 +226,8 @@ def main(argv=sys.argv[1:]):
                   file=sys.stderr)
             return 1
 
+    elapsed_time = time.time() - start_time
+
     # output summary
     file_count = sum(1 if report[k] else 0 for k in report.keys())
     replacement_count = sum(len(r) for r in report.values())
@@ -233,14 +249,30 @@ def main(argv=sys.argv[1:]):
             suffix = '.xunit'
             if file_name.endswith(suffix):
                 file_name = file_name[0:-len(suffix)]
-        testname = '%s.%s' % (folder_name, file_name)
+        testname = f'{folder_name}.{file_name}'
 
-        xml = get_xunit_content(report, testname, time.time() - start_time)
+        xml = get_xunit_content(report, testname, elapsed_time)
         path = os.path.dirname(os.path.abspath(args.xunit_file))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
+
+    # generate a SARIF file
+    if args.sarif_file:
+        folder_name = os.path.basename(os.path.dirname(args.sarif_file))
+        file_name = os.path.basename(args.sarif_file)
+        suffix = '.sarif'
+        if file_name.endswith(suffix):
+            file_name = file_name[0:-len(suffix)]
+        testname = f'{folder_name}.{file_name}'
+
+        sarif = get_sarif_content(report, testname, elapsed_time, get_clang_format_version(clang_format_bin))
+        path = os.path.dirname(os.path.abspath(args.sarif_file))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(args.sarif_file, 'w') as f:
+            f.write(sarif)
 
     return rc
 
@@ -368,6 +400,91 @@ def get_xunit_content(report, testname, elapsed):
 
     xml += '</testsuite>\n'
     return xml
+
+
+def get_sarif_content(report, testname, elapsed, clang_format_version):
+    test_count = sum(max(len(r), 1) for r in report.values())
+    error_count = sum(len(r) for r in report.values())
+
+    # Lay out the basic structure of the SARIF file (a single run that has 'tool',
+    # 'artifacts', and 'results' entries)
+    sarif = {
+        'version': '2.1.0',
+        '$schema': 'http://json.schemastore.org/sarif-2.1.0-rtm.5',
+        'properties': {
+            'comment': 'clang format output converted to SARIF by ament_clang_format',
+            'test_name': testname,
+            'test_count': test_count,
+            'error_count': error_count,
+            'execution_time': '%.3f' % round(elapsed, 3),
+        },
+        'runs': [{
+            'tool': {
+                'driver': {
+                    'name': 'clang_format',
+                    'version': clang_format_version,
+                    'informationUri': 'https://clang.llvm.org/docs/ClangFormat.html',
+                    'rules': []
+                }
+            },
+            'artifacts': [],
+            'results': []
+        }]
+    }
+
+    # For convenience, get entries to the 'rules', 'artifacts', and 'results' sections
+    rules = sarif['runs'][0]['tool']['driver']['rules']
+    artifacts = sarif['runs'][0]['artifacts']
+    results = sarif['runs'][0]['results']
+
+    # There is only one rule that this utility checks
+    rule_id = 'non-compliant-code-formatting'
+    message = 'Source code does not comply with code formatting standards'
+    rules.append({
+        'id': rule_id,
+        'shortDescription': {
+            'text': message
+        },
+    })
+
+    for filename in sorted(report.keys()):
+        # Populate the artifact information (source files analyzed)
+        artifacts.append({'location': {'uri': filename}})
+
+        replacements = report[filename]
+        if replacements:
+            # report each replacement as a failing testcase
+            for replacement in replacements:
+                starting_line = replacement['line_no']
+                starting_column = replacement['offset_in_line']
+                original = replacement['original']
+                deletion = replacement['deletion']
+                addition = replacement['addition']
+
+                # Populate the results with this code formatting issue
+                results.append({
+                    'ruleId': rule_id,
+                    'level': 'error',
+                    'message': {
+                        'text': message,
+                    },
+                    'locations': [{
+                        'physicalLocation': {
+                            'artifactLocation': {
+                                'uri': filename,
+                                'index': artifacts.index({'location': {'uri': filename}}),
+                            },
+                            'region': {
+                                'startLine': int(starting_line),
+                                'startColumn': int(starting_column),
+                                'endLine': int(starting_line) + original.count('\\n'),
+                                'message': {'text': deletion + "\n" + addition}
+                            },
+                        }
+                    }],
+                })
+
+    return json.dumps(sarif, indent=2)
 
 
 if __name__ == '__main__':
