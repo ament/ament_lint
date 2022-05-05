@@ -5017,7 +5017,8 @@ def _ClassifyInclude(fileinfo, include, used_angle_brackets, include_order="defa
             or Search(r'(?:%s)\/.*\.h' % "|".join(C_STANDARD_HEADER_FOLDERS), include))
 
   # Headers with C++ extensions shouldn't be considered C system headers
-  is_system = used_angle_brackets and not os.path.splitext(include)[1] in ['.hpp', '.hxx', '.h++']
+  include_ext = os.path.splitext(include)[1]
+  is_system = used_angle_brackets and not include_ext in ['.hh', '.hpp', '.hxx', '.h++']
 
   if is_system:
     if is_cpp_header:
