@@ -6,11 +6,12 @@
   <description>The auto-magic functions for ease to use of the ament linters in CMake.</description>
 
   <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
-  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+  <maintainer email="brandon@openrobotics.org">Brandon Ong</maintainer>
 
   <license>Apache License 2.0</license>
 
   <author email="audrow@openrobotics.org">Audrow Nash</author>
+  <author email="michel@ekumenlabs.com">Michel Hidalgo</author>
   <author>Claire Wang</author>
   <author>Dirk Thomas</author>
 
