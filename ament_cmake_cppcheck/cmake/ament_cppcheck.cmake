@@ -45,8 +45,9 @@ function(ament_cppcheck)
     message(FATAL_ERROR "ament_cppcheck() could not find program 'ament_cppcheck'")
   endif()
 
-  set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
-  set(cmd "${ament_cppcheck_BIN}" "--xunit-file" "${result_file}")
+  set(xunit_result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
+  set(sarif_result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.sarif")
+  set(cmd "${ament_cppcheck_BIN}" "--xunit-file" "${xunit_result_file}" "--sarif-file" "${sarif_result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
   if(ARG_EXCLUDE)
     list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
@@ -68,7 +69,7 @@ function(ament_cppcheck)
     COMMAND ${cmd}
     TIMEOUT 300
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_cppcheck/${ARG_TESTNAME}.txt"
-    RESULT_FILE "${result_file}"
+    RESULT_FILE "${xunit_result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   )
   set_tests_properties(

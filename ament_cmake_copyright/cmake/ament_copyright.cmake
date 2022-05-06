@@ -38,8 +38,9 @@ function(ament_copyright)
     message(FATAL_ERROR "ament_copyright() could not find program 'ament_copyright'")
   endif()
 
-  set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
-  set(cmd "${ament_copyright_BIN}" "--xunit-file" "${result_file}")
+  set(xunit_result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
+  set(sarif_result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.sarif")
+  set(cmd "${ament_copyright_BIN}" "--xunit-file" "${xunit_result_file}" "--sarif-file" "${sarif_result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_copyright")
@@ -47,7 +48,7 @@ function(ament_copyright)
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_copyright/${ARG_TESTNAME}.txt"
-    RESULT_FILE "${result_file}"
+    RESULT_FILE "${xunit_result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     TIMEOUT "${ARG_TIMEOUT}"
   )
