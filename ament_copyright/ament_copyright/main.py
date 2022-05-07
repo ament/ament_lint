@@ -100,7 +100,7 @@ def main(argv=sys.argv[1:]):
     # such that --xunit-file and --sarif-file options can be used together, but are still part of
     # the mutually exclusive group. For example: XOR(A, B, C, D, (E OR F)).
     if any([
-            args.add_missing, args.add_copyright_year != None,
+            args.add_missing, args.add_copyright_year is not None,
             args.list_copyright_names, args.list_licenses
     ]) and args.sarif_file:
         # Emulate the output normally produced by argparse
@@ -110,7 +110,9 @@ def main(argv=sys.argv[1:]):
             end='')
         if args.add_missing:
             print('--add-missing')
-        elif args.add_copyright_year:
+        # The empty list is considered false, so we have to account for the user specifying --add-copyright-year
+        # without specifying a year (meaning use the current year), which results in an empty list.
+        elif args.add_copyright_year is not None:
             print('--add-copyright-year')
         elif args.list_copyright_names:
             print('--list-copyright-names')
