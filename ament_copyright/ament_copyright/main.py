@@ -91,10 +91,33 @@ def main(argv=sys.argv[1:]):
     group.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
-    group.add_argument(
+    parser.add_argument(
         '--sarif-file',
         help='Generate a SARIF file')
     args = parser.parse_args(argv)
+
+    # Have to do some additional argument testing here because argparse doesn't support nested groups,
+    # such that --xunit-file and --sarif-file options can be used together, but are still part of
+    # the mutually exclusive group. For example: XOR(A, B, C, D, (E OR F)).
+    if any([
+            args.add_missing, args.add_copyright_year != None,
+            args.list_copyright_names, args.list_licenses
+    ]) and args.sarif_file:
+        # Emulate the output normally produced by argparse
+        parser.print_usage()
+        print(
+            f'{os.path.basename(__file__)}: error: argument --sarif-file: not allowed with argument ',
+            end='')
+        if args.add_missing:
+            print('--add-missing')
+        elif args.add_copyright_year:
+            print('--add-copyright-year')
+        elif args.list_copyright_names:
+            print('--list-copyright-names')
+        elif args.list_licenses:
+            print('--list-licenses')
+        print()
+        return -1
 
     names = get_copyright_names()
     if args.list_copyright_names:
