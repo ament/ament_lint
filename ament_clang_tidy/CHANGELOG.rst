@@ -2,6 +2,11 @@
 Changelog for package ament_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.13.1 (2022-05-09)
+-------------------
+* Improve message and avoid missing new lines between reports from files (`#373 <https://github.com/ament/ament_lint/issues/373>`_)
+* Contributors: William Woodall
+
 0.13.0 (2022-04-29)
 -------------------
 
