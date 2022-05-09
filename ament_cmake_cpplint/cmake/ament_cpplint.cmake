@@ -44,8 +44,9 @@ function(ament_cpplint)
     message(FATAL_ERROR "ament_cpplint() could not find program 'ament_cpplint'")
   endif()
 
-  set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
-  set(cmd "${ament_cpplint_BIN}" "--xunit-file" "${result_file}")
+  set(xunit_result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
+  set(sarif_result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.sarif")
+  set(cmd "${ament_cpplint_BIN}" "--xunit-file" "${xunit_result_file}" "--sarif-file" "${sarif_result_file}")
   if(ARG_EXCLUDE)
     list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
@@ -69,7 +70,7 @@ function(ament_cpplint)
     "${ARG_TESTNAME}"
     COMMAND ${cmd}
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_cpplint/${ARG_TESTNAME}.txt"
-    RESULT_FILE "${result_file}"
+    RESULT_FILE "${xunit_result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     TIMEOUT "${ARG_TIMEOUT}"
   )
