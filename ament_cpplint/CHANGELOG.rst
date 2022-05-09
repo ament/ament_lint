@@ -2,6 +2,11 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.12.4 (2022-05-09)
+-------------------
+* Consider files with '.hh' extension as C++ headers (`#374 <https://github.com/ament/ament_lint/issues/374>`_) (`#381 <https://github.com/ament/ament_lint/issues/381>`_)
+* Contributors: Jacob Perron
+
 0.12.3 (2022-04-08)
 -------------------
 
