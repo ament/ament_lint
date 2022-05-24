@@ -31,6 +31,10 @@ if(_source_files)
     list(APPEND _all_exclude ${ament_cmake_cpplint_ADDITIONAL_EXCLUDE})
   endif()
 
+  if(DEFINED AMENT_LINT_AUTO_FILE_EXCLUDE)
+    list(APPEND _all_exclude ${AMENT_LINT_AUTO_FILE_EXCLUDE})
+  endif()
+
   message(STATUS "Configured cpplint exclude dirs and/or files: ${_all_exclude}")
   ament_cpplint(EXCLUDE ${_all_exclude})
 endif()
