@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ament_copyright.parser import search_copyright_information
+from ament_copyright.parser import search_copyright_information, split_template
 
 
 def test_search_copyright_information_incorrect_typo():
@@ -124,3 +124,21 @@ def test_search_copyright_information_uppercase2():
     copyrights, remaining_block = search_copyright_information(
         'COPYRIGHT (C) 2020 Open Source Robotics Foundation, Inc.')
     assert len(copyrights) == 1
+
+
+def test_split_template_no_split():
+    content = '1 2 3'
+    sections = split_template(content, 'A')
+    assert len(sections) == 1
+
+
+def test_split_template_single_split():
+    content = '1 A 2'
+    sections = split_template(content, 'A')
+    assert len(sections) == 2
+
+
+def test_split_template_multiple_splits():
+    content = '1 A 2 B 3 A 4 C 5 B 6'
+    sections = split_template(content, ['A', 'B', 'C'])
+    assert len(sections) == 6
