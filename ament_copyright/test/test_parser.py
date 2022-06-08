@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ament_copyright.parser import search_copyright_information, split_template
+from ament_copyright import UNKNOWN_IDENTIFIER
+from ament_copyright.parser import FileDescriptor, search_copyright_information, split_template
 
 
 def test_search_copyright_information_incorrect_typo():
@@ -127,18 +128,110 @@ def test_search_copyright_information_uppercase2():
 
 
 def test_split_template_no_split():
+    """Test the split_template with content that does not get split."""
     content = '1 2 3'
     sections = split_template(content, 'A')
     assert len(sections) == 1
 
 
 def test_split_template_single_split():
+    """Test the split_template with content that gets split once."""
     content = '1 A 2'
     sections = split_template(content, 'A')
     assert len(sections) == 2
 
 
 def test_split_template_multiple_splits():
+    """Test the split_template method with content split many times by different separators."""
     content = '1 A 2 B 3 A 4 C 5 B 6'
     sections = split_template(content, ['A', 'B', 'C'])
     assert len(sections) == 6
+
+
+def test_identify_license():
+    """
+    Test the identify_license method with content that matches the given header template.
+
+    This is a simple test case because the
+    template only has one placeholder at the beginning, so it does not
+    need to be split multiple times for matching.
+    """
+    content = """
+    {copyright}
+
+    Use of this source code is governed by an MIT-style
+    license that can be found in the LICENSE file or at
+    https://opensource.org/licenses/MIT.
+    """
+
+    class TempLicense(object):
+        pass
+    temp_license = TempLicense()
+    temp_license.file_headers = [content]
+    dut = FileDescriptor(0, '/')
+    dut.identify_license(content, 'file_headers', {'temp': temp_license})
+    assert dut.license_identifier == 'temp'
+
+
+def test_identify_license_failure():
+    """
+    Test the identify_license method with content that contains a typo.
+
+    Matching is expected to fail in this test case.
+    """
+    content = """
+    {copyright}
+
+    Use of this source code is governed by an MIT-style
+    license that can be found in the LICENSE file or at
+    https://opensource.org/licenses/MIT.
+    """
+
+    class TempLicense(object):
+        pass
+    temp_license = TempLicense()
+    temp_license.file_headers = [content]
+    dut = FileDescriptor(0, '/')
+    dut.identify_license(
+        content.replace('LICENSE', 'TYPO'),
+        'file_headers',
+        {'temp': temp_license}
+    )
+    assert dut.license_identifier == UNKNOWN_IDENTIFIER
+
+
+def test_identify_license_multiple_splits():
+    """
+    Test the identify_license method with content that must be split multiple times.
+
+    In order to match the header template that contains
+    placeholders in multiple locations.
+    """
+    header_template = """
+    {copyright}
+    ALL RIGHTS RESERVED
+
+
+    THIS UNPUBLISHED WORK BY {copyright_holder} IS PROTECTED. IF
+    PUBLICATION OF THE WORK SHOULD OCCUR, THE FOLLOWING NOTICE SHALL
+    APPLY.
+
+     "{copyright} ALL RIGHTS RESERVED."
+
+    {copyright_holder} DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE.
+    """
+    content = header_template.replace(
+        '{copyright}',
+        'Copyright 2020 Open Source Robotics Foundation, Inc.'
+    ).replace(
+        '{copyright_holder}',
+        'Open Source Robotics Foundation, Inc.'
+    )
+
+    class TempLicense(object):
+        pass
+    temp_license = TempLicense()
+    temp_license.file_headers = [content]
+    dut = FileDescriptor(0, '/')
+    dut.identify_license(content, 'file_headers', {'temp': temp_license})
+    assert dut.license_identifier == 'temp'

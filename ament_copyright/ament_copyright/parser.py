@@ -55,12 +55,14 @@ class FileDescriptor:
     def parse(self):
         raise NotImplementedError()
 
-    def identify_license(self, content, license_part):
+    def identify_license(self, content, license_part, licenses=None):
         if content is None:
             return
+        if licenses is None:
+            licenses = get_licenses()
         formatted_content = remove_formatting(content)
 
-        for name, license_ in get_licenses().items():
+        for name, license_ in licenses.items():
             templates = getattr(license_, license_part)
             for template in templates:
                 last_index = -1
