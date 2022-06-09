@@ -180,11 +180,19 @@ def parse_config_file(config_file):
     opts_manager = manager.OptionManager(prog='flake8', version='3.0.0')
     flake8_options.register_default_options(opts_manager)
 
-    return aggregator.aggregate_options(
-        opts_manager,
-        config.ConfigFileFinder("flake8", [], [config_file]),
-        []
-    )
+    try:
+        return aggregator.aggregate_options(
+            opts_manager,
+            config.ConfigFileFinder('flake8', [], [config_file]),
+            []
+        )
+    except TypeError:
+        # Support 4.0.0
+        return aggregator.aggregate_options(
+            opts_manager,
+            config.ConfigFileFinder('flake8', [], config_file),
+            []
+        )
 
 
 def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
