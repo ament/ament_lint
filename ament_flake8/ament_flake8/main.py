@@ -177,20 +177,23 @@ def get_flake8_style_guide(argv):
 def parse_config_file(config_file):
     from flake8.options import config, manager, aggregator
 
-    opts_manager = manager.OptionManager(prog='flake8', version='3.0.0')
-    flake8_options.register_default_options(opts_manager)
-
     try:
-        return aggregator.aggregate_options(
-            opts_manager,
-            config.ConfigFileFinder('flake8', [], [config_file]),
-            []
-        )
-    except TypeError:
         # Support 4.0.0
+        opts_manager = manager.OptionManager(prog='flake8', version='4.0.0')
+        flake8_options.register_default_options(opts_manager)
+
         return aggregator.aggregate_options(
             opts_manager,
             config.ConfigFileFinder('flake8', [], config_file),
+            []
+        )
+    except TypeError:
+        opts_manager = manager.OptionManager(prog='flake8', version='3.0.0')
+        flake8_options.register_default_options(opts_manager)
+
+        return aggregator.aggregate_options(
+            opts_manager,
+            config.ConfigFileFinder('flake8', [], [config_file]),
             []
         )
 
