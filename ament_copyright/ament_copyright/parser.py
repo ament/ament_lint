@@ -307,7 +307,7 @@ def get_multiline_comment_block(content, index):
         block = content[start_index:end_index]
         prefixed_lines = block.splitlines()[1:-1]
         line_prefix = os.path.commonprefix(prefixed_lines)
-        lines = [line[len(line_prefix) + 1:] for line in prefixed_lines]
+        lines = [line[len(line_prefix):] for line in prefixed_lines]
 
         return '\n'.join(lines)
     return None
