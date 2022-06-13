@@ -24,6 +24,7 @@ from xml.sax.saxutils import quoteattr
 import flake8
 from flake8.api.legacy import StyleGuide
 from flake8.main import application as flake8_app
+from flake8.main import options as flake8_options
 
 
 def main(argv=sys.argv[1:]):
@@ -173,7 +174,39 @@ def get_flake8_style_guide(argv):
     return StyleGuide(application)
 
 
+def parse_config_file(config_file):
+    from flake8.options import config, manager, aggregator
+
+    try:
+        # Support 4.0.0
+        opts_manager = manager.OptionManager(prog='flake8', version='4.0.0')
+        flake8_options.register_default_options(opts_manager)
+
+        return aggregator.aggregate_options(
+            opts_manager,
+            config.ConfigFileFinder('flake8', [], config_file),
+            []
+        )
+    except TypeError:
+        opts_manager = manager.OptionManager(prog='flake8', version='3.0.0')
+        flake8_options.register_default_options(opts_manager)
+
+        return aggregator.aggregate_options(
+            opts_manager,
+            config.ConfigFileFinder('flake8', [], [config_file]),
+            []
+        )
+
+
 def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
+    opts, _ = parse_config_file(config_file)
+
+    # Ignore flake8 defaults here
+    if opts.exclude != list(flake8_options.defaults.EXCLUDE):
+        # Explicitly append to exclude args to prevent config excludes
+        # from being overwritten
+        excludes.extend(opts.exclude)
+
     flake8_argv = []
     if config_file is not None:
         flake8_argv.append('--config={0}'.format(config_file))
