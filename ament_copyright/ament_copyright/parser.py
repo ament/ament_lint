@@ -114,9 +114,9 @@ class SourceDescriptor(FileDescriptor):
         index = scan_past_empty_lines(self.content, index)
 
         # get first comment block without leading comment tokens
-        block, _ = get_comment_block(self.content, index)
+        block = get_multiline_comment_block(self.content, index)
         if not block:
-            block = get_multiline_comment_block(self.content, index)
+            block, _ = get_comment_block(self.content, index)
         if not block:
             return
         copyrights, remaining_block = search_copyright_information(block)
