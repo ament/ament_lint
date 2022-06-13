@@ -15,4 +15,9 @@
 message(
   STATUS
   "Added test 'copyright' to check source files copyright and LICENSE")
-ament_copyright()
+
+if(DEFINED AMENT_LINT_AUTO_FILE_EXCLUDE)
+  ament_copyright(EXCLUDE ${AMENT_LINT_AUTO_FILE_EXCLUDE})
+else()
+  ament_copyright()
+endif()
