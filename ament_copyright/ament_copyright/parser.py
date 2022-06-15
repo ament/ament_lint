@@ -107,21 +107,26 @@ class SourceDescriptor(FileDescriptor):
     def parse(self):
         self.read()
         if not self.content:
-            return
+            return None
 
         # skip over coding and shebang lines
         index = scan_past_coding_and_shebang_lines(self.content)
         index = scan_past_empty_lines(self.content, index)
 
         # get first comment block without leading comment tokens
-        block = get_multiline_comment_block(self.content, index)
+        block, _ = get_comment_block(self.content, index)
         if not block:
-            block, _ = get_comment_block(self.content, index)
-        if not block:
-            return
-        copyrights, remaining_block = search_copyright_information(block)
-        if not copyrights:
             return None
+
+        copyrights, remaining_block = search_copyright_information(block)
+
+        if not copyrights:
+            block = get_multiline_comment_block(self.content, index)
+            if not block:
+                return None
+            copyrights, remaining_block = search_copyright_information(block)
+            if not copyrights:
+                return None
 
         self.copyrights = copyrights
 
@@ -305,9 +310,20 @@ def get_multiline_comment_block(content, index):
 
         # collect all lines between start and end (open interval) and strip out any common prefix
         block = content[start_index:end_index]
-        prefixed_lines = block.splitlines()[1:-1]
-        line_prefix = os.path.commonprefix(prefixed_lines)
-        lines = [line[len(line_prefix):] for line in prefixed_lines]
+        block_lines = block.splitlines()
+        if len(block_lines) == 1:
+            prefixed_lines = block_lines
+        elif len(block_lines) == 2:
+            prefixed_lines = block_lines[1:]
+        else:
+            prefixed_lines = block_lines[1:-1]
+
+        if len(prefixed_lines) > 1:
+            line_prefix = os.path.commonprefix(prefixed_lines)
+            lines = [line[len(line_prefix):] for line in prefixed_lines]
+        else:
+            # Single-line header does not have a common prefix to strip out
+            lines = prefixed_lines
 
         return '\n'.join(lines)
     return None
