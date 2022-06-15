@@ -55,7 +55,6 @@ def test_search_copyright_information_capitalization1():
     """
     copyrights, remaining_block = search_copyright_information(
         '  Copyright 2020 Open Source Robotics Foundation, Inc.')
-    print(copyrights[0].name)
     assert copyrights[0].name == 'Open Source Robotics Foundation, Inc.'
     assert len(copyrights) == 1
 
@@ -258,6 +257,25 @@ def test_get_comment_block_slashes():
     assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
 
 
+def test_get_comment_block_slashes2():
+    """Test parsing comment multiline block that is not at the start of the content."""
+    commented_content = """
+// aaa
+// bbb
+// ccc
+
+///
+/**
+ddd
+*/
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block = get_multiline_comment_block(commented_content, index)
+    assert block is not None
+    assert block == 'ddd'
+
+
 def test_get_comment_block_doxygen():
     """Test parsing comment block with doxygen-style comment forward slashes."""
     commented_content = """
@@ -299,6 +317,25 @@ def test_get_multiline_comment_block_cstyle():
 /**
  * Comment not part of the header
  */
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block = get_multiline_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
+
+
+def test_get_multiline_comment_block_cstyle2():
+    """Test parsing comment block with multiline c-style comment block."""
+    commented_content = """
+/**
+ * aaa
+ * bbb
+ * ccc
+ */
+
+// Comment not part of
+// the header
     """
     index = 0
     index = scan_past_empty_lines(commented_content, index)
