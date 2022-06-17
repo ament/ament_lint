@@ -107,7 +107,7 @@ class SourceDescriptor(FileDescriptor):
     def parse(self):
         self.read()
         if not self.content:
-            return None
+            return
 
         # skip over coding and shebang lines
         index = scan_past_coding_and_shebang_lines(self.content)
@@ -115,18 +115,14 @@ class SourceDescriptor(FileDescriptor):
 
         # get first comment block without leading comment tokens
         block, _ = get_comment_block(self.content, index)
-        if not block:
-            return None
-
         copyrights, remaining_block = search_copyright_information(block)
 
-        if not copyrights:
+        if len(copyrights) == 0:
             block = get_multiline_comment_block(self.content, index)
-            if not block:
-                return None
             copyrights, remaining_block = search_copyright_information(block)
-            if not copyrights:
-                return None
+
+        if len(copyrights) == 0:
+            return
 
         self.copyrights = copyrights
 
@@ -185,6 +181,8 @@ def determine_filetype(path):
 
 
 def search_copyright_information(content):
+    if content is None:
+        return [], content
     # regex for matching years or year ranges (yyyy-yyyy) separated by colons
     year = r'\d{4}'
     year_range = '%s-%s' % (year, year)
