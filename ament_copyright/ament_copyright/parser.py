@@ -115,11 +115,14 @@ class SourceDescriptor(FileDescriptor):
 
         # get first comment block without leading comment tokens
         block, _ = get_comment_block(self.content, index)
-        if not block:
-            return
         copyrights, remaining_block = search_copyright_information(block)
-        if not copyrights:
-            return None
+
+        if len(copyrights) == 0:
+            block = get_multiline_comment_block(self.content, index)
+            copyrights, remaining_block = search_copyright_information(block)
+
+        if len(copyrights) == 0:
+            return
 
         self.copyrights = copyrights
 
@@ -178,6 +181,8 @@ def determine_filetype(path):
 
 
 def search_copyright_information(content):
+    if content is None:
+        return [], content
     # regex for matching years or year ranges (yyyy-yyyy) separated by colons
     year = r'\d{4}'
     year_range = '%s-%s' % (year, year)
@@ -277,6 +282,49 @@ def get_comment_block(content, index):
     lines = [line[len(comment_token) + 1:] for line in lines]
 
     return '\n'.join(lines), start_index + len(comment_token) + 1
+
+
+def get_multiline_comment_block(content, index):
+    patterns = [('^(/[*])', '([*]/)$'),
+                ('^(<!--)', '(-->)$')]
+    for pattern_pair in patterns:
+        start_pattern, end_pattern = pattern_pair
+        # find the first match of the comment start token
+        # also accept BOM if present
+        if index == 0 and content[0] == '\ufeff':
+            start_pattern = start_pattern[0] + '\ufeff' + start_pattern[1:]
+        start_regex = re.compile(start_pattern, re.MULTILINE)
+        start_match = start_regex.search(content, index)
+        if not start_match:
+            continue
+        start_index = start_match.start(1)
+
+        # find the first match of the comment end token
+        end_regex = re.compile(end_pattern, re.MULTILINE)
+        end_match = end_regex.search(content, index)
+        if not end_match:
+            continue
+        end_index = end_match.start(1)
+
+        # collect all lines between start and end (open interval) and strip out any common prefix
+        block = content[start_index:end_index]
+        block_lines = block.splitlines()
+        if len(block_lines) == 1:
+            prefixed_lines = block_lines
+        elif len(block_lines) == 2:
+            prefixed_lines = block_lines[1:]
+        else:
+            prefixed_lines = block_lines[1:-1]
+
+        if len(prefixed_lines) > 1:
+            line_prefix = os.path.commonprefix(prefixed_lines)
+            lines = [line[len(line_prefix):] for line in prefixed_lines]
+        else:
+            # Single-line header does not have a common prefix to strip out
+            lines = prefixed_lines
+
+        return '\n'.join(lines)
+    return None
 
 
 def scan_past_empty_lines(content, index):

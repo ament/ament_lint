@@ -13,7 +13,12 @@
 # limitations under the License.
 
 from ament_copyright import UNKNOWN_IDENTIFIER
-from ament_copyright.parser import FileDescriptor, search_copyright_information, split_template
+from ament_copyright.parser import FileDescriptor
+from ament_copyright.parser import get_comment_block
+from ament_copyright.parser import get_multiline_comment_block
+from ament_copyright.parser import scan_past_empty_lines
+from ament_copyright.parser import search_copyright_information
+from ament_copyright.parser import split_template
 
 
 def test_search_copyright_information_incorrect_typo():
@@ -50,7 +55,6 @@ def test_search_copyright_information_capitalization1():
     """
     copyrights, remaining_block = search_copyright_information(
         '  Copyright 2020 Open Source Robotics Foundation, Inc.')
-    print(copyrights[0].name)
     assert copyrights[0].name == 'Open Source Robotics Foundation, Inc.'
     assert len(copyrights) == 1
 
@@ -235,3 +239,138 @@ def test_identify_license_multiple_splits():
     dut = FileDescriptor(0, '/')
     dut.identify_license(content, 'file_headers', {'temp': temp_license})
     assert dut.license_identifier == 'temp'
+
+
+def test_get_comment_block_slashes():
+    """Test parsing comment block with c-style comment forward slashes."""
+    commented_content = """
+// aaa
+// bbb
+// ccc
+
+// Comment not part of the header
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block, _ = get_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
+
+
+def test_get_comment_block_slashes2():
+    """Test parsing comment multiline block that is not at the start of the content."""
+    commented_content = """
+// aaa
+// bbb
+// ccc
+
+///
+/**
+ddd
+*/
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block = get_multiline_comment_block(commented_content, index)
+    assert block is not None
+    assert block == 'ddd'
+
+
+def test_get_comment_block_doxygen():
+    """Test parsing comment block with doxygen-style comment forward slashes."""
+    commented_content = """
+/// aaa
+/// bbb
+/// ccc
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block, _ = get_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
+
+
+def test_get_comment_block_pound():
+    """Test parsing comment block with python-style comment pound signs."""
+    commented_content = """
+# aaa
+# bbb
+# ccc
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block, _ = get_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
+
+
+def test_get_multiline_comment_block_cstyle():
+    """Test parsing comment block with multiline c-style comment block."""
+    commented_content = """
+/**
+ * aaa
+ * bbb
+ * ccc
+ */
+
+
+/**
+ * Comment not part of the header
+ */
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block = get_multiline_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
+
+
+def test_get_multiline_comment_block_cstyle2():
+    """Test parsing comment block with multiline c-style comment block."""
+    commented_content = """
+/**
+ * aaa
+ * bbb
+ * ccc
+ */
+
+// Comment not part of
+// the header
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block = get_multiline_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
+
+
+def test_get_multiline_comment_block_xmlstyle():
+    """Test parsing comment block with multiline xml-style comment block."""
+    commented_content = """
+<!--
+  aaa
+  bbb
+  ccc
+ -->
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block = get_multiline_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
+
+
+def test_get_multiline_comment_block_xmlstyle_prefixed():
+    """Test parsing comment block with multiline xml-style comment block containing a prefix."""
+    commented_content = """
+<!--
+  # aaa
+  # bbb
+  # ccc
+ -->
+    """
+    index = 0
+    index = scan_past_empty_lines(commented_content, index)
+    block = get_multiline_comment_block(commented_content, index)
+    assert block is not None
+    assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
