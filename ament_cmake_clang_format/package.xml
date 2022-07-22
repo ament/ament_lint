@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_cmake_clang_format</name>
-  <version>0.9.6</version>
+  <version>0.9.7</version>
   <description>
     The CMake API for ament_clang_format to lint C / C++ code using clang format.
   </description>
