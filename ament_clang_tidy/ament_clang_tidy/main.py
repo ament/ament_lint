@@ -173,6 +173,9 @@ def main(argv=sys.argv[1:]):
                 print('The invocation of "%s" failed with error code %d: %s' %
                       (os.path.basename(clang_tidy_bin), e.returncode, e),
                       file=sys.stderr)
+                # Attempt to recover output, if any was found (eg - if
+                # WarningsAsErrors was specified in the config file).
+                output = e.output.decode("utf-8")
             return output
 
         files = []
@@ -203,7 +206,7 @@ def main(argv=sys.argv[1:]):
     for compilation_db in compilation_dbs:
         package_dir = os.path.dirname(compilation_db)
         package_name = os.path.basename(package_dir)
-        print(f"found compilation database for package '{package_name}' at '{compilation_db}'")
+        print('found compilation database for package "%s"...' % package_name)
         (source_files, output) = invoke_clang_tidy(compilation_db)
         files += source_files
         outputs.append(output)
