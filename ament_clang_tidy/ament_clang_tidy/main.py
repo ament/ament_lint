@@ -206,8 +206,7 @@ def main(argv=sys.argv[1:]):
     for compilation_db in compilation_dbs:
         package_dir = os.path.dirname(compilation_db)
         package_name = os.path.basename(package_dir)
-        print('found compilation database for package "%s"...' % package_name)
-        (source_files, output) = invoke_clang_tidy(compilation_db)
+        print(f"found compilation database for package '{package_name}' at '{compilation_db}'")        (source_files, output) = invoke_clang_tidy(compilation_db)
         files += source_files
         outputs.append(output)
     pool.close()
