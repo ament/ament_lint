@@ -242,6 +242,7 @@ def find_executable(file_name, additional_paths=None):
 
 def get_files(paths, extensions):
     files = []
+    cwd = os.getcwd()
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
@@ -256,7 +257,7 @@ def get_files(paths, extensions):
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
                     if ext in ['.%s' % e for e in extensions]:
-                        files.append(os.path.join(dirpath, filename))
+                        files.append(os.path.join(cwd, dirpath, filename))
         if os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
