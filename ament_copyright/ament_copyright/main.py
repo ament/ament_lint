@@ -558,7 +558,7 @@ def get_sarif_content(report, testname, elapsed):
 
     for (filename, rule_id, no_error, message) in report:
         # Populate the artifact information (source files analyzed)
-        artifacts.append({'location': {'uri': filename}})
+        artifacts.append({'location': {'uri': filename, 'uriBaseId': os.getcwd()}})
 
         # Process any associated error/warning info associated with this file
         if not no_error:
