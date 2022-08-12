@@ -497,7 +497,7 @@ def get_sarif_content(report, testname, elapsed, uncrustify_version):
 
     for (filename, diff_lines) in report:
         # Populate the artifact information (source files analyzed)
-        artifacts.append({'location': {'uri': filename}})
+        artifacts.append({'location': {'uri': filename, 'uriBaseId': os.getcwd()}})
 
         # Process any associated error/warning info associated with this file
         if diff_lines:
