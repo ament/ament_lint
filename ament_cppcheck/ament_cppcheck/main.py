@@ -421,7 +421,7 @@ def get_sarif_content(cppcheck_version, report, testname, elapsed, skip=None):
     for filename in sorted(report.keys()):
         errors = report[filename]
         for error in errors:
-            index = artifacts.index({'location': {'uri': filename}})
+            index = artifacts.index({'location': {'uri': filename, 'uriBaseId': os.getcwd()}})
             results_dict = {
                 'ruleId': error['id'],
                 'level': 'warning',

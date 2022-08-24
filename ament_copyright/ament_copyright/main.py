@@ -575,7 +575,7 @@ def get_sarif_content(report, testname, elapsed):
             # Populate the results of the analysis (issues discovered)
             message = message
             line = 1  # Indicate copyright issues at the start of the file since we don't have a line number
-            index = artifacts.index({'location': {'uri': filename}})
+            index = artifacts.index({'location': {'uri': filename, 'uriBaseId': os.getcwd()}})
 
             results.append({
                 'ruleId': rule_id,
