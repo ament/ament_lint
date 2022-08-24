@@ -528,7 +528,7 @@ def get_sarif_content(report, testname, elapsed, uncrustify_version):
                                 'physicalLocation': {
                                     'artifactLocation': {
                                         'uri': filename,
-                                        'index': artifacts.index({'location': {'uri': filename}}),
+                                        'index': artifacts.index({'location': {'uri': filename, 'uriBaseId': os.getcwd()}}),
                                     },
                                     'region': {
                                         'startLine': int(starting_line),
