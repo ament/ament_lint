@@ -93,6 +93,10 @@ def main(argv=sys.argv[1:]):
         '--cppcheck-version',
         action='store_true',
         help='Get the cppcheck version, print it, and then exit.')
+    parser.add_argument(
+        '--enable-extra-checks',
+        help="Passed to cppcheck as '--enable=<extra_checks>', and add extra checks to cppcheck "
+             "as the given extra_checks (e.g. 'all', 'warning', 'style').")
     args = parser.parse_args(argv)
 
     cppcheck_bin = find_cppcheck_executable()
@@ -161,6 +165,8 @@ def main(argv=sys.argv[1:]):
         cmd.extend(['--suppress=*:' + exclude])
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
+    if args.enable_extra_checks:
+        cmd.extend(['--enable={0}'.format(args.enable_extra_checks)])
     cmd.extend(files)
     try:
         p = subprocess.Popen(cmd, stderr=subprocess.PIPE)
