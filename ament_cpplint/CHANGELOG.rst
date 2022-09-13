@@ -2,8 +2,8 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.13.2 (2022-09-13)
+-------------------
 * [ament_cpplint] Process errors without linenums (`#385 <https://github.com/ament/ament_lint/issues/385>`_)
 * Update maintainers (`#379 <https://github.com/ament/ament_lint/issues/379>`_)
 * Contributors: Abrar Rahman Protyasha, methylDragon

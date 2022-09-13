@@ -2,8 +2,8 @@
 Changelog for package ament_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.13.2 (2022-09-13)
+-------------------
 * Update maintainers (`#379 <https://github.com/ament/ament_lint/issues/379>`_)
 * Contributors: methylDragon
 
