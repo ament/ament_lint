@@ -2,6 +2,12 @@
 Changelog for package ament_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [ament_pep257][master] redirecting error prints to stderr (`#390 <https://github.com/ament/ament_lint/issues/390>`_)
+* Update maintainers (`#379 <https://github.com/ament/ament_lint/issues/379>`_)
+* Contributors: Mirco Colosi (CR/AAS3), methylDragon
+
 0.13.1 (2022-05-09)
 -------------------
 

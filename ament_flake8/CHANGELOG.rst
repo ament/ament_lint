@@ -2,6 +2,12 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix exclude regression (`#387 <https://github.com/ament/ament_lint/issues/387>`_)
+* Update maintainers (`#379 <https://github.com/ament/ament_lint/issues/379>`_)
+* Contributors: methylDragon
+
 0.13.1 (2022-05-09)
 -------------------
 

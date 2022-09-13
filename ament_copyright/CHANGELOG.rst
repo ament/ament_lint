@@ -2,6 +2,14 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support for matching license header within multiline comment block (`#361 <https://github.com/ament/ament_lint/issues/361>`_)
+* Improved licencse matching (`#358 <https://github.com/ament/ament_lint/issues/358>`_)
+* Updated regex and adding test cases for copyright search (`#363 <https://github.com/ament/ament_lint/issues/363>`_)
+* Update maintainers (`#379 <https://github.com/ament/ament_lint/issues/379>`_)
+* Contributors: Will, methylDragon
+
 0.13.1 (2022-05-09)
 -------------------
 
