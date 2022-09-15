@@ -148,13 +148,28 @@ def get_flake8_style_guide(argv):
             argv)
         flake8.configure_logging(prelim_opts.verbose, prelim_opts.output_file)
         from flake8.options import config
-        config_finder = config.ConfigFileFinder(
-            application.program, prelim_opts.append_config,
-            config_file=prelim_opts.config,
-            ignore_config_files=prelim_opts.isolated)
-        application.find_plugins(config_finder)
-        application.register_plugin_options()
-        application.parse_configuration_and_cli(config_finder, remaining_args)
+        if hasattr(config, "ConfigFileFinder"):
+            config_finder = config.ConfigFileFinder(
+                application.program, prelim_opts.append_config,
+                config_file=prelim_opts.config,
+                ignore_config_files=prelim_opts.isolated)
+            application.find_plugins(config_finder)
+            application.register_plugin_options()
+            application.parse_configuration_and_cli(config_finder, remaining_args)
+        else:
+            cfg, cfg_dir = config.load_config(
+                config=prelim_opts.config,
+                extra=prelim_opts.append_config,
+                isolated=prelim_opts.isolated,
+            )
+            application.find_plugins(
+                cfg,
+                cfg_dir,
+                enable_extensions=prelim_opts.enable_extensions,
+                require_plugins=prelim_opts.require_plugins,
+            )
+            application.register_plugin_options()
+            application.parse_configuration_and_cli(cfg, cfg_dir, remaining_args)
     else:
         application.parse_preliminary_options_and_args([])
         flake8.configure_logging(
