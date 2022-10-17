@@ -311,7 +311,7 @@ def add_copyright_year(file_descriptors, new_years, verbose):
         if not match:
             assert False, "Could not find copyright information in file '%s'" % \
                 file_descriptor.path
-        years_span, _ = match.span(1), match.span(2)
+        years_span = match.span(1)
 
         # skip if all new years are already included
         years = get_years_from_string(block[years_span[0]:years_span[1]])
