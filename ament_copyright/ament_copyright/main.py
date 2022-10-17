@@ -29,11 +29,11 @@ from ament_copyright import SOURCE_FILETYPE
 from ament_copyright import UNKNOWN_IDENTIFIER
 from ament_copyright.crawler import get_files
 from ament_copyright.parser import get_comment_block
+from ament_copyright.parser import get_copyright_information_regex
 from ament_copyright.parser import get_index_of_next_line
 from ament_copyright.parser import parse_file
 from ament_copyright.parser import scan_past_coding_and_shebang_lines
 from ament_copyright.parser import scan_past_empty_lines
-from ament_copyright.parser import search_copyright_information
 
 
 def main(argv=sys.argv[1:]):
@@ -61,6 +61,13 @@ def main(argv=sys.argv[1:]):
         default=[],
         dest='excludes',
         help='The filenames to exclude.')
+    parser.add_argument(
+        '--allowed-licenses',
+        metavar='license name',
+        nargs='+',
+        default=[],
+        dest='allowed_licenses',
+        help='List of valid licenses.')
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         '--add-missing',
@@ -112,9 +119,20 @@ def main(argv=sys.argv[1:]):
     if not filenames:
         print('No repository roots and files found')
 
+    # if user has specified a list of allowed licenses, use only those
+    if args.allowed_licenses:
+        allowed_licenses = {}
+        for license_name in args.allowed_licenses:
+            if license_name in licenses:
+                allowed_licenses[license_name] = licenses[license_name]
+            else:
+                assert False, 'Requested unknown license: ' + license_name
+    else:
+        allowed_licenses = licenses
+
     file_descriptors = {}
     for filename in sorted(filenames):
-        file_descriptors[filename] = parse_file(filename)
+        file_descriptors[filename] = parse_file(filename, allowed_licenses)
 
     if args.add_missing:
         name = names.get(args.add_missing[0], args.add_missing[0])
@@ -274,7 +292,7 @@ def add_copyright_year(file_descriptors, new_years, verbose):
         file_descriptor = file_descriptors[path]
 
         # ignore files which do not have a header
-        if not getattr(file_descriptor, 'copyright_identifier', None):
+        if not getattr(file_descriptor, 'copyright_identifiers', None):
             continue
 
         index = scan_past_coding_and_shebang_lines(file_descriptor.content)
@@ -287,10 +305,13 @@ def add_copyright_year(file_descriptors, new_years, verbose):
         else:
             block = file_descriptor.content[index:]
             block_offset = 0
-        copyright_span, years_span, name_span = search_copyright_information(block)
-        if copyright_span is None:
+
+        regex = get_copyright_information_regex()
+        match = regex.search(block)
+        if not match:
             assert False, "Could not find copyright information in file '%s'" % \
                 file_descriptor.path
+        years_span, _ = match.span(1), match.span(2)
 
         # skip if all new years are already included
         years = get_years_from_string(block[years_span[0]:years_span[1]])
@@ -311,12 +332,13 @@ def add_copyright_year(file_descriptors, new_years, verbose):
             file_descriptor.content[global_years_span[1]:]
 
         # output beginning of file for debugging
-        # index = global_years_span[0]
-        # for _ in range(3):
-        #     index = get_index_of_next_line(content, index)
-        # print('<<<')
-        # print(content[:index - 1])
-        # print('>>>')
+        if verbose:
+            index = global_years_span[0]
+            for _ in range(3):
+                index = get_index_of_next_line(content, index)
+                print('<<<')
+                print(content[:index - 1])
+                print('>>>')
 
         with open(file_descriptor.path, 'w', encoding='utf-8') as h:
             h.write(content)

@@ -52,7 +52,7 @@ class FileDescriptor:
         with open(self.path, 'r', encoding='utf-8') as h:
             self.content = h.read()
 
-    def parse(self):
+    def parse(self, allowed_licenses):
         raise NotImplementedError()
 
     def identify_license(self, content, license_part, licenses=None):
@@ -104,7 +104,7 @@ class SourceDescriptor(FileDescriptor):
             else:
                 self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
 
-    def parse(self):
+    def parse(self, allowed_licenses):
         self.read()
         if not self.content:
             return
@@ -113,23 +113,35 @@ class SourceDescriptor(FileDescriptor):
         index = scan_past_coding_and_shebang_lines(self.content)
         index = scan_past_empty_lines(self.content, index)
 
-        # get first comment block without leading comment tokens
-        block, _ = get_comment_block(self.content, index)
-        copyrights, remaining_block = search_copyright_information(block)
-
-        if len(copyrights) == 0:
-            block = get_multiline_comment_block(self.content, index)
+        def parse_comment_block(block):
             copyrights, remaining_block = search_copyright_information(block)
+            self.copyrights += copyrights
+            # if we haven't found a license yet, try to identify it in this block
+            # in case of files with multiple licenses, we only consider the first one found
+            # an example is if you copy a file with an existing license and then you prepend yours
+            if self.license_identifier == UNKNOWN_IDENTIFIER:
+                license_text = '{copyright}' + remaining_block
+                self.identify_license(license_text, 'file_headers', allowed_licenses)
 
-        if len(copyrights) == 0:
-            return
+        # parse all single-line comment blocks for copyright information
+        tmp_index = index
+        while True:
+            block, tmp_index = get_comment_block(self.content, tmp_index)
+            if block:
+                parse_comment_block(block)
+            else:
+                break
 
-        self.copyrights = copyrights
+        # parse all multi-line comment blocks for copyright information
+        tmp_index = index
+        while True:
+            block, tmp_index = get_multiline_comment_block(self.content, tmp_index)
+            if block:
+                parse_comment_block(block)
+            else:
+                break
 
         self.identify_copyright()
-
-        content = '{copyright}' + remaining_block
-        self.identify_license(content, 'file_headers')
 
 
 class ContributingDescriptor(FileDescriptor):
@@ -137,12 +149,12 @@ class ContributingDescriptor(FileDescriptor):
     def __init__(self, path):
         super(ContributingDescriptor, self).__init__(CONTRIBUTING_FILETYPE, path)
 
-    def parse(self):
+    def parse(self, allowed_licenses):
         self.read()
         if not self.content:
             return
 
-        self.identify_license(self.content, 'contributing_files')
+        self.identify_license(self.content, 'contributing_files', allowed_licenses)
 
 
 class LicenseDescriptor(FileDescriptor):
@@ -150,15 +162,15 @@ class LicenseDescriptor(FileDescriptor):
     def __init__(self, path):
         super(LicenseDescriptor, self).__init__(LICENSE_FILETYPE, path)
 
-    def parse(self):
+    def parse(self, allowed_licenses):
         self.read()
         if not self.content:
             return
 
-        self.identify_license(self.content, 'license_files')
+        self.identify_license(self.content, 'license_files', allowed_licenses)
 
 
-def parse_file(path):
+def parse_file(path, allowed_licenses):
     filetype = determine_filetype(path)
     if filetype == SOURCE_FILETYPE:
         d = SourceDescriptor(path)
@@ -168,7 +180,7 @@ def parse_file(path):
         d = LicenseDescriptor(path)
     else:
         return None
-    d.parse()
+    d.parse(allowed_licenses)
     return d
 
 
@@ -180,9 +192,7 @@ def determine_filetype(path):
     return SOURCE_FILETYPE
 
 
-def search_copyright_information(content):
-    if content is None:
-        return [], content
+def get_copyright_information_regex():
     # regex for matching years or year ranges (yyyy-yyyy) separated by colons
     year = r'\d{4}'
     year_range = '%s-%s' % (year, year)
@@ -191,6 +201,13 @@ def search_copyright_information(content):
               r'copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
         (year_or_year_range, year_or_year_range)
     regex = re.compile(pattern, re.DOTALL | re.MULTILINE | re.IGNORECASE)
+    return regex
+
+
+def search_copyright_information(content):
+    if content is None:
+        return [], content
+    regex = get_copyright_information_regex()
 
     copyrights = []
     while True:
@@ -297,6 +314,7 @@ def get_multiline_comment_block(content, index):
         start_match = start_regex.search(content, index)
         if not start_match:
             continue
+        comment_token = start_match.group(1)
         start_index = start_match.start(1)
 
         # find the first match of the comment end token
@@ -323,8 +341,8 @@ def get_multiline_comment_block(content, index):
             # Single-line header does not have a common prefix to strip out
             lines = prefixed_lines
 
-        return '\n'.join(lines)
-    return None
+        return '\n'.join(lines), start_index + len(comment_token) + 1
+    return None, index
 
 
 def scan_past_empty_lines(content, index):
