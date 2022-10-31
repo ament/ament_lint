@@ -214,8 +214,14 @@ def main(argv=sys.argv[1:]):
     for filename in files:
         report[filename] = []
 
-    error_re = re.compile('(/.*?\\.(?:%s)):(\\d+):(\\d+): (?:warning:|error:)' %
-                          '|'.join(extensions))
+    # Regex explanation:
+    #   \s*\^?                   : Capture many spaces, then an optional `^`. clang_tidy output isn't great.
+    #   (\/home\/^[^:]*)         : Group capture. Everything from `/home/` up until a `:`.
+    #   (\d+)                    : Group capture. Grabs line number.
+    #   (\d+)                    : Group capture. Grabs column number.
+    #   (?:warning:|error:note:) : Non-capturing group. Matches warning, error, note.
+    #   \[(.*)\]                 : Matches and captures [<rule_name>]. Ignores any messages from clang_tidy without an ending [<rule_name>].
+    error_re = re.compile('\\s*\^?\/home\/([^:]*):(\\d+):(\\d+): (?:warning:|error:|note:).*\\[(.*)\\]')
 
     current_file = None
     new_file = None
@@ -413,6 +419,8 @@ def get_sarif_content(report, clang_tidy_version):
     with open('1.yaml', 'w') as file:
         yaml.dump(report, file)
 
+    # print(json.dumps(report, indent=4))
+
     # Lay out the basic structure of the SARIF file (a single run that has 'tool',
     # 'artifacts', and 'results' entries)
     sarif = {
@@ -443,19 +451,21 @@ def get_sarif_content(report, clang_tidy_version):
         for error in report[filename]:
             description, rule_id = filter(
                 None, re.split('\[|\]', error['error_msg']))
-            rules.append({
+            new_rule = {
                 'id': rule_id,
-                'shortDescription': {
-                    'text': description.rstrip()
-                },
                 'helpUri': 'https://clang.llvm.org/extra/clang-tidy/checks/list.html',
-            })
+            }
+            if new_rule not in rules:
+                rules.append(new_rule)
 
     # Populate the artifact information (source files analyzed)
     artifacts = sarif['runs'][0]['artifacts']
     for filename in sorted(report.keys()):
         artifact = {'location': {'uri': filename}}
         artifacts.append(artifact)
+
+    # Strip error message of rule ID
+    strip_error = re.compile("(.*) \[.*]")
 
     # Populate the results of the analysis (issues discovered)
     results = sarif['runs'][0]['results']
@@ -469,12 +479,17 @@ def get_sarif_content(report, clang_tidy_version):
             start_column = error['offset_in_line']
             index = artifacts.index({'location': {'uri': filename}})
 
+            error_without_rule = strip_error.match(error['error_msg'])
+
+            if not error_without_rule:
+                print("OOPS! Check your regex")
+
             results_dict = {
                 'ruleId': rule_id,
                 'level': 'warning',
                 'kind': 'review',
                 'message': {
-                    'text': error['code_correct_rec']
+                    'text': error_without_rule.group(1)
                 },
                 'locations': [{
                     'physicalLocation': {
@@ -483,8 +498,8 @@ def get_sarif_content(report, clang_tidy_version):
                             'index': index
                         },
                         'region': {
-                            'startLine': start_line,
-                            'startColumn': start_column
+                            'startLine': int(start_line),
+                            'startColumn': int(start_column)
                         }
                     }
                 }]
