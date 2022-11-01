@@ -419,8 +419,6 @@ def get_sarif_content(report, clang_tidy_version):
     with open('1.yaml', 'w') as file:
         yaml.dump(report, file)
 
-    # print(json.dumps(report, indent=4))
-
     # Lay out the basic structure of the SARIF file (a single run that has 'tool',
     # 'artifacts', and 'results' entries)
     sarif = {
@@ -480,9 +478,6 @@ def get_sarif_content(report, clang_tidy_version):
             index = artifacts.index({'location': {'uri': filename}})
 
             error_without_rule = strip_error.match(error['error_msg'])
-
-            if not error_without_rule:
-                print("OOPS! Check your regex")
 
             results_dict = {
                 'ruleId': rule_id,
