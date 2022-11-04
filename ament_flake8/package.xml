@@ -19,6 +19,14 @@
 
   <exec_depend>ament_lint</exec_depend>
   <exec_depend>python3-flake8</exec_depend>
+  <exec_depend>python3-flake8-blind-except</exec_depend>
+  <exec_depend>python3-flake8-builtins</exec_depend>
+  <exec_depend>python3-flake8-class-newline</exec_depend>
+  <exec_depend>python3-flake8-comprehensions</exec_depend>
+  <exec_depend>python3-flake8-deprecated</exec_depend>
+  <exec_depend>python3-flake8-docstrings</exec_depend>
+  <exec_depend>python3-flake8-import-order</exec_depend>
+  <exec_depend>python3-flake8-quotes</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>
