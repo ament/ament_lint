@@ -219,7 +219,7 @@ def main(argv=sys.argv[1:]):
     #   (\/home\/^[^:]*)         : Group capture. Everything from `/home/` up until a `:`.
     #   (\d+)                    : Group capture. Grabs line number.
     #   (\d+)                    : Group capture. Grabs column number.
-    #   (?:warning:|error:note:) : Non-capturing group. Matches warning, error, note.
+    #   (?:warning:|error:|note:) : Non-capturing group. Matches warning, error, note.
     #   \[(.*)\]                 : Matches and captures [<rule_name>]. Ignores any messages from clang_tidy without an ending [<rule_name>].
     error_re = re.compile('\\s*\^?\/home\/([^:]*):(\\d+):(\\d+): (?:warning:|error:|note:).*\\[(.*)\\]')
 
