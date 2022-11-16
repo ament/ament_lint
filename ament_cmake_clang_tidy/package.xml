@@ -8,13 +8,13 @@
   </description>
 
   <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
-  <maintainer email="brandon@openrobotics.org">Brandon Ong</maintainer>
 
   <license>Apache License 2.0</license>
 
   <author email="audrow@openrobotics.org">Audrow Nash</author>
-  <author email="michel@ekumenlabs.com">Michel Hidalgo</author>
+  <author email="brandon@openrobotics.org">Brandon Ong</author>
   <author>Claire Wang</author>
+  <author email="michel@ekumenlabs.com">Michel Hidalgo</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>
