@@ -63,6 +63,8 @@ function(ament_flake8)
     list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
 
+  list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_flake8")
   ament_add_test(
     "${ARG_TESTNAME}"
