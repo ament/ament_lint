@@ -216,12 +216,12 @@ def main(argv=sys.argv[1:]):
 
     # Regex explanation:
     #   \s*\^?                   : Capture many spaces, then an optional `^`. clang_tidy output isn't great.
-    #   (\/home\/^[^:]*)         : Group capture. Everything from `/home/` up until a `:`.
+    #   (/home/^[^:]*)         : Group capture. Everything from `/home/` up until a `:`.
     #   (\d+)                    : Group capture. Grabs line number.
     #   (\d+)                    : Group capture. Grabs column number.
     #   (?:warning:|error:|note:) : Non-capturing group. Matches warning, error, note.
     #   \[(.*)\]                 : Matches and captures [<rule_name>]. Ignores any messages from clang_tidy without an ending [<rule_name>].
-    error_re = re.compile('\\s*\^?\/home\/([^:]*):(\\d+):(\\d+): (?:warning:|error:|note:).*\\[(.*)\\]')
+    error_re = re.compile(r'\s*\^?(?:/home/|/root/|/src/)([^:]*):(\d+):(\d+): (?:warning:|error:|note:).*(?:\[(.*)\])?')
 
     current_file = None
     new_file = None
@@ -447,8 +447,12 @@ def get_sarif_content(report, clang_tidy_version):
     rules = sarif['runs'][0]['tool']['driver']['rules']
     for filename in sorted(report.keys()):
         for error in report[filename]:
-            description, rule_id = filter(
-                None, re.split('\[|\]', error['error_msg']))
+            try:
+                _, rule_id = filter(
+                    None, re.split('\[|\]', error['error_msg']))
+            except ValueError:
+                # Rule string not found (clang_tidy doesn't always have a [rule-id] post-fixing the result), so skip
+                continue
             new_rule = {
                 'id': rule_id,
                 'helpUri': 'https://clang.llvm.org/extra/clang-tidy/checks/list.html',
@@ -463,7 +467,7 @@ def get_sarif_content(report, clang_tidy_version):
         artifacts.append(artifact)
 
     # Strip error message of rule ID
-    strip_error = re.compile("(.*) \[.*]")
+    strip_error = re.compile("(.*)( \[.*])?")
 
     # Populate the results of the analysis (issues discovered)
     results = sarif['runs'][0]['results']
@@ -471,7 +475,10 @@ def get_sarif_content(report, clang_tidy_version):
         errors = report[filename]
         for error in errors:
             # Get the symbolic rule name (it's the part in brackets)
-            _, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
+            try:
+                _, rule_id = filter(None, re.split('\[|\]', error['error_msg']))
+            except ValueError:
+                rule_id = ""
 
             start_line = error['line_no']
             start_column = error['offset_in_line']
@@ -480,7 +487,6 @@ def get_sarif_content(report, clang_tidy_version):
             error_without_rule = strip_error.match(error['error_msg'])
 
             results_dict = {
-                'ruleId': rule_id,
                 'level': 'warning',
                 'kind': 'review',
                 'message': {
@@ -499,6 +505,10 @@ def get_sarif_content(report, clang_tidy_version):
                     }
                 }]
             }
+
+            if not rule_id == "":
+                results_dict['ruleId'] = rule_id
+
             results.append(results_dict)
 
     return json.dumps(sarif, indent=2)
