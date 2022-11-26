@@ -167,17 +167,19 @@ def main(argv=sys.argv[1:]):
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     if args.enable_misra_checks:
-        # The MISRA rule text is copyrighted. If the user happens to provide a misra.json configuration
-        # file that specifies a rule text file to use, use it. Here's an example misra.json:
+        # The MISRA rule text is copyrighted. However, if the user happens to have a misra.json
+        # configuration file in the $HOME directory, use it.
+        #
+        # Here's an example misra.json:
         # {
         #   "script": "/usr/lib/x86_64-linux-gnu/cppcheck/addons/misra.py",
         #   "args": [
-        #      "--rule-texts=/home/spaceros-user/src/spaceros/install/ament_cppcheck/share/ament_cppcheck/misra-rules.txt",
+        #      "--rule-texts=/home/spaceros-user/misra-rules.txt",
         #      "--suppress-rules 17.3,21.12"
         #   ]
         # }
 
-        misra_json = os.path.join(get_package_share_directory('ament_cppcheck'), 'misra.json')
+        misra_json = os.path.join(os.environ['HOME'], 'misra.json')
         cmd.extend([f'--addon={misra_json}']) if os.path.isfile(misra_json) else cmd.extend(['--addon=misra'])
     cmd.extend(files)
     try:
