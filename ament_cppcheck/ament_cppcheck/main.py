@@ -179,7 +179,7 @@ def main(argv=sys.argv[1:]):
         #   ]
         # }
 
-        misra_json = os.path.join(os.environ['HOME'], 'misra.json')
+        misra_json = os.path.join(os.path.expanduser('~'), 'misra.json')
         cmd.extend([f'--addon={misra_json}']) if os.path.isfile(misra_json) else cmd.extend(['--addon=misra'])
     cmd.extend(files)
     try:
