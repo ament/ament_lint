@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from ament_index_python.packages import get_package_share_directory
 import argparse
 from collections import defaultdict
 import json
@@ -166,7 +167,20 @@ def main(argv=sys.argv[1:]):
     if jobs:
         cmd.extend(['-j', '%d' % jobs])
     if args.enable_misra_checks:
-        cmd.extend(['--addon=misra'])
+        # The MISRA rule text is copyrighted. However, if the user happens to have a misra.json
+        # configuration file in the $HOME directory, use it.
+        #
+        # Here's an example misra.json:
+        # {
+        #   "script": "/usr/lib/x86_64-linux-gnu/cppcheck/addons/misra.py",
+        #   "args": [
+        #      "--rule-texts=/home/spaceros-user/misra-rules.txt",
+        #      "--suppress-rules 17.3,21.12"
+        #   ]
+        # }
+
+        misra_json = os.path.join(os.path.expanduser('~'), 'misra.json')
+        cmd.extend([f'--addon={misra_json}']) if os.path.isfile(misra_json) else cmd.extend(['--addon=misra'])
     cmd.extend(files)
     try:
         p = subprocess.Popen(cmd, stderr=subprocess.PIPE)
