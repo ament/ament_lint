@@ -187,24 +187,14 @@ def generate_pep257_report(paths, excludes, ignore, select, convention, add_igno
     report = []
 
     files_dict = {}
-    # Unpack 3 values for pydocstyle <= 6.1.1
-    try:
-        for filename, checked_codes, ignore_decorators in files_to_check:
-            if _filename_in_excludes(filename, excludes):
-                continue
-            files_dict[filename] = {
-                'select': checked_codes,
-                'ignore_decorators': ignore_decorators,
-            }
-    # Unpack 4 values since pydocstyle >= 6.2.0
-    except ValueError:
-        for filename, checked_codes, ignore_decorators, _ in files_to_check:
-            if _filename_in_excludes(filename, excludes):
-                continue
-            files_dict[filename] = {
-                'select': checked_codes,
-                'ignore_decorators': ignore_decorators,
-            }
+    # Unpack 3 values for pydocstyle <= 6.1.1 and 4 values for pydocstyle >= 6.2.0
+    for filename, checked_codes, ignore_decorators, *_ in files_to_check:
+        if _filename_in_excludes(filename, excludes):
+            continue
+        files_dict[filename] = {
+            'select': checked_codes,
+            'ignore_decorators': ignore_decorators,
+        }    
 
     for filename in sorted(files_dict.keys()):
         print('checking', filename)
