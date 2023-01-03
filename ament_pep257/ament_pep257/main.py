@@ -194,7 +194,7 @@ def generate_pep257_report(paths, excludes, ignore, select, convention, add_igno
         files_dict[filename] = {
             'select': checked_codes,
             'ignore_decorators': ignore_decorators,
-        } 
+        }
 
     for filename in sorted(files_dict.keys()):
         print('checking', filename)
