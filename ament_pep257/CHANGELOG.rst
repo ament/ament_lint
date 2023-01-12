@@ -2,6 +2,11 @@
 Changelog for package ament_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.12.5 (2023-01-12)
+-------------------
+* Added undescore to ignore new pydocstyle item (backport `#428 <https://github.com/ament/ament_lint/issues/428>`_) (`#429 <https://github.com/ament/ament_lint/issues/429>`_)
+* Contributors: mergify[bot]
+
 0.12.4 (2022-05-09)
 -------------------
 
