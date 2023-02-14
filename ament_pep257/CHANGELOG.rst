@@ -2,6 +2,13 @@
 Changelog for package ament_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* updating ref to pep257 docs (`#433 <https://github.com/ament/ament_lint/issues/433>`_)
+* Added underscore to ignore new pydocstyle item (`#428 <https://github.com/ament/ament_lint/issues/428>`_)
+* [rolling] Update maintainers - 2022-11-07 (`#421 <https://github.com/ament/ament_lint/issues/421>`_)
+* Contributors: Audrow Nash, Christian Henkel, Cristóbal Arroyo
+
 0.13.2 (2022-09-13)
 -------------------
 * [ament_pep257][master] redirecting error prints to stderr (`#390 <https://github.com/ament/ament_lint/issues/390>`_)

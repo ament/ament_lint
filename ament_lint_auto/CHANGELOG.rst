@@ -2,6 +2,12 @@
 Changelog for package ament_lint_auto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add flake8 linter ignore support (`#424 <https://github.com/ament/ament_lint/issues/424>`_)
+* [rolling] Update maintainers - 2022-11-07 (`#421 <https://github.com/ament/ament_lint/issues/421>`_)
+* Contributors: Audrow Nash, RFRIEDM-Trimble, Abrar Rahman Protyasha
+
 0.13.2 (2022-09-13)
 -------------------
 * [ament_lint_auto] General file exclusion with AMENT_LINT_AUTO_FILE_EXCLUDE (`#386 <https://github.com/ament/ament_lint/issues/386>`_)

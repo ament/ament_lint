@@ -2,6 +2,12 @@
 Changelog for package ament_clang_format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* ament_clang_format: use open braces for enum definitions (`#426 <https://github.com/ament/ament_lint/issues/426>`_)
+* [rolling] Update maintainers - 2022-11-07 (`#421 <https://github.com/ament/ament_lint/issues/421>`_)
+* Contributors: Audrow Nash, james-rms
+
 0.13.2 (2022-09-13)
 -------------------
 * Update maintainers (`#379 <https://github.com/ament/ament_lint/issues/379>`_)

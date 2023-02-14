@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_lint_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [rolling] Update maintainers - 2022-11-07 (`#421 <https://github.com/ament/ament_lint/issues/421>`_)
+* Contributors: Audrow Nash
+
 0.13.2 (2022-09-13)
 -------------------
 * Update maintainers (`#379 <https://github.com/ament/ament_lint/issues/379>`_)
