@@ -2,6 +2,9 @@
 Changelog for package ament_lint_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.14.0 (2023-02-14)
 -------------------
 * [rolling] Update maintainers - 2022-11-07 (`#421 <https://github.com/ament/ament_lint/issues/421>`_)

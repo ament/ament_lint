@@ -2,6 +2,9 @@
 Changelog for package ament_lint_auto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.14.0 (2023-02-14)
 -------------------
 * Add flake8 linter ignore support (`#424 <https://github.com/ament/ament_lint/issues/424>`_)
