@@ -5,7 +5,7 @@ package_name = 'ament_uncrustify'
 
 setup(
     name=package_name,
-    version='0.12.5',
+    version='0.12.6',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
