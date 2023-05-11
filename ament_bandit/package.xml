@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>ament_bandit</name>
+  <version>0.1.0</version>
+  <description>
+    The ability to perform static code analysis on Python code using Bandit
+  </description>
+
+  <maintainer email="florencia.cabralberenfus@canonical.com">Florencia Cabral</maintainer>
+  
+  <license>Apache License 2.0</license>
+
+  <author email="florencia.cabralberenfus@canonical.com">Florencia Cabral</author>
+
+  <exec_depend>bandit</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
