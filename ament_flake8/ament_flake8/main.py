@@ -148,7 +148,7 @@ def get_flake8_style_guide(argv):
             argv)
         flake8.configure_logging(prelim_opts.verbose, prelim_opts.output_file)
         from flake8.options import config
-        if hasattr(config, "ConfigFileFinder"):
+        if hasattr(config, 'ConfigFileFinder'):
             config_finder = config.ConfigFileFinder(
                 application.program, prelim_opts.append_config,
                 config_file=prelim_opts.config,
@@ -198,7 +198,7 @@ def parse_config_file(config_file):
     if major_release >= 5:
         opts_manager = manager.OptionManager(
             version=flake8_version,
-            plugin_versions="",
+            plugin_versions='',
             parents=[]
         )
         flake8_options.register_default_options(opts_manager)
