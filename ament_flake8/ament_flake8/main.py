@@ -148,13 +148,28 @@ def get_flake8_style_guide(argv):
             argv)
         flake8.configure_logging(prelim_opts.verbose, prelim_opts.output_file)
         from flake8.options import config
-        config_finder = config.ConfigFileFinder(
-            application.program, prelim_opts.append_config,
-            config_file=prelim_opts.config,
-            ignore_config_files=prelim_opts.isolated)
-        application.find_plugins(config_finder)
-        application.register_plugin_options()
-        application.parse_configuration_and_cli(config_finder, remaining_args)
+        if hasattr(config, 'ConfigFileFinder'):
+            config_finder = config.ConfigFileFinder(
+                application.program, prelim_opts.append_config,
+                config_file=prelim_opts.config,
+                ignore_config_files=prelim_opts.isolated)
+            application.find_plugins(config_finder)
+            application.register_plugin_options()
+            application.parse_configuration_and_cli(config_finder, remaining_args)
+        else:
+            cfg, cfg_dir = config.load_config(
+                config=prelim_opts.config,
+                extra=prelim_opts.append_config,
+                isolated=prelim_opts.isolated,
+            )
+            application.find_plugins(
+                cfg,
+                cfg_dir,
+                enable_extensions=prelim_opts.enable_extensions,
+                require_plugins=prelim_opts.require_plugins,
+            )
+            application.register_plugin_options()
+            application.parse_configuration_and_cli(cfg, cfg_dir, remaining_args)
     else:
         application.parse_preliminary_options_and_args([])
         flake8.configure_logging(
@@ -175,27 +190,41 @@ def get_flake8_style_guide(argv):
 
 
 def parse_config_file(config_file):
+    from flake8 import __version__ as flake8_version, __version_info__ as flake8_version_info
     from flake8.options import config, manager, aggregator
 
-    try:
-        # Support 4.0.0
-        opts_manager = manager.OptionManager(prog='flake8', version='4.0.0')
+    major_release = flake8_version_info[0]
+
+    if major_release >= 5:
+        opts_manager = manager.OptionManager(
+            version=flake8_version,
+            plugin_versions='',
+            parents=[]
+        )
+        flake8_options.register_default_options(opts_manager)
+        cfg, cfg_dir = config.load_config(config_file, [])
+
+        return aggregator.aggregate_options(
+            opts_manager,
+            cfg, cfg_dir,
+            []
+        ), []
+
+    if major_release >= 3:
+        opts_manager = manager.OptionManager(prog='flake8', version=flake8_version)
         flake8_options.register_default_options(opts_manager)
 
         return aggregator.aggregate_options(
             opts_manager,
-            config.ConfigFileFinder('flake8', [], config_file),
+            config.ConfigFileFinder(
+                'flake8',
+                [],
+                config_file if major_release == 4 else [config_file]
+            ),
             []
         )
-    except TypeError:
-        opts_manager = manager.OptionManager(prog='flake8', version='3.0.0')
-        flake8_options.register_default_options(opts_manager)
 
-        return aggregator.aggregate_options(
-            opts_manager,
-            config.ConfigFileFinder('flake8', [], [config_file]),
-            []
-        )
+    raise RuntimeError('flake8 is too old. Please upgrade to version 3.0.0 or newer')
 
 
 def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
