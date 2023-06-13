@@ -277,9 +277,6 @@ def get_compilation_db_files(paths):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in dirnames + filenames:
-                    dirnames[:] = []
-                    continue
                 # ignore folder starting with . or _
                 dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
                 dirnames.sort()
