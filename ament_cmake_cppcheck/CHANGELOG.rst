@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_cppcheck
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.15.1 (2023-06-07)
 -------------------
 
