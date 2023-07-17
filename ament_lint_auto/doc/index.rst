@@ -43,3 +43,22 @@ sufficient to test with a set of common linters.
 The documentation of the package `ament_cmake_test
 <https://github.com/ament/ament_cmake>`_ provides more information on testing
 in CMake ament packages.
+
+How to exclude files with ament_lint_auto?
+------------------------------------------
+
+Linter hooks conform to the ament_lint_auto convention of excluding files
+specified in the CMake list variable `AMENT_LINT_AUTO_FILE_EXCLUDE`.
+As such, the CMake snippet from above can be modified to exclude files across
+all linters with one addition.
+
+``CMakeLists.txt``:
+
+.. code:: cmake
+
+    # this must happen before the invocation of ament_package()
+    if(BUILD_TESTING)
+      find_package(ament_lint_auto REQUIRED)
+      set(AMENT_LINT_AUTO_FILE_EXCLUDE /path/to/ignored_file ...)
+      ament_lint_auto_find_test_dependencies()
+    endif()
