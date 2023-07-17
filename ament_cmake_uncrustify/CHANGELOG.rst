@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.12.7 (2023-07-17)
+-------------------
+* [ament_lint_auto] General file exclusion with AMENT_LINT_AUTO_FILE_EXCLUDE (`#386 <https://github.com/ament/ament_lint/issues/386>`_) (`#445 <https://github.com/ament/ament_lint/issues/445>`_)
+* Contributors: mergify[bot]
+
 0.12.6 (2023-04-25)
 -------------------
 

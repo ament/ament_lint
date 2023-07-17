@@ -2,6 +2,9 @@
 Changelog for package ament_pycodestyle
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.12.7 (2023-07-17)
+-------------------
+
 0.12.6 (2023-04-25)
 -------------------
 * ament_pycodestyle - fix crash caused by reporting on ignored errors (`#435 <https://github.com/ament/ament_lint/issues/435>`_) (`#436 <https://github.com/ament/ament_lint/issues/436>`_)
