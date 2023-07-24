@@ -251,14 +251,13 @@ def get_xunit_content(report, testname, elapsed):
 """ % data
 
     for (filename, errors) in report:
-
         if errors:
             # report each error as a failing testcase
             for error in errors:
                 data = {
                     'quoted_location': quoteattr(
-                        '%s (%s:%d)' % (
-                            error['category'], filename, error['linenumber'])),
+                        '%s (%s:%s)' % (
+                            error['category'], filename, str(error['linenumber']))),
                     'testname': testname,
                     'quoted_message': quoteattr(error['message']),
                 }
