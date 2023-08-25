@@ -277,6 +277,12 @@ def get_compilation_db_files(paths):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
+                # NOTE: here we don't check for the AMENT_IGNORE file.
+                # This function tries to find compile_commands.json file in the build folders.
+                # Build folders always include a AMENT_IGNORE file, so checking for it would result in not finding any compilation db.
+                # The check would also be redundant, because if a source folder was marked with AMENT_IGNORE, then 
+                # the compile_commands.json will not be present in relevant build folder.
+
                 # ignore folder starting with . or _
                 dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
                 dirnames.sort()
