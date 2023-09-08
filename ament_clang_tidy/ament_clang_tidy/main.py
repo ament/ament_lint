@@ -55,6 +55,11 @@ def main(argv=sys.argv[1:]):
         type=int,
         default=1,
         help='number of clang-tidy jobs to run in parallel')
+    parser.add_argument(
+        '--extra-arg',
+        type=str,
+        default=None,
+        help='Additional argument to append to the compiler command line')
 
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
@@ -152,6 +157,8 @@ def main(argv=sys.argv[1:]):
             cmd.append('--quiet')
         if args.system_headers:
             cmd.append('--system-headers')
+        if args.extra_arg:
+            cmd.append('--extra-arg=' + args.extra_arg)
 
         def is_gtest_source(file_name):
             if file_name == 'gtest_main.cc' or file_name == 'gtest-all.cc' \
