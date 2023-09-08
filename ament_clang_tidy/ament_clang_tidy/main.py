@@ -180,6 +180,7 @@ def main(argv=sys.argv[1:]):
                 print('The invocation of "%s" failed with error code %d: %s' %
                       (os.path.basename(clang_tidy_bin), e.returncode, e),
                       file=sys.stderr)
+                output = e.output.decode()
             return output
 
         files = []
@@ -267,6 +268,9 @@ def main(argv=sys.argv[1:]):
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
+
+    if output:
+        sys.exit(1)
 
 
 def find_executable(file_names):
