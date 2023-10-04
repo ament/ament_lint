@@ -2,6 +2,11 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Pass --output argument to cpplint (`#453 <https://github.com/ament/ament_lint/issues/453>`_)
+* Contributors: Vladimir Ivan
+
 0.15.2 (2023-07-11)
 -------------------
 

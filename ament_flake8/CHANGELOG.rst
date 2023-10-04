@@ -2,6 +2,11 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add additional dependencies to ament_flake8. (`#454 <https://github.com/ament/ament_lint/issues/454>`_)
+* Contributors: Chris Lalancette
+
 0.15.2 (2023-07-11)
 -------------------
 
