@@ -38,9 +38,9 @@ def main(argv=sys.argv[1:]):
         'paths',
         nargs='*',
         default=[os.curdir],
-        help='The files or directories to check. For directories files ending '
-             'in %s will be considered. Unless overruled by the --extensions '
-             'argument' %
+        help='The files or directories to check. For directories, only files ending '
+             'in %s will be considered (unless overruled by the --extensions '
+             'option)' %
              ', '.join(["'.%s'" % e for e in default_extensions]))
     parser.add_argument(
         '--exclude',
