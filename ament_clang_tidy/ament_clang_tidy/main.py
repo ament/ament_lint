@@ -162,6 +162,11 @@ def main(argv=sys.argv[1:]):
         def is_unittest_source(package, file_path):
             return ('%s/test/' % package) in file_path
 
+        def is_protobuf_source(file_name):
+            if(file_name.endswith(".pb.cc") or file_name.endswith(".pb.h")):
+                return True
+            return False
+
         def start_subprocess(full_cmd):
             output = ''
             try:
@@ -186,6 +191,10 @@ def main(argv=sys.argv[1:]):
             # exclude unit test sources from being checked by clang-tidy
             # because gtest macros are problematic
             if is_unittest_source(package_name, item['file']):
+                continue
+
+            # exclude auto-generated protobuf sources from being checked by clang-tidy
+            if is_protobuf_source(os.path.basename(item['file'])):
                 continue
 
             files.append(item['file'])
