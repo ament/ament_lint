@@ -163,7 +163,7 @@ def main(argv=sys.argv[1:]):
             return ('%s/test/' % package) in file_path
 
         def is_protobuf_source(file_name):
-            if(file_name.endswith(".pb.cc") or file_name.endswith(".pb.h")):
+            if(file_name.endswith('.pb.cc') or file_name.endswith('.pb.h')):
                 return True
             return False
 
