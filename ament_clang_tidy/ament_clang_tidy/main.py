@@ -281,7 +281,7 @@ def get_compilation_db_files(paths):
                 # This function tries to find compile_commands.json file in the build folders.
                 # Build folders always include a AMENT_IGNORE file, so checking for it would
                 # result in not finding any compilation db. The check would also be redundant
-                # because if a source folder was marked with AMENT_IGNORE, then 
+                # because if a source folder was marked with AMENT_IGNORE, then
                 # the compile_commands.json will not be present in relevant build folder.
 
                 # ignore folder starting with . or _
