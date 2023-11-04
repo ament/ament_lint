@@ -25,6 +25,8 @@
 #
 # :param TESTNAME: the name of the test, default: "clang_tidy"
 # :type TESTNAME: string
+# :param EXCLUDE: an optional list of exclude directories or files for flake8
+# :type EXCLUDE: list
 # :param CONFIG_FILE: the path of the configuration file for clang-tidy to consider
 # :type CONFIG_FILE: string
 # :param ARGN: the files or directories to check
@@ -35,7 +37,7 @@
 # @public
 #
 function(ament_clang_tidy)
-  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE;TIMEOUT;HEADER_FILTER;JOBS" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME;EXCLUDE;CONFIG_FILE;TIMEOUT;HEADER_FILTER;JOBS" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "clang_tidy")
   endif()
@@ -48,6 +50,10 @@ function(ament_clang_tidy)
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_clang_tidy_BIN}" "--xunit-file" "${result_file}")
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
+  endif()
 
   if(ARG_CONFIG_FILE)
     list(APPEND cmd "--config" "${ARG_CONFIG_FILE}")

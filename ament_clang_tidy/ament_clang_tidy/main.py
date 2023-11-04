@@ -17,6 +17,7 @@
 import argparse
 from collections import defaultdict
 import copy
+import glob
 import json
 from multiprocessing.pool import ThreadPool
 import os
@@ -85,9 +86,16 @@ def main(argv=sys.argv[1:]):
         '--packages-select', nargs='*', metavar='PKG_NAME',
         help='Only process a subset of packages')
     parser.add_argument(
+        '--exclude', default=[], nargs='*', help='Filenames to exclude')
+    parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
+
+    excludes = []
+    for exclude_pattern in args.exclude:
+        excludes.extend(glob.glob(exclude_pattern))
+    excludes = {os.path.realpath(x) for x in excludes}
 
     if args.config_file is not None and not os.path.exists(args.config_file):
         print("Could not find config file '%s'" % args.config_file,
@@ -167,6 +175,9 @@ def main(argv=sys.argv[1:]):
                 return True
             return False
 
+        def is_excluded(file_path):
+            return file_path in excludes
+
         def start_subprocess(full_cmd):
             output = ''
             try:
@@ -195,6 +206,10 @@ def main(argv=sys.argv[1:]):
 
             # exclude auto-generated protobuf sources from being checked by clang-tidy
             if is_protobuf_source(os.path.basename(item['file'])):
+                continue
+
+            # exclude files that are explicitly excluded
+            if is_excluded(item['file']):
                 continue
 
             files.append(item['file'])
