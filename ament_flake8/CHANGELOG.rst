@@ -2,6 +2,9 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.16.0 (2023-10-04)
 -------------------
 * Add additional dependencies to ament_flake8. (`#454 <https://github.com/ament/ament_lint/issues/454>`_)

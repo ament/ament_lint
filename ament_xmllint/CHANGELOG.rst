@@ -2,6 +2,11 @@
 Changelog for package ament_xmllint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* (ament_xmllint) add extensions argument (`#456 <https://github.com/ament/ament_lint/issues/456>`_)
+* Contributors: Matthijs van der Burgh
+
 0.16.0 (2023-10-04)
 -------------------
 

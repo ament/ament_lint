@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Provide --header-filter and --jobs to CMake. (`#450 <https://github.com/ament/ament_lint/issues/450>`_)
+* Contributors: Roderick Taylor
+
 0.16.0 (2023-10-04)
 -------------------
 
