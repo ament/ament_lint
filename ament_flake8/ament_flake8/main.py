@@ -143,7 +143,7 @@ def get_flake8_style_guide(argv):
     # appropriate options to pass into the standard flake8.legacy.get_style_guide();
     # passing argv gets it to determine the options for us.
     application = flake8_app.Application()
-
+    file_checker_takes_argv = False
     if hasattr(application, 'parse_preliminary_options'):
         prelim_opts, remaining_args = application.parse_preliminary_options(
             argv)
@@ -184,6 +184,7 @@ def get_flake8_style_guide(argv):
         # Ref: https://github.com/PyCQA/flake8/commit/0d667a73299971f1cf8ff549c519fffb282b1faf
         from flake8.options.parse_args import parse_args
         application.plugins, application.options = parse_args(argv)
+        file_checker_takes_argv = True
     application.make_formatter()
     try:
         # needed in older flake8 versions to populate the listener
@@ -191,7 +192,11 @@ def get_flake8_style_guide(argv):
     except AttributeError:
         pass
     application.make_guide()
-    application.make_file_checker_manager(argv)
+
+    if file_checker_takes_argv:
+        application.make_file_checker_manager(argv)
+    else:
+        application.make_file_checker_manager()
     return StyleGuide(application)
 
 
