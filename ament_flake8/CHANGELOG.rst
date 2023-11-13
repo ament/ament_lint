@@ -2,6 +2,11 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.12.9 (2023-11-13)
+-------------------
+* [backport humble] Fix compatibility with flake8 version 5 (`#387 <https://github.com/ament/ament_lint/issues/387>`_, `#410 <https://github.com/ament/ament_lint/issues/410>`_) (`#451 <https://github.com/ament/ament_lint/issues/451>`_)
+* Contributors: Emerson Knapp
+
 0.12.8 (2023-09-19)
 -------------------
 

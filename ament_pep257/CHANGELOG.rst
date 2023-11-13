@@ -2,6 +2,9 @@
 Changelog for package ament_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.12.9 (2023-11-13)
+-------------------
+
 0.12.8 (2023-09-19)
 -------------------
 * Convert linenumber to string when printing errors (`#443 <https://github.com/ament/ament_lint/issues/443>`_) (`#446 <https://github.com/ament/ament_lint/issues/446>`_)
