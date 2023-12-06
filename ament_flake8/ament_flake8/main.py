@@ -207,12 +207,19 @@ def parse_config_file(config_file):
     major_release = flake8_version_info[0]
 
     if major_release >= 5:
-        opts_manager = manager.OptionManager(
-            version=flake8_version,
-            plugin_versions='',
-            parents=[],
-            formatter_names=[],
-        )
+        if major_release == 5:
+            opts_manager = manager.OptionManager(
+                version=flake8_version,
+                plugin_versions='',
+                parents=[],
+            )
+        else:
+            opts_manager = manager.OptionManager(
+                version=flake8_version,
+                plugin_versions='',
+                parents=[],
+                formatter_names=[],
+            )
         flake8_options.register_default_options(opts_manager)
         cfg, cfg_dir = config.load_config(config_file, [])
 
