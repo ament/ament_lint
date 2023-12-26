@@ -2,8 +2,8 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.16.2 (2023-12-26)
+-------------------
 * Changes to make ament_flake8 work with v6+ (`#459 <https://github.com/ament/ament_lint/issues/459>`_)
 * Contributors: Michael Carroll
 
