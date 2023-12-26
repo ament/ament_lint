@@ -2,6 +2,9 @@
 Changelog for package ament_clang_format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.16.1 (2023-11-06)
 -------------------
 

@@ -2,6 +2,9 @@
 Changelog for package ament_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.16.1 (2023-11-06)
 -------------------
 * remove AMENT_IGNORE check in clang-tidy when looking for compilation db (`#441 <https://github.com/ament/ament_lint/issues/441>`_)
