@@ -96,7 +96,7 @@ def main(argv=sys.argv[1:]):
         return 1
 
     bin_names = [
-        # 'clang-tidy',
+        'clang-tidy',
         'clang-tidy-6.0',
     ]
     clang_tidy_bin = find_executable(bin_names)
