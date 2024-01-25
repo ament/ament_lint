@@ -150,7 +150,7 @@ def main(argv=sys.argv[1:]):
                     report.append((filename, diff_lines))
             if args.reformat:
                 # overwrite original with reformatted file
-                with(open(filename, 'wb')) as original_file:
+                with open(filename, 'wb') as original_file:
                     with open(modified_filename, 'rb') as modified_file:
                         original_file.write(modified_file.read())
     finally:
