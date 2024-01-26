@@ -67,17 +67,17 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--libraries',
         nargs='*',
-        help="Library configurations to load in addition to the standard libraries of C and C++."
+        help='Library configurations to load in addition to the standard libraries of C and C++.'
              "Each library is passed to cppcheck as '--library=<library_name>'")
     parser.add_argument(
         '--include_dirs',
         nargs='*',
-        help="Include directories for C/C++ files being checked."
+        help='Include directories for C/C++ files being checked.'
              "Each directory is passed to cppcheck as '-I <include_dir>'")
     parser.add_argument(
         '--exclude',
         nargs='*',
-        help="Exclude C/C++ files from being checked."
+        help='Exclude C/C++ files from being checked.'
              "Each file is passed to cppcheck as '--suppress=*:<file>'")
     parser.add_argument(
         '--language',
@@ -127,7 +127,8 @@ def main(argv=sys.argv[1:]):
         if cppcheck_version == '1.88' or cppcheck_version.startswith('2.'):
             print(
                 f'cppcheck {cppcheck_version} has known performance issues and therefore will not '
-                'be used, set the AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS environment variable to override this.',
+                'be used, set the AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS environment variable to '
+                'override this.',
                 file=sys.stderr,
             )
 
@@ -203,7 +204,7 @@ def main(argv=sys.argv[1:]):
             data = dict(data)
             data['filename'] = filename
             print('[%(filename)s:%(line)d]: (%(severity)s: %(id)s) %(msg)s' % data,
-                file=sys.stderr)
+                  file=sys.stderr)
 
     # output summary
     error_count = sum(len(r) for r in report.values())
@@ -277,10 +278,10 @@ def get_xunit_content(report, testname, elapsed, skip=None):
 
         if skip:
             data = {
-              'quoted_name': quoteattr(filename),
-              'testname': testname,
-              'quoted_message': quoteattr(''),
-              'skip': skip,
+                'quoted_name': quoteattr(filename),
+                'testname': testname,
+                'quoted_message': quoteattr(''),
+                'skip': skip,
             }
             xml += """  <testcase
     name=%(quoted_name)s
