@@ -260,4 +260,4 @@ def test__get_xunit_content(mocker, sample_errors):
                                              [err.group('filename') for err in errors], .01)
     root = ET.fromstring(xml)
     assert root.get('failures') == '0'
-    assert(len(root)) == 2
+    assert len(root) == 2
