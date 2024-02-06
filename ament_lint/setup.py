@@ -32,6 +32,7 @@ setup(
 Providing common API for ament linter packages, e.g. the `linter` marker for
 pytest.""",
     license='Apache License, Version 2.0',
+    tests_require=['pytest'],
     entry_points={
         'pytest11': [
             'ament_lint = ament_lint.pytest_marker',
