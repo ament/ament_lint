@@ -7,8 +7,6 @@
     The ability to check code against the Google style conventions using
     cpplint and generate xUnit test result files.</description>
 
-  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
-
   <license>Apache License 2.0</license>
   <license>BSD</license>
 

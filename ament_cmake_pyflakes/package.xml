@@ -7,8 +7,6 @@
     The CMake API for ament_pyflakes to check code using pyflakes.
   </description>
 
-  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
-
   <license>Apache License 2.0</license>
 
   <author email="audrow@openrobotics.org">Audrow Nash</author>
