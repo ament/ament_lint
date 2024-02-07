@@ -2,6 +2,12 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Changes to make ament_flake8 work with v6+ (`#463 <https://github.com/ament/ament_lint/issues/463>`_)
+* Fix compatibility with flake8 version 5 (`#465 <https://github.com/ament/ament_lint/issues/465>`_)
+* Contributors: Chris Lalancette, Michael Carroll, Timo Röhling
+
 0.14.2 (2023-09-08)
 -------------------
 
