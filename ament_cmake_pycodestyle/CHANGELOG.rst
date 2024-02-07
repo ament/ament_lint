@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_pycodestyle
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.16.2 (2023-12-26)
 -------------------
 

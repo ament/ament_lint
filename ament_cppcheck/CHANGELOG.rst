@@ -2,6 +2,11 @@
 Changelog for package ament_cppcheck
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add in checks to ament_cppcheck code. (`#472 <https://github.com/ament/ament_lint/issues/472>`_)
+* Contributors: Chris Lalancette
+
 0.16.2 (2023-12-26)
 -------------------
 

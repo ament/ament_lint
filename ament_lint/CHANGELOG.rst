@@ -2,6 +2,11 @@
 Changelog for package ament_lint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add an ament_lint test dependency on python3-pytest. (`#473 <https://github.com/ament/ament_lint/issues/473>`_)
+* Contributors: Chris Lalancette
+
 0.16.2 (2023-12-26)
 -------------------
 
