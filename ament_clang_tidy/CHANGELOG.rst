@@ -2,8 +2,8 @@
 Changelog for package ament_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.16.3 (2024-02-07)
+-------------------
 * Fix a warning from newer versions of flake8. (`#469 <https://github.com/ament/ament_lint/issues/469>`_)
 * Contributors: Chris Lalancette
 

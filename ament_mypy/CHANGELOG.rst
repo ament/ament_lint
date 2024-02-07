@@ -2,8 +2,8 @@
 Changelog for package ament_mypy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.16.3 (2024-02-07)
+-------------------
 * Fix a flake8 warning in ament_mypy. (`#470 <https://github.com/ament/ament_lint/issues/470>`_)
   No need for parentheses around an assert.
 * Contributors: Chris Lalancette
