@@ -271,7 +271,7 @@ ddd
     """
     index = 0
     index = scan_past_empty_lines(commented_content, index)
-    block = get_multiline_comment_block(commented_content, index)
+    block, _ = get_multiline_comment_block(commented_content, index)
     assert block is not None
     assert block == 'ddd'
 
@@ -320,7 +320,7 @@ def test_get_multiline_comment_block_cstyle():
     """
     index = 0
     index = scan_past_empty_lines(commented_content, index)
-    block = get_multiline_comment_block(commented_content, index)
+    block, _ = get_multiline_comment_block(commented_content, index)
     assert block is not None
     assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
 
@@ -339,7 +339,7 @@ def test_get_multiline_comment_block_cstyle2():
     """
     index = 0
     index = scan_past_empty_lines(commented_content, index)
-    block = get_multiline_comment_block(commented_content, index)
+    block, _ = get_multiline_comment_block(commented_content, index)
     assert block is not None
     assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
 
@@ -355,7 +355,7 @@ def test_get_multiline_comment_block_xmlstyle():
     """
     index = 0
     index = scan_past_empty_lines(commented_content, index)
-    block = get_multiline_comment_block(commented_content, index)
+    block, _ = get_multiline_comment_block(commented_content, index)
     assert block is not None
     assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
 
@@ -371,6 +371,6 @@ def test_get_multiline_comment_block_xmlstyle_prefixed():
     """
     index = 0
     index = scan_past_empty_lines(commented_content, index)
-    block = get_multiline_comment_block(commented_content, index)
+    block, _ = get_multiline_comment_block(commented_content, index)
     assert block is not None
     assert block == '\n'.join(['aaa', 'bbb', 'ccc'])
