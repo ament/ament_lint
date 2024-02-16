@@ -7,7 +7,7 @@
     The CMake API for ament_cpplint to lint C / C++ code using cpplint.
   </description>
 
-  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
 
   <license>Apache License 2.0</license>
 
