@@ -8,6 +8,8 @@
     PEP 257 and generate xUnit test result files.
   </description>
 
+  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+
   <license>Apache License 2.0</license>
   <license>MIT</license>
 
