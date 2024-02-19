@@ -311,14 +311,6 @@ def add_copyright_year(file_descriptors, new_years, verbose):
             content = file_descriptor.content[:global_years_span[0]] + years_string + \
                 file_descriptor.content[global_years_span[1]:]
 
-            # output beginning of file for debugging
-            # index = global_years_span[0]
-            # for _ in range(3):
-            #     index = get_index_of_next_line(content, index)
-            # print('<<<')
-            # print(content[:index - 1])
-            # print('>>>')
-
             with open(file_descriptor.path, 'w', encoding='utf-8') as h:
                 h.write(content)
 
