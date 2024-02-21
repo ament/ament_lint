@@ -39,7 +39,7 @@ def main(argv=sys.argv[1:]):
 
     try:
         cmd = [uncrustify_bin, '--version']
-        version = subprocess.check_output(cmd)
+        version_output = subprocess.check_output(cmd)
     except subprocess.CalledProcessError as e:
         if e.output:
             print(e.output.decode(), file=sys.stderr)
@@ -47,15 +47,25 @@ def main(argv=sys.argv[1:]):
               (e.returncode, e), file=sys.stderr)
         return 1
 
-    # Loading specific version for 0.78.1
-    if version[version.index('-')+1: version.index('_')] == '0.78.1':
-        config_file = 'ament_code_style_0_78.cfg'
-    else:
-        config_file = 'ament_code_style.cfg'
+    # Version 0.78.1 is different enough that we have a specific
+    # configuration file for it.  Anything before that uses the 0.72 one.
+    # The strings that uncrustify can print vary depending on how it was
+    # built; common variations are "Uncrustify_d-0.78.1"
+    # and "Uncrustify-0.72.0_f".
+    version_match = re.match(rb'^Uncrustify[^0-9]*([0-9]*\.[0-9]*\.[0-9]*).*$', version_output)
+    if version_match is None or len(version_match.groups()) != 1:
+        print("Invalid uncrustify version '%s'" % (version))
+        return 1
 
-    config_file = os.path.join(
+    version = version_match.group(1)
+    if version == b'0.78.1':
+        default_config_file = 'ament_code_style_0_78.cfg'
+    else:
+        default_config_file = 'ament_code_style_0_72.cfg'
+
+    default_config_path = os.path.join(
         os.path.dirname(__file__),
-        'configuration', config_file)
+        'configuration', default_config_file)
 
     c_extensions = ['c', 'cc', 'h', 'hh']
     cpp_extensions = ['cpp', 'cxx', 'hpp', 'hxx']
@@ -66,7 +76,7 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '-c',
         metavar='CFG',
-        default=config_file,
+        default=default_config_path,
         dest='config_file',
         help='The config file')
     parser.add_argument(

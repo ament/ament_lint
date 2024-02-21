@@ -14,7 +14,8 @@ setup(
     ],
     install_requires=['setuptools'],
     package_data={'': [
-        'configuration/ament_code_style.cfg',
+        'configuration/ament_code_style_0_72.cfg',
+        'configuration/ament_code_style_0_78.cfg',
     ]},
     zip_safe=False,
     author='Dirk Thomas',
