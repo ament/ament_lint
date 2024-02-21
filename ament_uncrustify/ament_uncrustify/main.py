@@ -32,9 +32,30 @@ from xml.sax.saxutils import quoteattr
 
 
 def main(argv=sys.argv[1:]):
+    uncrustify_bin = find_executable('uncrustify')
+    if not uncrustify_bin:
+        print("Could not find 'uncrustify' executable", file=sys.stderr)
+        return 1
+
+    try:
+        cmd = [uncrustify_bin, '--version']
+        version = subprocess.check_output(cmd)
+    except subprocess.CalledProcessError as e:
+        if e.output:
+            print(e.output.decode(), file=sys.stderr)
+        print("The invocation of 'uncrustify' failed with error code %d: %s" %
+              (e.returncode, e), file=sys.stderr)
+        return 1
+
+    # Loading specific version for 0.78.1
+    if version[version.index('-')+1: version.index('_')] == '0.78.1':
+        config_file = 'ament_code_style_0_78.cfg'
+    else:
+        config_file = 'ament_code_style.cfg'
+
     config_file = os.path.join(
         os.path.dirname(__file__),
-        'configuration', 'ament_code_style.cfg')
+        'configuration', config_file)
 
     c_extensions = ['c', 'cc', 'h', 'hh']
     cpp_extensions = ['cpp', 'cxx', 'hpp', 'hxx']
@@ -117,11 +138,6 @@ def main(argv=sys.argv[1:]):
             exclude_patterns=args.exclude, language=language_)
         if not files_by_language:
             print('No files found', file=sys.stderr)
-            return 1
-
-        uncrustify_bin = find_executable('uncrustify')
-        if not uncrustify_bin:
-            print("Could not find 'uncrustify' executable", file=sys.stderr)
             return 1
 
         report = []
