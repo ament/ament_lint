@@ -54,7 +54,7 @@ def main(argv=sys.argv[1:]):
     # and "Uncrustify-0.72.0_f".
     version_match = re.match(rb'^Uncrustify[^0-9]*([0-9]*\.[0-9]*\.[0-9]*).*$', version_output)
     if version_match is None or len(version_match.groups()) != 1:
-        print("Invalid uncrustify version '%s'" % (version))
+        print("Invalid uncrustify version '%s'" % (version_output))
         return 1
 
     version = version_match.group(1)
