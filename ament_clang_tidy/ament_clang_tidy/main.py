@@ -159,6 +159,11 @@ def main(argv=sys.argv[1:]):
                 return True
             return False
 
+        def is_moc_generated(file_name):
+            if file_name.startswith('moc_') and file_name.endswith('.cpp'):
+                return True
+            return False
+
         def is_unittest_source(package, file_path):
             return ('%s/test/' % package) in file_path
 
@@ -181,6 +186,10 @@ def main(argv=sys.argv[1:]):
         for item in db:
             # exclude gtest sources from being checked by clang-tidy
             if is_gtest_source(os.path.basename(item['file'])):
+                continue
+
+            # exclude Qt moc generated files from being checked by clang-tidy
+            if is_moc_generated(os.path.basename(item['file'])):
                 continue
 
             # exclude unit test sources from being checked by clang-tidy
