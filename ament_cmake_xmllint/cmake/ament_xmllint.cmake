@@ -23,7 +23,7 @@
 # @public
 #
 function(ament_xmllint)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME" "PATHS;EXCLUDE;EXTENSIONS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "xmllint")
   endif()
@@ -35,6 +35,14 @@ function(ament_xmllint)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_xmllint_BIN}" "--xunit-file" "${result_file}")
+
+  if(ARG_EXTENSIONS)
+    list(APPEND cmd "--extensions")
+    foreach(ext ${ARG_EXTENSIONS})
+      list(APPEND cmd "${ext}")
+    endforeach()
+  endif()
+
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   find_program(xmllint_BIN NAMES "xmllint")
