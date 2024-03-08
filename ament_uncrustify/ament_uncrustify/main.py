@@ -37,7 +37,7 @@ def main(argv=sys.argv[1:]):
         'configuration', 'ament_code_style.cfg')
 
     c_extensions = ['c', 'cc', 'h', 'hh']
-    cpp_extensions = ['cpp', 'cxx', 'hpp', 'hxx']
+    cpp_extensions = ['cpp', 'cxx', 'hpp', 'hxx', 'ipp']
 
     parser = argparse.ArgumentParser(
         description='Check code style using uncrustify.',
@@ -243,18 +243,32 @@ def get_files(paths, extension_types, exclude_patterns=[], language=None):
                 # select files by extension
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
-                    language = extensions_with_dot_to_language.get(ext, None)
-                    if language is not None:
-                        filepath = os.path.join(dirpath, filename)
-                        if os.path.realpath(filepath) not in excludes:
+                    # Check whether to use default ext language or user custom one
+                    language_ = extensions_with_dot_to_language.get(ext, None)
+                    filepath = os.path.join(dirpath, filename)
+                    if os.path.realpath(filepath) not in excludes:
+                        # Add file only if it is not excluded
+                        if language_ is not None:
+                            # Add file with its own extension
+                            files[language_].append(
+                                os.path.normpath(os.path.join(dirpath, filename)))
+                        else:
+                            # When ext not found, add file with user custom extension
                             files[language].append(
                                 os.path.normpath(os.path.join(dirpath, filename)))
+        
         if os.path.isfile(path):
             _, ext = os.path.splitext(path)
-            language = extensions_with_dot_to_language.get(ext, None)
-            if language is not None:
-                if os.path.realpath(path) not in excludes:
+            # Check whether to use default ext language or user custom one
+            language_ = extensions_with_dot_to_language.get(ext, None)
+            if os.path.realpath(path) not in excludes:
+                if language_ is not None:
+                    # Add file with its own extension
+                    files[language_].append(os.path.normpath(path))
+                else:
+                    # When ext not found, add file with user set extension
                     files[language].append(os.path.normpath(path))
+                    
     return files
 
 
