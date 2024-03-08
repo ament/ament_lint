@@ -39,7 +39,7 @@
 # @public
 #
 function(ament_flake8)
-  cmake_parse_arguments(ARG "" "EXCLUDE;MAX_LINE_LENGTH;TESTNAME;CONFIG_FILE" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME;CONFIG_FILE" "EXCLUDE" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "flake8")
   endif()
