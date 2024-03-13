@@ -33,6 +33,15 @@ function(ament_copyright)
     set(ARG_TIMEOUT 120)
   endif()
 
+  # https://cmake.org/cmake/help/latest/prop_dir/TESTS.html
+  get_directory_property(_declared_tests TESTS)
+  if(DEFINED AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS)
+    if((AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS) AND (${ARG_TESTNAME} IN_LIST _declared_tests))
+      message(VERBOSE "skipping test '${ARG_TESTNAME}' as it has already been added")
+      return()
+    endif()
+  endif()
+
   find_program(ament_copyright_BIN NAMES "ament_copyright")
   if(NOT ament_copyright_BIN)
     message(FATAL_ERROR "ament_copyright() could not find program 'ament_copyright'")
