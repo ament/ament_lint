@@ -28,6 +28,15 @@ function(ament_pep257)
     set(ARG_TESTNAME "pep257")
   endif()
 
+  # https://cmake.org/cmake/help/latest/prop_dir/TESTS.html
+  get_directory_property(_declared_tests TESTS)
+  if(DEFINED AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS)
+    if((AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS) AND (${ARG_TESTNAME} IN_LIST _declared_tests))
+      message(VERBOSE "skipping test '${ARG_TESTNAME}' as it has already been added")
+      return()
+    endif()
+  endif()
+
   find_program(ament_pep257_BIN NAMES "ament_pep257")
   if(NOT ament_pep257_BIN)
     message(FATAL_ERROR "ament_pep257() could not find program 'ament_pep257'")

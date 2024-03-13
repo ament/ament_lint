@@ -35,6 +35,15 @@ function(ament_pclint)
     set(ARG_TESTNAME "pclint")
   endif()
 
+  # https://cmake.org/cmake/help/latest/prop_dir/TESTS.html
+  get_directory_property(_declared_tests TESTS)
+  if(DEFINED AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS)
+    if((AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS) AND (${ARG_TESTNAME} IN_LIST _declared_tests))
+      message(VERBOSE "skipping test '${ARG_TESTNAME}' as it has already been added")
+      return()
+    endif()
+  endif()
+
   find_program(ament_pclint_BIN NAMES "ament_pclint")
   if(NOT ament_pclint_BIN)
     message(FATAL_ERROR "ament_pclint() could not find program 'ament_pclint'")
