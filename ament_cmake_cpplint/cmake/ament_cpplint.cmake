@@ -34,7 +34,7 @@
 # @public
 #
 function(ament_cpplint)
-  cmake_parse_arguments(ARG "" "EXCLUDE;MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS;EXCLUDE" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cpplint")
   endif()
@@ -51,7 +51,7 @@ function(ament_cpplint)
   endif()
   if(ARG_FILTERS)
     string(REPLACE ";" "," filters "${ARG_FILTERS}")
-    list(APPEND cmd "--filters=${filters}")
+    list(APPEND cmd "--filter=${filters}")
   endif()
   if(ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
