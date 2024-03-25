@@ -267,7 +267,7 @@ def add_missing_header(file_descriptors, name, license_, verbose):
 
 def add_copyright_year(file_descriptors, new_years, verbose):
     if verbose:
-        print(f'Adding {",".join(map(str,new_years))} to existing copyright notices:')
+        print(f'Adding {",".join(map(str, new_years))} to existing copyright notices:')
         print()
 
     for path in sorted(file_descriptors.keys()):

@@ -347,7 +347,7 @@ def remove_formatting(text):
 
 # Flat list of sections split on all separators provided
 def split_template(sections, separators):
-    if type(sections) != list:
+    if not isinstance(sections, list):
         return split_template([sections], separators)
     elif len(separators) > 1:
         return sum([split_template([section], separators[0:1]) for section
