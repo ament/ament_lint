@@ -31,6 +31,8 @@
 # :param LANGUAGE: a specific language argument for uncrustify instead of
 #   deriving the language from the file extension, either 'C' or 'C++'
 # :type LANGUAGE: string
+# :param TIMEOUT: the test timeout in seconds, default: 300
+# :type TIMEOUT: integer
 # :param EXCLUDE: an optional list of exclude files or directories for uncrustify
 # :type EXCLUDE: list
 # :param ARGN: the files or directories to check
@@ -39,7 +41,7 @@
 # @public
 #
 function(ament_uncrustify)
-  cmake_parse_arguments(ARG "" "CONFIG_FILE;LANGUAGE;MAX_LINE_LENGTH;TESTNAME" "EXCLUDE" ${ARGN})
+  cmake_parse_arguments(ARG "" "CONFIG_FILE;LANGUAGE;MAX_LINE_LENGTH;TESTNAME;TIMEOUT" "EXCLUDE" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "uncrustify")
   endif()
@@ -64,6 +66,9 @@ function(ament_uncrustify)
   if(ARG_EXCLUDE)
     list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
+  if(NOT ARG_TIMEOUT)
+    set(ARG_TIMEOUT 300)
+  endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_uncrustify")
@@ -73,6 +78,7 @@ function(ament_uncrustify)
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_uncrustify/${ARG_TESTNAME}.txt"
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    TIMEOUT "${ARG_TIMEOUT}"
   )
   set_tests_properties(
     "${ARG_TESTNAME}"
