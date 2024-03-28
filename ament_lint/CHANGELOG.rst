@@ -2,6 +2,11 @@
 Changelog for package ament_lint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update maintainer list in package.xml files (`#474 <https://github.com/ament/ament_lint/issues/474>`_)
+* Contributors: Michael Jeronimo
+
 0.16.3 (2024-02-07)
 -------------------
 * Add an ament_lint test dependency on python3-pytest. (`#473 <https://github.com/ament/ament_lint/issues/473>`_)

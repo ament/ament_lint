@@ -2,6 +2,13 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Small fixes for modern flake8. (`#484 <https://github.com/ament/ament_lint/issues/484>`_)
+* Fix add-copyright year function (`#466 <https://github.com/ament/ament_lint/issues/466>`_)
+* Update maintainer list in package.xml files (`#474 <https://github.com/ament/ament_lint/issues/474>`_)
+* Contributors: Chris Lalancette, Lloyd Pearson, Michael Jeronimo
+
 0.16.3 (2024-02-07)
 -------------------
 

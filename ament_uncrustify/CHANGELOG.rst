@@ -2,6 +2,12 @@
 Changelog for package ament_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adds uncrustify 0.78.1 config (`#475 <https://github.com/ament/ament_lint/issues/475>`_)
+* Update maintainer list in package.xml files (`#474 <https://github.com/ament/ament_lint/issues/474>`_)
+* Contributors: Marco A. Gutierrez, Michael Jeronimo
+
 0.16.3 (2024-02-07)
 -------------------
 * Fix a flake8 warning in ament_uncrustify. (`#471 <https://github.com/ament/ament_lint/issues/471>`_)

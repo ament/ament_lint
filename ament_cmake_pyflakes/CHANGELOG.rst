@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_pyflakes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update maintainer list in package.xml files (`#474 <https://github.com/ament/ament_lint/issues/474>`_)
+* Contributors: Michael Jeronimo
+
 0.16.3 (2024-02-07)
 -------------------
 
