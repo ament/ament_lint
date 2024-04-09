@@ -28,7 +28,7 @@
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_uncrustify
 # :type MAX_LINE_LENGTH: integer
-# :param TIMEOUT: the test timeout in seconds, default: 300
+# :param TIMEOUT: the test timeout in seconds, default (Windows): 300, default (other): 60
 # :type TIMEOUT: integer
 # :param LANGUAGE: a specific language argument for uncrustify instead of
 #   deriving the language from the file extension, either 'C' or 'C++'
@@ -69,6 +69,8 @@ function(ament_uncrustify)
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
   if(NOT ARG_TIMEOUT)
     if(WIN32)
+      # There are many timeouts when uncrustify is executed on Windows,
+      # increasing the timeout seems to fix the problem.
       set(ARG_TIMEOUT 300)
     else()
       set(ARG_TIMEOUT 60)
