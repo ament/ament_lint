@@ -43,7 +43,21 @@ function(ament_xmllint)
     endforeach()
   endif()
 
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude")
+    foreach(ex ${ARG_EXCLUDE})
+      list(APPEND cmd "${ex}")
+    endforeach()
+  endif()
+
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+
+  if(ARG_PATHS)
+    list(APPEND cmd "--")
+    foreach(path ${ARG_PATHS})
+      list(APPEND cmd "${path}")
+    endforeach()
+  endif()
 
   find_program(xmllint_BIN NAMES "xmllint")
 
