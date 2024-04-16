@@ -2,6 +2,9 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.16.4 (2024-03-28)
 -------------------
 * Small fixes for modern flake8. (`#484 <https://github.com/ament/ament_lint/issues/484>`_)

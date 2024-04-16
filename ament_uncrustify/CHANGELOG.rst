@@ -2,6 +2,9 @@
 Changelog for package ament_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.16.4 (2024-03-28)
 -------------------
 * Adds uncrustify 0.78.1 config (`#475 <https://github.com/ament/ament_lint/issues/475>`_)
