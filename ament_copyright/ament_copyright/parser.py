@@ -115,11 +115,11 @@ class SourceDescriptor(FileDescriptor):
 
         # get first comment block without leading comment tokens
         block, _ = get_comment_block(self.content, index)
-        copyrights, remaining_block = search_copyright_information(block)
+        copyrights, _, _, remaining_block = search_copyright_information(block)
 
         if len(copyrights) == 0:
             block = get_multiline_comment_block(self.content, index)
-            copyrights, remaining_block = search_copyright_information(block)
+            copyrights, _, _, remaining_block = search_copyright_information(block)
 
         if len(copyrights) == 0:
             return
@@ -193,17 +193,21 @@ def search_copyright_information(content):
     regex = re.compile(pattern, re.DOTALL | re.MULTILINE | re.IGNORECASE)
 
     copyrights = []
+    years_spans = []
+    name_spans = []
     while True:
         match = regex.search(content)
         if not match:
             break
         years_span, name_span = match.span(1), match.span(2)
+        years_spans.append(years_span)
+        name_spans.append(name_span)
         years = content[years_span[0]:years_span[1]]
         name = content[name_span[0]:name_span[1]]
         copyrights.append(CopyrightDescriptor(name, years))
         content = content[name_span[1]:]
 
-    return copyrights, content
+    return copyrights, years_spans, name_spans, content
 
 
 def scan_past_coding_and_shebang_lines(content):
@@ -343,7 +347,7 @@ def remove_formatting(text):
 
 # Flat list of sections split on all separators provided
 def split_template(sections, separators):
-    if type(sections) != list:
+    if not isinstance(sections, list):
         return split_template([sections], separators)
     elif len(separators) > 1:
         return sum([split_template([section], separators[0:1]) for section

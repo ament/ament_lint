@@ -267,14 +267,14 @@ def add_missing_header(file_descriptors, name, license_, verbose):
 
 def add_copyright_year(file_descriptors, new_years, verbose):
     if verbose:
-        print('Adding the current year to existing copyright notices:')
+        print(f'Adding {",".join(map(str, new_years))} to existing copyright notices:')
         print()
 
     for path in sorted(file_descriptors.keys()):
         file_descriptor = file_descriptors[path]
 
         # ignore files which do not have a header
-        if not getattr(file_descriptor, 'copyright_identifier', None):
+        if not getattr(file_descriptor, 'copyright_identifiers', None):
             continue
 
         index = scan_past_coding_and_shebang_lines(file_descriptor.content)
@@ -287,39 +287,32 @@ def add_copyright_year(file_descriptors, new_years, verbose):
         else:
             block = file_descriptor.content[index:]
             block_offset = 0
-        copyright_span, years_span, name_span = search_copyright_information(block)
-        if copyright_span is None:
+        copyrights, years_spans, _, _ = search_copyright_information(block)
+        if copyrights is None:
             assert False, "Could not find copyright information in file '%s'" % \
                 file_descriptor.path
 
-        # skip if all new years are already included
-        years = get_years_from_string(block[years_span[0]:years_span[1]])
-        if all((new_year in years) for new_year in new_years):
-            if verbose:
-                print(' ', file_descriptor.path)
-            continue
-        print('*' if file_descriptor.exists else '+', file_descriptor.path)
+        for years_span in years_spans:
+            # skip if all new years are already included
+            years = get_years_from_string(block[years_span[0]:years_span[1]])
+            if all((new_year in years) for new_year in new_years):
+                if verbose:
+                    print(' ', file_descriptor.path)
+                continue
+            print('*' if file_descriptor.exists else '+', file_descriptor.path)
 
-        for new_year in new_years:
-            years.add(new_year)
-        years_string = get_string_from_years(years)
+            for new_year in new_years:
+                years.add(new_year)
+            years_string = get_string_from_years(years)
 
-        # overwrite previous years with new years
-        offset = index + block_offset
-        global_years_span = [offset + years_span[0], offset + years_span[1]]
-        content = file_descriptor.content[:global_years_span[0]] + years_string + \
-            file_descriptor.content[global_years_span[1]:]
+            # overwrite previous years with new years
+            offset = index + block_offset
+            global_years_span = [offset + years_span[0], offset + years_span[1]]
+            content = file_descriptor.content[:global_years_span[0]] + years_string + \
+                file_descriptor.content[global_years_span[1]:]
 
-        # output beginning of file for debugging
-        # index = global_years_span[0]
-        # for _ in range(3):
-        #     index = get_index_of_next_line(content, index)
-        # print('<<<')
-        # print(content[:index - 1])
-        # print('>>>')
-
-        with open(file_descriptor.path, 'w', encoding='utf-8') as h:
-            h.write(content)
+            with open(file_descriptor.path, 'w', encoding='utf-8') as h:
+                h.write(content)
 
 
 def get_years_from_string(content):

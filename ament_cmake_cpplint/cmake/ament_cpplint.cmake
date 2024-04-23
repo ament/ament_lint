@@ -61,7 +61,17 @@ function(ament_cpplint)
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
   if(NOT ARG_TIMEOUT)
-    set(ARG_TIMEOUT 120)
+    if(WIN32)
+      # There are many timeouts when cpplint is executed on Windows,
+      # increasing the timeout seems to fix the problem.
+      set(ARG_TIMEOUT 500)
+    else()
+      set(ARG_TIMEOUT 120)
+    endif()
+  endif()
+  if(NOT ARG_TIMEOUT GREATER 0)
+    message(FATAL_ERROR "ament_add_test() the TIMEOUT argument must be a "
+      "valid number and greater than zero")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")
