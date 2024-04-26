@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.17.0 (2024-04-16)
 -------------------
 * Increased cpplint timeout by default on Windows (`#486 <https://github.com/ament/ament_lint/issues/486>`_)
