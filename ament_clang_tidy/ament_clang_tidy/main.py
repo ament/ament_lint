@@ -171,6 +171,9 @@ def main(argv=sys.argv[1:]):
                 print('The invocation of "%s" failed with error code %d: %s' %
                       (os.path.basename(clang_tidy_bin), e.returncode, e),
                       file=sys.stderr)
+                # Attempt to recover output, if any was found (eg - if
+                # WarningsAsErrors was specified in the config file).
+                output = e.output.decode('utf-8')
             return output
 
         files = []
