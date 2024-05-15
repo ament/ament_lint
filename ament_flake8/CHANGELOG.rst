@@ -2,6 +2,9 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.12.11 (2024-05-15)
+--------------------
+
 0.12.10 (2024-01-24)
 --------------------
 * Changes to make ament_flake8 work with v6+ (`#459 <https://github.com/ament/ament_lint/issues/459>`_) (`#464 <https://github.com/ament/ament_lint/issues/464>`_)
