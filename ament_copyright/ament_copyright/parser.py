@@ -182,7 +182,7 @@ def determine_filetype(path):
 
 def search_copyright_information(content):
     if content is None:
-        return [], content
+        return [], [], [], content
     # regex for matching years or year ranges (yyyy-yyyy) separated by colons
     year = r'\d{4}'
     year_range = '%s-%s' % (year, year)
