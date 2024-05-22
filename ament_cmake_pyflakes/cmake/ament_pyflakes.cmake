@@ -28,6 +28,15 @@ function(ament_pyflakes)
     set(ARG_TESTNAME "pyflakes")
   endif()
 
+  # https://cmake.org/cmake/help/latest/prop_dir/TESTS.html
+  get_directory_property(_declared_tests TESTS)
+  if(DEFINED AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS)
+    if((AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS) AND (${ARG_TESTNAME} IN_LIST _declared_tests))
+      message(VERBOSE "skipping test '${ARG_TESTNAME}' as it has already been added")
+      return()
+    endif()
+  endif()
+
   find_program(ament_pyflakes_BIN NAMES "ament_pyflakes")
   if(NOT ament_pyflakes_BIN)
     message(FATAL_ERROR "ament_pyflakes() could not find program 'ament_pyflakes'")

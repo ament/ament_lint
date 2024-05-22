@@ -40,6 +40,15 @@ function(ament_cppcheck)
     set(ARG_TESTNAME "cppcheck")
   endif()
 
+  # https://cmake.org/cmake/help/latest/prop_dir/TESTS.html
+  get_directory_property(_declared_tests TESTS)
+  if(DEFINED AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS)
+    if((AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS) AND (${ARG_TESTNAME} IN_LIST _declared_tests))
+      message(VERBOSE "skipping test '${ARG_TESTNAME}' as it has already been added")
+      return()
+    endif()
+  endif()
+
   find_program(ament_cppcheck_BIN NAMES "ament_cppcheck")
   if(NOT ament_cppcheck_BIN)
     message(FATAL_ERROR "ament_cppcheck() could not find program 'ament_cppcheck'")

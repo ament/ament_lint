@@ -40,6 +40,15 @@ function(ament_clang_tidy)
     set(ARG_TESTNAME "clang_tidy")
   endif()
 
+  # https://cmake.org/cmake/help/latest/prop_dir/TESTS.html
+  get_directory_property(_declared_tests TESTS)
+  if(DEFINED AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS)
+    if((AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS) AND (${ARG_TESTNAME} IN_LIST _declared_tests))
+      message(VERBOSE "skipping test '${ARG_TESTNAME}' as it has already been added")
+      return()
+    endif()
+  endif()
+
   find_program(ament_clang_tidy_BIN NAMES "ament_clang_tidy")
   if(NOT ament_clang_tidy_BIN)
     message(FATAL_ERROR "ament_clang_tidy() variable 'ament_clang_tidy_BIN' must not be empty")
