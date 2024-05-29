@@ -120,8 +120,8 @@ def main(argv=sys.argv[1:]):
         'clang-tidy-11',
         'clang-tidy-6.0',
     ]
-    if clang_tidy_exe:
-        clang_tidy_bin = clang_tidy_path_exe if check_executable(clang_tidy_path_exe) else None
+    if args.clang_tidy_path_exe:
+        clang_tidy_bin = args.clang_tidy_path_exe if check_executable(args.clang_tidy_path_exe) else None
     else:
         clang_tidy_bin = find_executable(bin_names)
     if not clang_tidy_bin:
@@ -280,8 +280,10 @@ def find_executable(file_names):
                 return file_path
     return None
 
+
 def check_executable(exec_path):
     return os.path.isfile(exec_path) and os.access(exec_path, os.X_OK)
+
 
 def get_compilation_db_files(paths):
     files = []
