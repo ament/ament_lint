@@ -88,7 +88,7 @@ def main(argv=sys.argv[1:]):
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     parser.add_argumet(
-        '--clang-tidy-path-exe'
+        '--clang-tidy-path-exe',
         default=None,
         dest='clang_tidy_path_exe',
         help='Path to Clang Tidy executable')
