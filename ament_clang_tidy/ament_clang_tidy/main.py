@@ -87,6 +87,11 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
+    parser.add_argumet(
+        '--clang-tidy-path-exe'
+        default=None,
+        dest='clang_tidy_path_exe',
+        help='Path to Clang Tidy executable')
     args = parser.parse_args(argv)
 
     if args.config_file is not None and not os.path.exists(args.config_file):
@@ -115,7 +120,10 @@ def main(argv=sys.argv[1:]):
         'clang-tidy-11',
         'clang-tidy-6.0',
     ]
-    clang_tidy_bin = find_executable(bin_names)
+    if clang_tidy_exe:
+        clang_tidy_bin = clang_tidy_path_exe if check_executable(clang_tidy_path_exe) else None
+    else:
+        clang_tidy_bin = find_executable(bin_names)
     if not clang_tidy_bin:
         print('Could not find %s executable' %
               ' / '.join(["'%s'" % n for n in bin_names]), file=sys.stderr)
@@ -268,10 +276,12 @@ def find_executable(file_names):
     for file_name in file_names:
         for path in paths:
             file_path = os.path.join(path, file_name)
-            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
+            if check_executable(file_path):
                 return file_path
     return None
 
+def check_executable(exec_path):
+    return os.path.isfile(exec_path) and os.access(exec_path, os.X_OK)
 
 def get_compilation_db_files(paths):
     files = []
