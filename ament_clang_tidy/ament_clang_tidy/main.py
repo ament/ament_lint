@@ -90,7 +90,7 @@ def main(argv=sys.argv[1:]):
     parser.add_argumet(
         '--clang-tidy-path-exe',
         default=None,
-        dest='clang_tidy_path_exe',
+        dest='clang_tidy_path',
         help='Path to Clang Tidy executable')
     args = parser.parse_args(argv)
 
@@ -120,8 +120,8 @@ def main(argv=sys.argv[1:]):
         'clang-tidy-11',
         'clang-tidy-6.0',
     ]
-    if args.clang_tidy_path_exe:
-        clang_tidy_bin = args.clang_tidy_path_exe if check_executable(args.clang_tidy_path_exe) else None
+    if args.clang_tidy_path:
+        clang_tidy_bin = args.clang_tidy_path if check_executable(args.clang_tidy_path) else None
     else:
         clang_tidy_bin = find_executable(bin_names)
     if not clang_tidy_bin:
