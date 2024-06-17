@@ -2,6 +2,9 @@
 Changelog for package ament_pycodestyle
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.18.0 (2024-04-26)
 -------------------
 

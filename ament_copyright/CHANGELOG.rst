@@ -2,6 +2,11 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix error path for search_copyright_information. (`#491 <https://github.com/ament/ament_lint/issues/491>`_)
+* Contributors: Chris Lalancette
+
 0.18.0 (2024-04-26)
 -------------------
 
