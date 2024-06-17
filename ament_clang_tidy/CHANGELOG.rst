@@ -2,8 +2,8 @@
 Changelog for package ament_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.18.1 (2024-06-17)
+-------------------
 * ament_clang_tidy - Fix Reporting when WarningsAsErrors is specified in config (`#397 <https://github.com/ament/ament_lint/issues/397>`_)
 * Contributors: Matt Condino
 
