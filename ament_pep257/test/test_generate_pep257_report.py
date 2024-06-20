@@ -22,7 +22,7 @@ from ament_pep257.main import generate_pep257_report
 def test_invalid_file():
     ignore = ','.join(_ament_ignore)
 
-    report = generate_pep257_report(['non_existent_file.py'], [], ignore, [], 'ament', [], [])
+    report = generate_pep257_report(['non_existent_file.py'], [], ignore, [], 'ament', [], [], [])
     assert len(report) == 1
     filename, errors = report[0]
     assert filename == 'non_existent_file.py'
@@ -40,7 +40,7 @@ def test_valid_file():
         py_file = temp_dir / 'foobar.py'
         py_file.write_text('a = 1+2\n')
 
-        report = generate_pep257_report([str(temp_dir)], [], ignore, [], 'ament', [], [])
+        report = generate_pep257_report([str(temp_dir)], [], ignore, [], 'ament', [], [], [])
 
         assert len(report) == 1
         filename, errors = report[0]
