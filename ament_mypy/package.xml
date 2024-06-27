@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ament_mypy</name>
-  <version>0.17.0</version>
+  <version>0.17.1</version>
   <description>Support for mypy static type checking in ament.</description>
 
   <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
