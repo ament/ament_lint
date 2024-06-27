@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.17.0 (2024-04-16)
 -------------------
 * Added Timeout to ament_uncrustify (`#485 <https://github.com/ament/ament_lint/issues/485>`_)

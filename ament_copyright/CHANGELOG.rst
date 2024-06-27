@@ -2,6 +2,15 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix error path for search_copyright_information. (`#491 <https://github.com/ament/ament_lint/issues/491>`_) (`#492 <https://github.com/ament/ament_lint/issues/492>`_)
+  Callers now expect it to return a 4-tuple, but in the
+  case that there was no data it was only returning a 2-tuple.
+  (cherry picked from commit f5d1cad324be721f87fa87a416aa70701e75dcca)
+  Co-authored-by: Chris Lalancette <clalancette@gmail.com>
+* Contributors: mergify[bot]
+
 0.17.0 (2024-04-16)
 -------------------
 
