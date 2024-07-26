@@ -34,7 +34,11 @@ def main(argv=sys.argv[1:]):
 
 def main_with_errors(argv=sys.argv[1:]):
     config_file = os.path.join(
-        os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
+        os.getcwd(), 'test', 'configuration', 'ament_flake8.ini')
+
+    if not os.path.isfile(config_file):
+        config_file = os.path.join(
+          os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
 
     parser = argparse.ArgumentParser(
         description='Check code using flake8.',
