@@ -2,12 +2,12 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_flake8</name>
-  <version>0.16.2</version>
+  <version>0.18.1</version>
   <description>
     The ability to check code for style and syntax conventions with flake8.
   </description>
 
-  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
 
   <license>Apache License 2.0</license>
 
