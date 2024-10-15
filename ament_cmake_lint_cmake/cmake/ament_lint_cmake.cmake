@@ -31,6 +31,15 @@ function(ament_lint_cmake)
     set(ARG_TESTNAME "lint_cmake")
   endif()
 
+  # https://cmake.org/cmake/help/latest/prop_dir/TESTS.html
+  get_directory_property(_declared_tests TESTS)
+  if(DEFINED AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS)
+    if((AMENT_LINT_AUTO_SKIP_PREEXISTING_TESTS) AND (${ARG_TESTNAME} IN_LIST _declared_tests))
+      message(VERBOSE "skipping test '${ARG_TESTNAME}' as it has already been added")
+      return()
+    endif()
+  endif()
+
   find_program(ament_lint_cmake_BIN NAMES "ament_lint_cmake")
   if(NOT ament_lint_cmake_BIN)
     message(FATAL_ERROR "ament_lint_cmake() could not find program 'ament_lint_cmake'")
