@@ -72,6 +72,12 @@ def main(argv=sys.argv[1:]):
         help='Choose the basic list of error codes for pydocstyle to check for.'
     )
     err_code_group.add_argument(
+        '--config',
+        metavar='path',
+        dest='config_file',
+        help='The config file'
+    )
+    err_code_group.add_argument(
         '--convention',
         choices=_conventions,
         default='ament',
@@ -114,16 +120,21 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
+    if args.config_file and not os.path.exists(args.config_file):
+        print("Could not find config file '{}'".format(args.config_file), file=sys.stderr)
+        return 1
+
     args.ignore = ','.join(args.ignore)
     args.select = ','.join(args.select)
     args.add_select = ','.join(args.add_select)
     args.add_ignore = ','.join(args.add_ignore)
-    if not (args.ignore or args.select) and args.convention == 'ament':
+    if not (args.ignore or args.select or args.config_file) and args.convention == 'ament':
         args.ignore = ','.join(_ament_ignore)
 
     excludes = [os.path.abspath(e) for e in args.excludes]
     report = generate_pep257_report(args.paths, excludes, args.ignore, args.select,
-                                    args.convention, args.add_ignore, args.add_select)
+                                    args.convention, args.add_ignore, args.add_select,
+                                    args.config_file)
     error_count = sum(len(r[1]) for r in report)
 
     # print summary
@@ -161,7 +172,8 @@ def _filename_in_excludes(filename, excludes):
     return any(os.path.commonpath([absname, e]) == e for e in excludes)
 
 
-def generate_pep257_report(paths, excludes, ignore, select, convention, add_ignore, add_select):
+def generate_pep257_report(paths, excludes, ignore, select, convention, add_ignore, add_select,
+                           config_file):
     conf = ConfigurationParser()
     sys_argv = sys.argv
     sys.argv = [
@@ -173,12 +185,15 @@ def generate_pep257_report(paths, excludes, ignore, select, convention, add_igno
         sys.argv += ['--ignore', ignore]
     elif select:
         sys.argv += ['--select', select]
+    elif config_file:
+        sys.argv += ['--config', config_file]
     else:
         sys.argv += ['--convention', convention]
     if add_ignore:
         sys.argv += ['--add-ignore', add_ignore]
     if add_select:
         sys.argv += ['--add-select', add_select]
+
     sys.argv += paths
     conf.parse()
     sys.argv = sys_argv
