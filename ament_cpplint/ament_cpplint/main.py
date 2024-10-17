@@ -162,7 +162,7 @@ def main(argv=sys.argv[1:]):
             errors = []
 
             def custom_error(filename, linenum, category, confidence, message):
-                if cpplint._ShouldPrintError(category, confidence, linenum):
+                if cpplint._ShouldPrintError(category, confidence, filename, linenum):
                     errors.append({
                         'linenum': linenum,
                         'category': category,
@@ -258,7 +258,8 @@ def append_file_to_group(groups, path):
         for subfolder_name in subfolder_names]
     match_groups = [match.group(1) for match in matches if match]
     if match_groups:
-        match_groups = [{'group_len': len(x), 'group': x} for x in match_groups]
+        match_groups = [{'group_len': len(x), 'group': x}
+                        for x in match_groups]
         sorted_groups = sorted(match_groups, key=lambda k: k['group_len'])
         base_path = sorted_groups[-1]['group']
         root = base_path
@@ -310,7 +311,8 @@ def get_xunit_content(report, testname, elapsed):
         if errors:
             # report each cpplint error as a failing testcase
             for error in errors:
-                linenum = str(error['linenum']) if error['linenum'] is not None else 'None'
+                linenum = str(
+                    error['linenum']) if error['linenum'] is not None else 'None'
                 data = {
                     'quoted_name': quoteattr(
                         '%s [%s] (%s:%s)' % (
