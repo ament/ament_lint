@@ -104,8 +104,10 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
     print('\n{} files checked'.format(len(filenames)))
     if not normal_report:
         print('No errors found')
+        exit_code = 0
     else:
         print('{} errors'.format(len(errors_parsed)))
+        exit_code = len(errors_parsed)
 
     print(normal_report)
 
