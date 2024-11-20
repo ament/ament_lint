@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.18.1 (2024-06-17)
 -------------------
 

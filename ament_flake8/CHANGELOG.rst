@@ -2,6 +2,11 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add the rest of the flake8 plugins as dependencies. (`#503 <https://github.com/ament/ament_lint/issues/503>`_)
+* Contributors: Chris Lalancette
+
 0.18.1 (2024-06-17)
 -------------------
 

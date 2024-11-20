@@ -2,6 +2,11 @@
 Changelog for package ament_pclint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add ament_xmllint testing for all packages that we can. (`#508 <https://github.com/ament/ament_lint/issues/508>`_)
+* Contributors: Chris Lalancette
+
 0.18.1 (2024-06-17)
 -------------------
 

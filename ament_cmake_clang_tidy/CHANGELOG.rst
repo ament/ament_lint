@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_clang_tidy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.18.1 (2024-06-17)
 -------------------
 
