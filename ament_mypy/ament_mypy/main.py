@@ -24,7 +24,7 @@ from typing import List, Match, Optional, Tuple
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import mypy.api  # type: ignore
+import mypy.api
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
@@ -148,11 +148,11 @@ def _generate_mypy_report(paths: List[str],
     mypy_argv.append('--show-error-context')
     mypy_argv.append('--show-column-numbers')
     mypy_argv += paths
-    res = mypy.api.run(mypy_argv)  # type: Tuple[str, str, int]
+    res = mypy.api.run(mypy_argv)
     return res
 
 
-def _get_xunit_content(errors: List[Match],
+def _get_xunit_content(errors: List[Match[str]],
                        testname: str,
                        filenames: List[str],
                        elapsed: float) -> str:
@@ -231,7 +231,7 @@ def _get_files(paths: List[str]) -> List[str]:
     return [os.path.normpath(f) for f in files]
 
 
-def _get_errors(report_string: str) -> List[Match]:
+def _get_errors(report_string: str) -> List[Match[str]]:
     return list(re.finditer(r'^(?P<filename>([a-zA-Z]:)?([^:])+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning|note):\ (?P<msg>.*)$', report_string, re.MULTILINE))  # noqa: E501
 
 
