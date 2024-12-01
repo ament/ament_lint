@@ -264,6 +264,13 @@ def generate_flake8_report(config_file, paths, excludes, max_line_length=None):
     if max_line_length is not None:
         flake8_argv.append('--max-line-length={0}'.format(max_line_length))
 
+    # We've seen some problems, especially on RHEL-9, where using the multi-threaded
+    # pool in flake8 can cause the Python interpreter to crash.  Force flake8 to use
+    # the single-threaded pool here.  This has some performance implications for
+    # large codebases, but given the distributed nature of ROS packages this shouldn't
+    # generally be a large problem.
+    flake8_argv.append('-j=1')
+
     style = get_flake8_style_guide(flake8_argv)
 
     # Monkey patch formatter to collect all errors
