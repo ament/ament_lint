@@ -24,7 +24,6 @@
   <exec_depend>python3-flake8-class-newline</exec_depend>
   <exec_depend>python3-flake8-comprehensions</exec_depend>
   <exec_depend>python3-flake8-deprecated</exec_depend>
-  <exec_depend>python3-flake8-docstrings</exec_depend>
   <exec_depend>python3-flake8-import-order</exec_depend>
   <exec_depend>python3-flake8-quotes</exec_depend>
 
