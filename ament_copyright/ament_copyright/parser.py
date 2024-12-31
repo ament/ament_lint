@@ -17,6 +17,8 @@ import re
 
 from ament_copyright import ALL_FILETYPES
 from ament_copyright import CONTRIBUTING_FILETYPE
+from ament_copyright import get_copyright_names
+from ament_copyright import get_licenses
 from ament_copyright import LICENSE_FILETYPE
 from ament_copyright import SOURCE_FILETYPE
 from ament_copyright import UNKNOWN_IDENTIFIER
@@ -50,7 +52,7 @@ class FileDescriptor:
         with open(self.path, 'r', encoding='utf-8') as h:
             self.content = h.read()
 
-    def parse(self, licenses, known_copyrights):
+    def parse(self, licenses=None, known_copyrights=None):
         raise NotImplementedError()
 
     def identify_license(self, content, license_part, licenses):
@@ -99,7 +101,7 @@ class SourceDescriptor(FileDescriptor):
             else:
                 self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
 
-    def parse(self, licenses, known_copyrights):
+    def parse(self, licenses=None, known_copyrights=None):
         self.read()
         if not self.content:
             return
@@ -121,6 +123,11 @@ class SourceDescriptor(FileDescriptor):
 
         self.copyrights = copyrights
 
+        if licenses is None:
+            licenses = get_licenses()
+        if known_copyrights is None:
+            known_copyrights = get_copyright_names()
+
         self.identify_copyright(known_copyrights)
 
         content = '{copyright}' + remaining_block
@@ -132,10 +139,13 @@ class ContributingDescriptor(FileDescriptor):
     def __init__(self, path):
         super(ContributingDescriptor, self).__init__(CONTRIBUTING_FILETYPE, path)
 
-    def parse(self, licenses, known_copyrights):
+    def parse(self, licenses=None, known_copyrights=None):
         self.read()
         if not self.content:
             return
+
+        if licenses is None:
+            licenses = get_licenses()
 
         self.identify_license(self.content, 'contributing_files', licenses)
 
@@ -145,15 +155,23 @@ class LicenseDescriptor(FileDescriptor):
     def __init__(self, path):
         super(LicenseDescriptor, self).__init__(LICENSE_FILETYPE, path)
 
-    def parse(self, licenses, known_copyrights):
+    def parse(self, licenses=None, known_copyrights=None):
         self.read()
         if not self.content:
             return
 
+        if licenses is None:
+            licenses = get_licenses()
+
         self.identify_license(self.content, 'license_files', licenses)
 
 
-def parse_file(path, licenses, known_copyrights):
+def parse_file(path, licenses=None, known_copyrights=None):
+    if licenses is None:
+        licenses = get_licenses()
+    if known_copyrights is None:
+        known_copyrights = get_copyright_names()
+
     filetype = determine_filetype(path)
     if filetype == SOURCE_FILETYPE:
         d = SourceDescriptor(path)
