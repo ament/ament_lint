@@ -226,6 +226,14 @@ def _get_files(paths: List[str]) -> List[str]:
                 for filename in sorted(filenames):
                     if filename.endswith('.py'):
                         files.append(os.path.join(dirpath, filename))
+                    elif filename.endswith('.pyi'):
+                        type_stub_path = os.path.join(dirpath, filename)
+                        files.append(type_stub_path)
+
+                        regular_file_path = type_stub_path.removesuffix('i')
+                        # Use type stub over file
+                        if regular_file_path in files:
+                            files.remove(regular_file_path)
         elif os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
