@@ -46,7 +46,7 @@ in CMake ament packages.
 
 
 How to exclude linter modules with ament_lint_auto?
-------------------------------------------
+---------------------------------------------------
 
 Linter modules can be excluded via the CMake list variable `AMENT_LINT_AUTO_EXCLUDE`.
 
