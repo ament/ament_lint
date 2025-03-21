@@ -230,7 +230,8 @@ def _get_files(paths: List[str]) -> List[str]:
                         type_stub_path = os.path.join(dirpath, filename)
                         files.append(type_stub_path)
 
-                        regular_file_path = type_stub_path.removesuffix('i')
+                        # removes suffix i
+                        regular_file_path = type_stub_path[:-len('i')]
                         # Use type stub over file
                         if regular_file_path in files:
                             files.remove(regular_file_path)
