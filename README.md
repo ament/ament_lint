@@ -5,7 +5,7 @@ It bundles common linting tools with ROS 2-specific wrappers to ensure consisten
 ## Contributing
 
 The tool argument are still being refined — some features from standalone linters may not yet work perfectly. We welcome contributions to improve:
-- Linter configurations
+- Linter arguments
 - Additional tool support
 - ...
 Please follow the [Contrubution Guidelines](CONTRIBUTING.md).
