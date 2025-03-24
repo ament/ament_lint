@@ -1,4 +1,5 @@
-ament_lint integrates linting tools into ROS 2’s build system, automating code quality checks based on the [ROS 2 coding standards](https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html).
+ament_lint contains a number of packages that perform linting tasks. Those linters can be used both from the command line and from CMake.
+The tools are configured to meet [ROS 2 coding standards](https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html).
 It bundles common linting tools with ROS 2-specific wrappers to ensure consistent functionality across packages.
 
 ## Key Benefits
