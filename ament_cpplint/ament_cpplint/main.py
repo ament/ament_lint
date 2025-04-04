@@ -16,11 +16,11 @@
 
 import argparse
 import glob
+import logging
 import os
 import re
 import sys
 import time
-import logging
 
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
