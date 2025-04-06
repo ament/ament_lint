@@ -21,7 +21,6 @@ import os
 import re
 import sys
 import time
-
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
