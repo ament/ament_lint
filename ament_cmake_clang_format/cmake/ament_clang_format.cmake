@@ -23,18 +23,27 @@
 # The 'CONFIG_FILE' argument takes priority over
 # 'ament_cmake_clang_format_CONFIG_FILE' if both are defined
 #
+# The version of clang-format being run can be overridden by specifying either
+# the argument 'CLANG_FORMAT_VERSION' or a global variable named
+# `ament_cmake_clang_format_CLANG_FORMAT_VERSION`. The argument takes priority
+# over the global variable if both are defined.
+#
 # :param TESTNAME: the name of the test, default: "clang_format"
 # :type TESTNAME: string
 # :param CONFIG_FILE: the path of the configuration file for
 #                     clang-format to consider
 # :type CONFIG_FILE: string
+# :param CLANG_FORMAT_VERSION: the version suffix appended to
+#                              "clang-format-" when determining
+#                              the executable to run
+# :type CLANG_FORMAT_VERSION: string
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_clang_format)
-  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE;CLANG_FORMAT_VERSION" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "clang_format")
   endif()
@@ -51,6 +60,11 @@ function(ament_clang_format)
     list(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
   elseif(DEFINED ament_cmake_clang_format_CONFIG_FILE)
     list(APPEND cmd "--config" "${ament_cmake_clang_format_CONFIG_FILE}")
+  endif()
+  if(ARG_CLANG_FORMAT_VERSION)
+    list(APPEND cmd "--clang-format-version" "${ARG_CLANG_FORMAT_VERSION}")
+  elseif(DEFINED ament_cmake_clang_format_CLANG_FORMAT_VERSION)
+    list(APPEND cmd "--clang-format-version" "${ament_cmake_clang_format_CLANG_FORMAT_VERSION}")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_clang_format")
