@@ -2,7 +2,7 @@ ament_cmake_cpplint
 ===================
 
 Checks the code style of C / C++ source files using `cpplint
-<https://github.com/google/styleguide>`_.
+<https://github.com/cpplint/cpplint>`_.
 Files with the following extensions are being considered:
 ``.c``, ``.cc``, ``.cpp``, ``.cxx``, ``.h``, ``.hh``, ``.hpp``, ``.hxx``.
 
