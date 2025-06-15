@@ -20,6 +20,8 @@ jobs:
           allow-prereleases: true
       - run: pip install --upgrade pip
       - run: pip install build pytest
-      # - run: pip install --editable .
-      - run: pythom -m build || true
+      - run: python -m build || true
+      - run: pip install --editable . || true
+      - run: pip install . || true
+      - run: PYTHONPATH="." pytest
       - run: pytest
