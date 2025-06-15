@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
       - run: pip install --upgrade pip
-      - run: pip install pytest
+      - run: pip install flake8 pydocstyle pytest
       - name: Install ament_copyright
         run: |
           pushd ament_copyright
