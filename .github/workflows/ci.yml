@@ -22,22 +22,22 @@ jobs:
       - run: pip install pytest
       - name: Install ament_copyright
         run: |
-          pushdir ament_copyright
+          pushd ament_copyright
           pip install --editable .
-          popdir
+          popd
       - name: Install ament_flake8
         run: |
-          pushdir ament_flake8
+          pushd ament_flake8
           pip install --editable .
-          popdir
+          popd
       - name: Install ament_pep257
         run: |
-          pushdir ament_pep257
+          pushd ament_pep257
           pip install --editable .
-          popdir
+          popd
       - name: Install ament_xmllint
         run: |
-          pushdir ament_xmllint
+          pushd ament_xmllint
           pip install --editable .
-          popdir
+          popd
       - run: pytest
