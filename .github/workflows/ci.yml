@@ -35,9 +35,8 @@ jobs:
           pushd ament_pep257
           pip install --editable .
           popd
-      - name: Install ament_xmllint
+      - name: Install ament_xmllint and run pytest
         run: |
           pushd ament_xmllint
           pip install --editable .
-          popd
-      - run: pytest
+          pytest
