@@ -11,6 +11,10 @@ jobs:
         python-version: ["3.13", "3.14", "pypy-3.11"]
     runs-on: ubuntu-latest
     steps:
+      - name: Install xmllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install libxml2-utils
       - uses: actions/checkout@v4
         with:
             submodules: recursive
