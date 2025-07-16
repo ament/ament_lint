@@ -2,8 +2,8 @@
 Changelog for package ament_cmake_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.12.13 (2025-07-16)
+--------------------
 * cpplint: update link to upstream cpplint repo (`#538 <https://github.com/ament/ament_lint/issues/538>`_) (`#543 <https://github.com/ament/ament_lint/issues/543>`_)
 * Contributors: mergify[bot]
 
