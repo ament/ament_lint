@@ -2,6 +2,11 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* cpplint: update link to upstream cpplint repo (`#538 <https://github.com/ament/ament_lint/issues/538>`_) (`#543 <https://github.com/ament/ament_lint/issues/543>`_)
+* Contributors: mergify[bot]
+
 0.12.12 (2025-03-25)
 --------------------
 
