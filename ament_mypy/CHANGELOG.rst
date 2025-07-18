@@ -2,6 +2,11 @@
 Changelog for package ament_mypy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix Windows Regression by removing removesuffix() (`#530 <https://github.com/ament/ament_lint/issues/530>`_) (`#549 <https://github.com/ament/ament_lint/issues/549>`_)
+* Contributors: mergify[bot]
+
 0.12.13 (2025-07-16)
 --------------------
 
