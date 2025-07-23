@@ -44,7 +44,6 @@ setup(
     keywords=['ament'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apex AI',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
