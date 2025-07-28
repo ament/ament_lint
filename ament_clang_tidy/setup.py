@@ -15,6 +15,7 @@ setup(
     install_requires=['setuptools', 'pyyaml'],
     package_data={'': [
         'configuration/.clang-tidy',
+        'py.typed'
     ]},
     zip_safe=False,
     author='John Shepherd',

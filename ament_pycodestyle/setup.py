@@ -15,6 +15,7 @@ setup(
     install_requires=['setuptools'],
     package_data={'': [
         'configuration/ament_pycodestyle.ini',
+        'py.typed'
     ]},
     zip_safe=False,
     author='Dirk Thomas',

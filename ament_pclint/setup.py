@@ -32,7 +32,8 @@ setup(
         'config/c99.lnt',
         'config/c++.lnt',
         'config/deprecate.lnt',
-        'config/env-xml.lnt'
+        'config/env-xml.lnt',
+        'py.typed'
     ]},
     zip_safe=False,
     author='Juan Pablo Samper',

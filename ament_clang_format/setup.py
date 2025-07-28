@@ -15,6 +15,7 @@ setup(
     install_requires=['setuptools', 'pyyaml'],
     package_data={'': [
         'configuration/.clang-format',
+        'py.typed'
     ]},
     zip_safe=False,
     author='Dirk Thomas',

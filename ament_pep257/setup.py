@@ -15,6 +15,7 @@ setup(
     install_requires=['setuptools'],
     package_data={'': [
         'configuration/ament_pep257.ini',
+        'py.typed'
     ]},
     zip_safe=True,
     author='Dirk Thomas',

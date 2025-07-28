@@ -15,6 +15,7 @@ setup(
     install_requires=['setuptools'],
     package_data={'': [
         'template/*',
+        'py.typed'
     ]},
     zip_safe=False,
     author='Dirk Thomas',
