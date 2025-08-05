@@ -2,6 +2,9 @@
 Changelog for package ament_lint_auto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.17.2 (2025-04-02)
 -------------------
 * Add docu for AMENT_LINT_AUTO_EXCLUDE (`#524 <https://github.com/ament/ament_lint/issues/524>`_) (`#525 <https://github.com/ament/ament_lint/issues/525>`_)

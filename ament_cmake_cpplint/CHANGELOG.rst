@@ -2,6 +2,16 @@
 Changelog for package ament_cmake_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* cpplint: update link to upstream cpplint repo (`#538 <https://github.com/ament/ament_lint/issues/538>`_) (`#542 <https://github.com/ament/ament_lint/issues/542>`_)
+  Since https://github.com/google/styleguide/pull/837 cpplint source code is
+  no longer hosted at https://github.com/google/styleguide but it is a
+  community driven project hosted at https://github.com/cpplint/cpplint
+  (cherry picked from commit f5db52813c07263db99a044fa7f7b2bcc2c628ec)
+  Co-authored-by: Romain Reignier <romainreignier@users.noreply.github.com>
+* Contributors: mergify[bot]
+
 0.17.2 (2025-04-02)
 -------------------
 
