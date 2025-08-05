@@ -2,8 +2,8 @@
 Changelog for package ament_cmake_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.17.3 (2025-08-05)
+-------------------
 * cpplint: update link to upstream cpplint repo (`#538 <https://github.com/ament/ament_lint/issues/538>`_) (`#542 <https://github.com/ament/ament_lint/issues/542>`_)
   Since https://github.com/google/styleguide/pull/837 cpplint source code is
   no longer hosted at https://github.com/google/styleguide but it is a
