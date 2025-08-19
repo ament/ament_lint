@@ -26,6 +26,8 @@ from xml.sax.saxutils import quoteattr
 
 import yaml
 
+from ament_lint.filesystem_helpers import find_executable
+
 
 def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     config_file = os.path.join(
@@ -244,16 +246,6 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
             f.write(xml)
 
     return rc
-
-
-def find_executable(file_names):
-    paths = os.getenv('PATH').split(os.path.pathsep)
-    for file_name in file_names:
-        for path in paths:
-            file_path = os.path.join(path, file_name)
-            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-                return file_path
-    return None
 
 
 def get_files(paths, extensions):

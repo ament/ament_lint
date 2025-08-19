@@ -31,6 +31,7 @@ from xml.sax.saxutils import quoteattr
 
 import yaml
 
+from ament_lint.filesystem_helpers import find_executable
 
 def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
@@ -264,16 +265,6 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
             os.makedirs(path)
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
-
-
-def find_executable(file_names):
-    paths = os.getenv('PATH').split(os.path.pathsep)
-    for file_name in file_names:
-        for path in paths:
-            file_path = os.path.join(path, file_name)
-            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-                return file_path
-    return None
 
 
 def get_compilation_db_files(paths):
