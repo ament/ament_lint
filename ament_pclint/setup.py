@@ -44,7 +44,6 @@ setup(
     keywords=['ament'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apex AI',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
@@ -53,8 +52,11 @@ setup(
 The ability to perform static code analysis on C/C++ code using PC-lint
 and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
-    tests_require=['pytest'],
-    test_suite='test',
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'ament_pclint = ament_pclint.main:main',
