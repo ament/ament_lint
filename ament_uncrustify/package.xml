@@ -18,7 +18,7 @@
   <author>Dirk Thomas</author>
   <author email="michel@ekumenlabs.com">Michel Hidalgo</author>
 
-  <exec_depend>uncrustify</exec_depend>
+  <exec_depend>uncrustify_vendor</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
