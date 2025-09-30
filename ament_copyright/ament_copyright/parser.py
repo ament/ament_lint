@@ -52,14 +52,12 @@ class FileDescriptor:
         with open(self.path, 'r', encoding='utf-8') as h:
             self.content = h.read()
 
-    def parse(self):
+    def parse(self, licenses=None, known_copyrights=None):
         raise NotImplementedError()
 
-    def identify_license(self, content, license_part, licenses=None):
+    def identify_license(self, content, license_part, licenses):
         if content is None:
             return
-        if licenses is None:
-            licenses = get_licenses()
         formatted_content = remove_formatting(content)
 
         for name, license_ in licenses.items():
@@ -93,8 +91,7 @@ class SourceDescriptor(FileDescriptor):
 
         self.copyright_identifiers = []
 
-    def identify_copyright(self):
-        known_copyrights = get_copyright_names()
+    def identify_copyright(self, known_copyrights):
         for c in self.copyrights:
             found_name = c.name
             for identifier, name in known_copyrights.items():
@@ -104,7 +101,7 @@ class SourceDescriptor(FileDescriptor):
             else:
                 self.copyright_identifiers.append(UNKNOWN_IDENTIFIER)
 
-    def parse(self):
+    def parse(self, licenses=None, known_copyrights=None):
         self.read()
         if not self.content:
             return
@@ -126,10 +123,15 @@ class SourceDescriptor(FileDescriptor):
 
         self.copyrights = copyrights
 
-        self.identify_copyright()
+        if licenses is None:
+            licenses = get_licenses()
+        if known_copyrights is None:
+            known_copyrights = get_copyright_names()
+
+        self.identify_copyright(known_copyrights)
 
         content = '{copyright}' + remaining_block
-        self.identify_license(content, 'file_headers')
+        self.identify_license(content, 'file_headers', licenses)
 
 
 class ContributingDescriptor(FileDescriptor):
@@ -137,12 +139,15 @@ class ContributingDescriptor(FileDescriptor):
     def __init__(self, path):
         super(ContributingDescriptor, self).__init__(CONTRIBUTING_FILETYPE, path)
 
-    def parse(self):
+    def parse(self, licenses=None, known_copyrights=None):
         self.read()
         if not self.content:
             return
 
-        self.identify_license(self.content, 'contributing_files')
+        if licenses is None:
+            licenses = get_licenses()
+
+        self.identify_license(self.content, 'contributing_files', licenses)
 
 
 class LicenseDescriptor(FileDescriptor):
@@ -150,15 +155,23 @@ class LicenseDescriptor(FileDescriptor):
     def __init__(self, path):
         super(LicenseDescriptor, self).__init__(LICENSE_FILETYPE, path)
 
-    def parse(self):
+    def parse(self, licenses=None, known_copyrights=None):
         self.read()
         if not self.content:
             return
 
-        self.identify_license(self.content, 'license_files')
+        if licenses is None:
+            licenses = get_licenses()
+
+        self.identify_license(self.content, 'license_files', licenses)
 
 
-def parse_file(path):
+def parse_file(path, licenses=None, known_copyrights=None):
+    if licenses is None:
+        licenses = get_licenses()
+    if known_copyrights is None:
+        known_copyrights = get_copyright_names()
+
     filetype = determine_filetype(path)
     if filetype == SOURCE_FILETYPE:
         d = SourceDescriptor(path)
@@ -168,7 +181,7 @@ def parse_file(path):
         d = LicenseDescriptor(path)
     else:
         return None
-    d.parse()
+    d.parse(licenses, known_copyrights)
     return d
 
 

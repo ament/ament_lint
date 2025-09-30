@@ -114,7 +114,7 @@ def main(argv=sys.argv[1:]):
 
     file_descriptors = {}
     for filename in sorted(filenames):
-        file_descriptors[filename] = parse_file(filename)
+        file_descriptors[filename] = parse_file(filename, licenses, names)
 
     if args.add_missing:
         name = names.get(args.add_missing[0], args.add_missing[0])

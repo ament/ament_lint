@@ -2,6 +2,24 @@
 Changelog for package ament_cmake_clang_format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.20.2 (2025-07-30)
+-------------------
+
+0.20.1 (2025-06-19)
+-------------------
+* Fix cmake deprecation (`#539 <https://github.com/ament/ament_lint/issues/539>`_)
+* Allow overriding clang-format version via CMake (`#536 <https://github.com/ament/ament_lint/issues/536>`_)
+* Contributors: Nathan Wiebe Neufeldt, mosfet80
+
+0.20.0 (2025-04-24)
+-------------------
+
+0.19.2 (2025-04-17)
+-------------------
+
+0.19.1 (2025-02-02)
+-------------------
+
 0.19.0 (2024-11-20)
 -------------------
 

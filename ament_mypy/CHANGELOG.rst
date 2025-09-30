@@ -2,6 +2,28 @@
 Changelog for package ament_mypy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.20.2 (2025-07-30)
+-------------------
+* fix setuptools deprecations (`#547 <https://github.com/ament/ament_lint/issues/547>`_)
+* Contributors: mosfet80
+
+0.20.1 (2025-06-19)
+-------------------
+
+0.20.0 (2025-04-24)
+-------------------
+
+0.19.2 (2025-04-17)
+-------------------
+* Fix Windows Regression by removing removesuffix() (`#530 <https://github.com/ament/ament_lint/issues/530>`_)
+* Export typing information (`#487 <https://github.com/ament/ament_lint/issues/487>`_)
+* Contributors: Michael Carlstrom
+
+0.19.1 (2025-02-02)
+-------------------
+* Add support for type stubs (`#516 <https://github.com/ament/ament_lint/issues/516>`_)
+* Contributors: Michael Carlstrom
+
 0.19.0 (2024-11-20)
 -------------------
 * Add ament_xmllint testing for all packages that we can. (`#508 <https://github.com/ament/ament_lint/issues/508>`_)

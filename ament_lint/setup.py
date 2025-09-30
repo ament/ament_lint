@@ -5,13 +5,14 @@ package_name = 'ament_lint'
 
 setup(
     name=package_name,
-    version='0.19.0',
+    version='0.20.2',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
     ],
+    package_data={'': ['py.typed']},
     install_requires=['setuptools'],
     zip_safe=True,
     author='Dirk Thomas',
@@ -23,7 +24,6 @@ setup(
     keywords=['ROS'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
@@ -32,7 +32,11 @@ setup(
 Providing common API for ament linter packages, e.g. the `linter` marker for
 pytest.""",
     license='Apache License, Version 2.0',
-    tests_require=['pytest'],
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
     entry_points={
         'pytest11': [
             'ament_lint = ament_lint.pytest_marker',

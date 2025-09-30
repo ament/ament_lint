@@ -2,6 +2,23 @@
 Changelog for package ament_flake8
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.20.2 (2025-07-30)
+-------------------
+* fix setuptools deprecations (`#547 <https://github.com/ament/ament_lint/issues/547>`_)
+* Contributors: mosfet80
+
+0.20.1 (2025-06-19)
+-------------------
+
+0.20.0 (2025-04-24)
+-------------------
+
+0.19.2 (2025-04-17)
+-------------------
+
+0.19.1 (2025-02-02)
+-------------------
+
 0.19.0 (2024-11-20)
 -------------------
 * Add the rest of the flake8 plugins as dependencies. (`#503 <https://github.com/ament/ament_lint/issues/503>`_)
