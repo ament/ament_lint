@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# https://github.com/cpplint/cpplint/blob/6b1d29874dc5d7c3c9201b70e760b3eb9468a60d/cpplint.py
+# https://github.com/cpplint/cpplint/blob/1.6.1/cpplint.py
 
 """Does google-lint on c++ files.
 
@@ -42,6 +42,11 @@ In particular, we can get very confused by /* and // inside strings!
 We do a small hack, which is to ignore //'s with "'s after them on the
 same line, but it is far from perfect (in either direction).
 """
+
+# cpplint predates fstrings
+# pylint: disable=consider-using-f-string
+
+# pylint: disable=invalid-name
 
 import codecs
 import copy
@@ -61,13 +66,15 @@ import xml.etree.ElementTree
 # if empty, use defaults
 _valid_extensions = set([])
 
-__VERSION__ = '1.5.5'
+__VERSION__ = '1.6.1'
 
 try:
+  #  -- pylint: disable=used-before-assignment
   xrange          # Python 2
 except NameError:
   #  -- pylint: disable=redefined-builtin
   xrange = range  # Python 3
+
 
 _USAGE = """
 Syntax: cpplint.py [--verbose=#] [--output=emacs|eclipse|vs7|junit|sed|gsed]
@@ -879,12 +886,14 @@ _line_length = 80
 _include_order = "default"
 
 try:
+  #  -- pylint: disable=used-before-assignment
   unicode
 except NameError:
   #  -- pylint: disable=redefined-builtin
   basestring = unicode = str
 
 try:
+  #  -- pylint: disable=used-before-assignment
   long
 except NameError:
   #  -- pylint: disable=redefined-builtin
@@ -1620,7 +1629,6 @@ class FileInfo(object):
             os.path.exists(os.path.join(current_dir, ".hg")) or
             os.path.exists(os.path.join(current_dir, ".svn"))):
           root_dir = current_dir
-          break
         current_dir = os.path.dirname(current_dir)
 
       if (os.path.exists(os.path.join(root_dir, ".git")) or
@@ -1926,6 +1934,7 @@ class CleansedLines(object):
     self.raw_lines = lines
     self.num_lines = len(lines)
     self.lines_without_raw_strings = CleanseRawStrings(lines)
+    # # pylint: disable=consider-using-enumerate
     for linenum in range(len(self.lines_without_raw_strings)):
       self.lines.append(CleanseComments(
           self.lines_without_raw_strings[linenum]))
@@ -2854,7 +2863,7 @@ class _NamespaceInfo(_BlockInfo):
     # deciding what these nontrivial things are, so this check is
     # triggered by namespace size only, which works most of the time.
     if (linenum - self.starting_linenum < 10
-        and not Match(r'^\s*};*\s*(//).*\bnamespace\b', line)):
+        and not Match(r'^\s*};*\s*(//|/\*).*\bnamespace\b', line)):
       return
 
     # Look for matching comment at end of namespace.
@@ -2871,7 +2880,7 @@ class _NamespaceInfo(_BlockInfo):
     # expected namespace.
     if self.name:
       # Named namespace
-      if not Match((r'^\s*};*\s*(//).*\bnamespace\s+' +
+      if not Match((r'^\s*};*\s*(//|/\*).*\bnamespace\s+' +
                     re.escape(self.name) + r'[\*/\.\\\s]*$'),
                    line):
         error(filename, linenum, 'readability/namespace', 5,
@@ -5080,10 +5089,12 @@ def CheckIncludeLine(filename, clean_lines, linenum, include_state, error):
   #
   # We also make an exception for Lua headers, which follow google
   # naming convention but not the include convention.
-  match = Match(r'#include\s*"([^/]+\.h)"', line)
-  if match and not _THIRD_PARTY_HEADERS_PATTERN.match(match.group(1)):
-    error(filename, linenum, 'build/include_subdir', 4,
-          'Include the directory when naming .h files')
+  match = Match(r'#include\s*"([^/]+\.(.*))"', line)
+  if match:
+    if (IsHeaderExtension(match.group(2)) and
+        not _THIRD_PARTY_HEADERS_PATTERN.match(match.group(1))):
+      error(filename, linenum, 'build/include_subdir', 4,
+            'Include the directory when naming header files')
 
   # we shouldn't include a file more than once. actually, there are a
   # handful of instances where doing so is okay, but in general it's
@@ -5332,28 +5343,12 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
           'Did you mean "memset(%s, 0, %s)"?'
           % (match.group(1), match.group(2)))
 
-  # Check for 'using namespace' which pollutes namespaces.
-  # This is tricky. Although in general 'using namespace' is a Bad Thing,
-  # an exception is made for certain standard namespaces, like std::*literals
-  # and std::placeholders, which are intended to be used in this fashion.
-  # This whitelist may grow over time as needed if/when shiny new libraries
-  # come along that are well-behaved in a 'using namespace' context.
-  # For example, 'using namespace std::chrono_literals;' is allowed, but
-  # 'using namespace foo;' is not allowed.
-  # Note that headers are not permitted to use this exception.
-  match = Search(r'\busing namespace\s+((\w|::)+)', line)
-  if match:
-    whitelist = [
-      'std::chrono_literals',
-      'std::complex_literals',
-      'std::literals',
-      'std::literals::chrono_literals',
-      'std::literals::complex_literals',
-      'std::literals::string_literals',
-      'std::placeholders',
-      'std::string_literals',
-    ]
-    if IsHeaderExtension(file_extension) or match.group(1) not in whitelist:
+  if Search(r'\busing namespace\b', line):
+    if Search(r'\bliterals\b', line):
+      error(filename, linenum, 'build/namespaces_literals', 5,
+            'Do not use namespace using-directives.  '
+            'Use using-declarations instead.')
+    else:
       error(filename, linenum, 'build/namespaces', 5,
             'Do not use namespace using-directives.  '
             'Use using-declarations instead.')
@@ -5872,7 +5867,8 @@ def CheckCStyleCast(filename, clean_lines, linenum, cast_type, pattern, error):
     return False
 
   # operator++(int) and operator--(int)
-  if context.endswith(' operator++') or context.endswith(' operator--'):
+  if (context.endswith(' operator++') or context.endswith(' operator--') or
+      context.endswith('::operator++') or context.endswith('::operator--')):
     return False
 
   # A single unnamed argument for a function tends to look like old style cast.
@@ -5880,10 +5876,6 @@ def CheckCStyleCast(filename, clean_lines, linenum, cast_type, pattern, error):
   remainder = line[match.end(0):]
   if Match(r'^\s*(?:;|const\b|throw\b|final\b|override\b|[=>{),]|->)',
            remainder):
-    return False
-
-  # Don't warn in C files about C-style casts
-  if os.path.splitext(filename)[1] in ['.c', '.h']:
     return False
 
   # At this point, all that should be left is actual casts.
@@ -6555,7 +6547,7 @@ def ProcessConfigOverrides(filename):
       continue
 
     try:
-      with open(cfg_file) as file_handle:
+      with codecs.open(cfg_file, 'r', 'utf8', 'replace') as file_handle:
         for line in file_handle:
           line, _, _ = line.partition('#')  # Remove comments.
           if not line.strip():
