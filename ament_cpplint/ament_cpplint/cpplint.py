@@ -5877,7 +5877,7 @@ def CheckCStyleCast(filename, clean_lines, linenum, cast_type, pattern, error):
   if Match(r'^\s*(?:;|const\b|throw\b|final\b|override\b|[=>{),]|->)',
            remainder):
     return False
-  
+
   # Don't warn in C files about C-style casts
   if os.path.splitext(filename)[1] in ['.c', '.h']:
     return False
