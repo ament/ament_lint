@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ament_mypy</name>
-  <version>0.16.3</version>
+  <version>0.20.2</version>
   <description>Support for mypy static type checking in ament.</description>
 
   <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
@@ -18,6 +18,7 @@
   <exec_depend>python3-mypy</exec_depend>
 
   <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_xmllint</test_depend>
   <test_depend>python3-pytest</test_depend>
   <test_depend>python3-pytest-mock</test_depend>
 

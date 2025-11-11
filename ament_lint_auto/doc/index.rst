@@ -44,6 +44,26 @@ The documentation of the package `ament_cmake_test
 <https://github.com/ament/ament_cmake>`_ provides more information on testing
 in CMake ament packages.
 
+
+How to exclude linter modules with ament_lint_auto?
+---------------------------------------------------
+
+Linter modules can be excluded via the CMake list variable `AMENT_LINT_AUTO_EXCLUDE`.
+
+As an example to exclude the `copyright` linter:
+
+``CMakeLists.txt``:
+
+.. code:: cmake
+
+    # this must happen before the invocation of ament_package()
+    if(BUILD_TESTING)
+      find_package(ament_lint_auto REQUIRED)
+      list(APPEND AMENT_LINT_AUTO_EXCLUDE ament_cmake_copyright)
+      ament_lint_auto_find_test_dependencies()
+    endif()
+
+
 How to exclude files with ament_lint_auto?
 ------------------------------------------
 

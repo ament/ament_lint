@@ -28,6 +28,8 @@
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_uncrustify
 # :type MAX_LINE_LENGTH: integer
+# :param TIMEOUT: the test timeout in seconds, default (Windows): 300, default (other): 60
+# :type TIMEOUT: integer
 # :param LANGUAGE: a specific language argument for uncrustify instead of
 #   deriving the language from the file extension, either 'C' or 'C++'
 # :type LANGUAGE: string
@@ -39,7 +41,7 @@
 # @public
 #
 function(ament_uncrustify)
-  cmake_parse_arguments(ARG "" "CONFIG_FILE;LANGUAGE;MAX_LINE_LENGTH;TESTNAME" "EXCLUDE" ${ARGN})
+  cmake_parse_arguments(ARG "" "CONFIG_FILE;TIMEOUT;LANGUAGE;MAX_LINE_LENGTH;TESTNAME" "EXCLUDE" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "uncrustify")
   endif()
@@ -65,6 +67,19 @@ function(ament_uncrustify)
     list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
+  if(NOT ARG_TIMEOUT)
+    if(WIN32)
+      # There are many timeouts when uncrustify is executed on Windows,
+      # increasing the timeout seems to fix the problem.
+      set(ARG_TIMEOUT 300)
+    else()
+      set(ARG_TIMEOUT 60)
+    endif()
+  endif()
+  if(NOT ARG_TIMEOUT GREATER 0)
+    message(FATAL_ERROR "ament_add_test() the TIMEOUT argument must be a "
+      "valid number and greater than zero")
+  endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_uncrustify")
   ament_add_test(
@@ -73,6 +88,7 @@ function(ament_uncrustify)
     OUTPUT_FILE "${CMAKE_BINARY_DIR}/ament_uncrustify/${ARG_TESTNAME}.txt"
     RESULT_FILE "${result_file}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    TIMEOUT "${ARG_TIMEOUT}"
   )
   set_tests_properties(
     "${ARG_TESTNAME}"

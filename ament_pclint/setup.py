@@ -5,7 +5,7 @@ package_name = 'ament_pclint'
 
 setup(
     name=package_name,
-    version='0.16.3',
+    version='0.20.2',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -32,7 +32,8 @@ setup(
         'config/c99.lnt',
         'config/c++.lnt',
         'config/deprecate.lnt',
-        'config/env-xml.lnt'
+        'config/env-xml.lnt',
+        'py.typed'
     ]},
     zip_safe=False,
     author='Juan Pablo Samper',
@@ -44,7 +45,6 @@ setup(
     keywords=['ament'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apex AI',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
@@ -53,8 +53,11 @@ setup(
 The ability to perform static code analysis on C/C++ code using PC-lint
 and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
-    tests_require=['pytest'],
-    test_suite='test',
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'ament_pclint = ament_pclint.main:main',

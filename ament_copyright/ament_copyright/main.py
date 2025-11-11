@@ -114,7 +114,7 @@ def main(argv=sys.argv[1:]):
 
     file_descriptors = {}
     for filename in sorted(filenames):
-        file_descriptors[filename] = parse_file(filename)
+        file_descriptors[filename] = parse_file(filename, licenses, names)
 
     if args.add_missing:
         name = names.get(args.add_missing[0], args.add_missing[0])
@@ -267,7 +267,7 @@ def add_missing_header(file_descriptors, name, license_, verbose):
 
 def add_copyright_year(file_descriptors, new_years, verbose):
     if verbose:
-        print(f'Adding {",".join(map(str,new_years))} to existing copyright notices:')
+        print(f'Adding {",".join(map(str, new_years))} to existing copyright notices:')
         print()
 
     for path in sorted(file_descriptors.keys()):
