@@ -24,11 +24,11 @@ from typing import List, Match, Optional, Tuple
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import mypy.api  # type: ignore
+import mypy.api
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
-    """Command line tool for linting files with mypy."""
+    """Command line tool for static type analysis with mypy."""
     parser = argparse.ArgumentParser(
         description='Check code using mypy',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -148,11 +148,11 @@ def _generate_mypy_report(paths: List[str],
     mypy_argv.append('--show-error-context')
     mypy_argv.append('--show-column-numbers')
     mypy_argv += paths
-    res = mypy.api.run(mypy_argv)  # type: Tuple[str, str, int]
+    res = mypy.api.run(mypy_argv)
     return res
 
 
-def _get_xunit_content(errors: List[Match],
+def _get_xunit_content(errors: List[Match[str]],
                        testname: str,
                        filenames: List[str],
                        elapsed: float) -> str:
@@ -161,6 +161,7 @@ def _get_xunit_content(errors: List[Match],
         <testsuite
         name="{test_name:s}"
         tests="{test_count:d}"
+        errors="0"
         failures="{error_count:d}"
         time="{time:s}"
         >
@@ -197,8 +198,7 @@ def _get_xunit_content(errors: List[Match],
         xml += _dedent_to("""\
             <testcase
               name="mypy"
-              classname="{}"
-              status="No problems found"/>
+              classname="{}"/>
             """, '  ').format(testname)
 
     # output list of checked files
@@ -215,7 +215,7 @@ def _get_files(paths: List[str]) -> List[str]:
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -226,12 +226,21 @@ def _get_files(paths: List[str]) -> List[str]:
                 for filename in sorted(filenames):
                     if filename.endswith('.py'):
                         files.append(os.path.join(dirpath, filename))
+                    elif filename.endswith('.pyi'):
+                        type_stub_path = os.path.join(dirpath, filename)
+                        files.append(type_stub_path)
+
+                        # removes suffix i
+                        regular_file_path = type_stub_path[:-len('i')]
+                        # Use type stub over file
+                        if regular_file_path in files:
+                            files.remove(regular_file_path)
         elif os.path.isfile(path):
             files.append(path)
     return [os.path.normpath(f) for f in files]
 
 
-def _get_errors(report_string: str) -> List[Match]:
+def _get_errors(report_string: str) -> List[Match[str]]:
     return list(re.finditer(r'^(?P<filename>([a-zA-Z]:)?([^:])+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning|note):\ (?P<msg>.*)$', report_string, re.MULTILINE))  # noqa: E501
 
 

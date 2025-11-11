@@ -24,5 +24,5 @@ file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
 )
 if(_source_files)
   message(STATUS "Added test 'clang_tidy' to check C / C++ code style")
-  ament_clang_tidy()
+  ament_clang_tidy("${CMAKE_CURRENT_BINARY_DIR}")
 endif()

@@ -58,6 +58,7 @@ def main(argv=sys.argv[1:]):
         '--exclude',
         metavar='filename',
         nargs='*',
+        default=[],
         dest='excludes',
         help='The filenames to exclude.')
     group = parser.add_mutually_exclusive_group()
@@ -107,16 +108,13 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
-    filenames = get_files(args.paths, extensions)
-    if args.excludes:
-        filenames = [f for f in filenames if os.path.basename(f) not in args.excludes]
+    filenames = get_files(args.paths, extensions, args.excludes)
     if not filenames:
-        print('No repository roots and files found', file=sys.stderr)
-        return 0
+        print('No repository roots and files found')
 
     file_descriptors = {}
     for filename in sorted(filenames):
-        file_descriptors[filename] = parse_file(filename)
+        file_descriptors[filename] = parse_file(filename, licenses, names)
 
     if args.add_missing:
         name = names.get(args.add_missing[0], args.add_missing[0])
@@ -218,7 +216,7 @@ def main(argv=sys.argv[1:]):
 
 def add_missing_header(file_descriptors, name, license_, verbose):
     copyright_ = 'Copyright %d %s' % (int(time.strftime('%Y')) - 1 + 1, name)
-    header = license_.file_header.format(**{
+    header = license_.file_headers[0].format(**{
         'copyright': copyright_,
         'copyright_holder': name})
     lines = header.splitlines()
@@ -256,12 +254,12 @@ def add_missing_header(file_descriptors, name, license_, verbose):
         elif file_descriptor.filetype == CONTRIBUTING_FILETYPE:
             print('+', file_descriptor.path)
             with open(file_descriptor.path, 'w', encoding='utf-8') as h:
-                h.write(license_.contributing_file)
+                h.write(license_.contributing_files[0])
 
         elif file_descriptor.filetype == LICENSE_FILETYPE:
             print('+', file_descriptor.path)
             with open(file_descriptor.path, 'w', encoding='utf-8') as h:
-                h.write(license_.license_file)
+                h.write(license_.license_files[0])
 
         else:
             assert False, 'Unknown filetype: ' + file_descriptor.filetype
@@ -269,14 +267,14 @@ def add_missing_header(file_descriptors, name, license_, verbose):
 
 def add_copyright_year(file_descriptors, new_years, verbose):
     if verbose:
-        print('Adding the current year to existing copyright notices:')
+        print(f'Adding {",".join(map(str, new_years))} to existing copyright notices:')
         print()
 
     for path in sorted(file_descriptors.keys()):
         file_descriptor = file_descriptors[path]
 
         # ignore files which do not have a header
-        if not getattr(file_descriptor, 'copyright_identifier', None):
+        if not getattr(file_descriptor, 'copyright_identifiers', None):
             continue
 
         index = scan_past_coding_and_shebang_lines(file_descriptor.content)
@@ -289,39 +287,32 @@ def add_copyright_year(file_descriptors, new_years, verbose):
         else:
             block = file_descriptor.content[index:]
             block_offset = 0
-        copyright_span, years_span, name_span = search_copyright_information(block)
-        if copyright_span is None:
+        copyrights, years_spans, _, _ = search_copyright_information(block)
+        if copyrights is None:
             assert False, "Could not find copyright information in file '%s'" % \
                 file_descriptor.path
 
-        # skip if all new years are already included
-        years = get_years_from_string(block[years_span[0]:years_span[1]])
-        if all((new_year in years) for new_year in new_years):
-            if verbose:
-                print(' ', file_descriptor.path)
-            continue
-        print('*' if file_descriptor.exists else '+', file_descriptor.path)
+        for years_span in years_spans:
+            # skip if all new years are already included
+            years = get_years_from_string(block[years_span[0]:years_span[1]])
+            if all((new_year in years) for new_year in new_years):
+                if verbose:
+                    print(' ', file_descriptor.path)
+                continue
+            print('*' if file_descriptor.exists else '+', file_descriptor.path)
 
-        for new_year in new_years:
-            years.add(new_year)
-        years_string = get_string_from_years(years)
+            for new_year in new_years:
+                years.add(new_year)
+            years_string = get_string_from_years(years)
 
-        # overwrite previous years with new years
-        offset = index + block_offset
-        global_years_span = [offset + years_span[0], offset + years_span[1]]
-        content = file_descriptor.content[:global_years_span[0]] + years_string + \
-            file_descriptor.content[global_years_span[1]:]
+            # overwrite previous years with new years
+            offset = index + block_offset
+            global_years_span = [offset + years_span[0], offset + years_span[1]]
+            content = file_descriptor.content[:global_years_span[0]] + years_string + \
+                file_descriptor.content[global_years_span[1]:]
 
-        # output beginning of file for debugging
-        # index = global_years_span[0]
-        # for _ in range(3):
-        #     index = get_index_of_next_line(content, index)
-        # print('<<<')
-        # print(content[:index - 1])
-        # print('>>>')
-
-        with open(file_descriptor.path, 'w', encoding='utf-8') as h:
-            h.write(content)
+            with open(file_descriptor.path, 'w', encoding='utf-8') as h:
+                h.write(content)
 
 
 def get_years_from_string(content):
@@ -424,6 +415,7 @@ def get_xunit_content(report, testname, elapsed):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >
@@ -450,8 +442,7 @@ def get_xunit_content(report, testname, elapsed):
             # if there is a known copyright / license report a single successful test
             xml += """  <testcase
     name=%(quoted_filename)s
-    classname="%(testname)s"
-    status="%(escaped_message)s"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files

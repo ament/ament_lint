@@ -12,21 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS
-  "*.cmake"
+message(
+  STATUS
+  "Added test 'copyright' to check source files copyright and LICENSE")
 
-  "*.c"
-  "*.cc"
-  "*.cpp"
-  "*.cxx"
-  "*.h"
-  "*.hh"
-  "*.hpp"
-  "*.hxx"
-
-  "*.py"
-)
-if(_source_files)
-  message(STATUS "Added test 'copyright' to check for copyright in CMake / C / C++ / Python code")
+if(DEFINED AMENT_LINT_AUTO_FILE_EXCLUDE)
+  ament_copyright(EXCLUDE ${AMENT_LINT_AUTO_FILE_EXCLUDE})
+else()
   ament_copyright()
 endif()

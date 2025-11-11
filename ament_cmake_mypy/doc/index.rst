@@ -1,7 +1,7 @@
 ament_cmake_mypy
 ==================
 
-Checks the code syntax and style of Python source files using `mypy
+Performs a static type analysis of Python source files using `mypy
 <http://mypy.readthedocs.io/>`_.
 Files with the following extensions are being considered: ``.py``.
 

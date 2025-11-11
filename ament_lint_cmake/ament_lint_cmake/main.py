@@ -48,6 +48,9 @@ def main(argv=sys.argv[1:]):
         default='',
         help='Filters for lint_cmake, for a list of filters see: '
              'https://github.com/richq/cmake-lint/blob/master/README.md#usage')
+    parser.add_argument(
+        '--linelength', metavar='N', type=int, default=140,
+        help='The maximum line length')
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -70,6 +73,8 @@ def main(argv=sys.argv[1:]):
     # invoke cmake lint
     cmakelint._lint_state.config = cmakelint._DEFAULT_CMAKELINTRC
     cmakelint._lint_state.SetFilters(args.filters)
+    if args.linelength is not None:
+        cmakelint._lint_state.SetLineLength(str(args.linelength))
     for filename in files:
         # hook into error reporting
         errors = []
@@ -125,7 +130,7 @@ def get_files(paths):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -159,6 +164,7 @@ def get_xunit_content(report, testname, elapsed):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >
@@ -192,8 +198,7 @@ def get_xunit_content(report, testname, elapsed):
             }
             xml += """  <testcase
     name=%(quoted_location)s
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files

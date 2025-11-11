@@ -1,7 +1,7 @@
 ament_pclint
 ==============
 
-Performs a static code analysis of C / C++ source files using `PCLint
+Performs a static code analysis of C / C++ source files using `PC-lint
 <http://www.gimpel.com/html/index.htm>`_.
 
 

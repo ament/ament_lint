@@ -9,6 +9,7 @@ BraceWrapping:
   AfterFunction: true
   AfterNamespace: true
   AfterStruct: true
+  AfterEnum: true
 BreakBeforeBraces: Custom
 ColumnLimit: 100
 ConstructorInitializerIndentWidth: 0

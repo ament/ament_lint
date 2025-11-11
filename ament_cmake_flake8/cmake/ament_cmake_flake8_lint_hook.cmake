@@ -15,5 +15,6 @@
 file(GLOB_RECURSE _python_files FOLLOW_SYMLINKS "*.py")
 if(_python_files)
   message(STATUS "Added test 'flake8' to check Python code syntax and style conventions")
-  ament_flake8()
+  message(STATUS "Configured 'flake8' exclude dirs and/or files: ${AMENT_LINT_AUTO_FILE_EXCLUDE}")
+  ament_flake8(EXCLUDE ${AMENT_LINT_AUTO_FILE_EXCLUDE})
 endif()

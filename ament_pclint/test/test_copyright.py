@@ -14,15 +14,20 @@
 
 from ament_copyright.main import main
 
+import pytest
 
+
+@pytest.mark.copyright
+@pytest.mark.linter
 def test_copyright():
+    path_prefix = 'ament_pclint/config/'
     excluded = [
-        'co-g++.h',
-        'co-gcc.h',
-        'co-osx-g++.h',
-        'co-osx-gcc.h',
-        'co-cl.h',
-        'co-cl++.h']
+        'gcc/co-g++.h',
+        'gcc/co-gcc.h',
+        'gcc/co-osx-g++.h',
+        'gcc/co-osx-gcc.h',
+        'msvc/co-cl.h',
+        'msvc/co-cl++.h']
 
-    rc = main(argv=['--exclude'] + excluded)
+    rc = main(argv=['--exclude'] + [path_prefix + fname for fname in excluded])
     assert rc == 0, 'Found errors'

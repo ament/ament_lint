@@ -1,8 +1,8 @@
 ament_pep257
 ============
 
-Checks the code style of Python source files using `pep257
-<http://pep257.readthedocs.org/>`_.
+Performs a static analysis to check compliance with Python docstring conventions
+of Python source files using `pep257 <http://pep257.readthedocs.org/>`_.
 Files with the following extensions are being considered: ``.py``.
 
 

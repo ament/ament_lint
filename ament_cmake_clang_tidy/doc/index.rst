@@ -30,8 +30,8 @@ How to run the check from within a CMake ament package as part of the tests?
 
     find_package(ament_cmake REQUIRED)
     if(BUILD_TESTING)
-      find_package(ament_clang_tidy REQUIRED)
-      ament_clang_tidy()
+      find_package(ament_cmake_clang_tidy REQUIRED)
+      ament_clang_tidy(${CMAKE_BINARY_DIR})
     endif()
 
 When running multiple linters as part of the CMake tests the documentation of

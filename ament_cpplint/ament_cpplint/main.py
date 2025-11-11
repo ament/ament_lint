@@ -15,6 +15,8 @@
 # limitations under the License.
 
 import argparse
+import glob
+import logging
 import os
 import re
 import sys
@@ -26,6 +28,13 @@ from ament_cpplint import cpplint
 from ament_cpplint.cpplint import _cpplint_state
 from ament_cpplint.cpplint import ParseArguments
 from ament_cpplint.cpplint import ProcessFile
+
+
+def setup_logging(quiet):
+    logging.basicConfig(
+            format='%(levelname)s: %(message)s', stream=sys.stdout,
+            level=logging.INFO if quiet else logging.DEBUG
+    )
 
 
 # use custom header guard with two underscore between the name parts
@@ -78,25 +87,39 @@ def main(argv=sys.argv[1:]):
         '--root', type=str,
         help='The --root option for cpplint')
     parser.add_argument(
+        '--exclude', default=[],
+        nargs='*',
+        help='Exclude C/C++ files from being checked.')
+    parser.add_argument(
+        '--output', type=str,
+        help='The --output option for cpplint')
+    parser.add_argument(
         'paths',
         nargs='*',
         default=[os.curdir],
         help='The files or directories to check. For directories files ending '
              'in %s will be considered.' %
              ', '.join(["'.%s'" % e for e in extensions + headers]))
+    parser.add_argument(
+        '--quiet', action='store_true',
+        help='Set logging level to debug and pass quiet arg to cpplint'
+    )
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
-
+    setup_logging(quiet=args.quiet)
+    LOGGER = logging.getLogger()
     if args.xunit_file:
         start_time = time.time()
 
     argv = []
     # collect category based counts
     argv.append('--counting=detailed')
+    if args.output:
+        argv.append('--output=%s' % args.output)
     argv.append('--extensions=%s' % ','.join(extensions))
     argv.append('--headers=%s' % ','.join(headers))
     filters = [
@@ -118,15 +141,15 @@ def main(argv=sys.argv[1:]):
     argv.append('--filter=%s' % ','.join(filters))
 
     argv.append('--linelength=%d' % args.linelength)
-
-    groups = get_file_groups(args.paths, extensions + headers)
+    if args.quiet:
+        argv.append('--quiet')
+    groups = get_file_groups(args.paths, extensions + headers, args.exclude)
     if not groups:
-        print('No files found', file=sys.stderr)
+        LOGGER.info('No files found')
         return 1
 
     # hook into error reporting
-    import ament_cpplint.cpplint
-    DefaultError = ament_cpplint.cpplint.Error  # noqa: N806
+    DefaultError = cpplint.Error  # noqa: N806
     report = []
 
     # invoke cpplint for each root group of files
@@ -140,10 +163,10 @@ def main(argv=sys.argv[1:]):
         if root:
             root_arg = '--root=%s' % root
             arguments.append(root_arg)
-            print("Using '%s' argument" % root_arg)
+            LOGGER.debug("Using '%s' argument", root_arg)
         else:
-            print("Not using '--root'")
-        print('')
+            LOGGER.debug("Not using '--root'")
+
         arguments += files
         filenames = ParseArguments(arguments)
 
@@ -152,7 +175,7 @@ def main(argv=sys.argv[1:]):
             errors = []
 
             def custom_error(filename, linenum, category, confidence, message):
-                if ament_cpplint.cpplint._ShouldPrintError(category, confidence, linenum):
+                if cpplint._ShouldPrintError(category, confidence, linenum):
                     errors.append({
                         'linenum': linenum,
                         'category': category,
@@ -160,22 +183,19 @@ def main(argv=sys.argv[1:]):
                         'message': message,
                     })
                 DefaultError(filename, linenum, category, confidence, message)
-            ament_cpplint.cpplint.Error = custom_error
+            cpplint.Error = custom_error
 
             ProcessFile(filename, _cpplint_state.verbose_level)
             report.append((filename, errors))
-            print('')
 
     # output summary
     for category in sorted(_cpplint_state.errors_by_category.keys()):
         count = _cpplint_state.errors_by_category[category]
-        print("Category '%s' errors found: %d" % (category, count),
-              file=sys.stderr)
+        LOGGER.info('Category %s errors found: %d', category, count)
     if _cpplint_state.error_count:
-        print('Total errors found: %d' % _cpplint_state.error_count,
-              file=sys.stderr)
+        LOGGER.info('Total errors found: %d', _cpplint_state.error_count)
     else:
-        print('No problems found')
+        LOGGER.debug('No problems found')
 
     # generate xunit file
     if args.xunit_file:
@@ -199,13 +219,18 @@ def main(argv=sys.argv[1:]):
     return 1 if _cpplint_state.error_count else 0
 
 
-def get_file_groups(paths, extensions):
+def get_file_groups(paths, extensions, exclude_patterns):
+    excludes = []
+    for exclude_pattern in exclude_patterns:
+        excludes.extend(glob.glob(exclude_pattern))
+    excludes = {os.path.realpath(x) for x in excludes}
+
     # dict mapping root path to files
     groups = {}
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -216,10 +241,13 @@ def get_file_groups(paths, extensions):
                 for filename in sorted(filenames):
                     _, ext = os.path.splitext(filename)
                     if ext in ('.%s' % e for e in extensions):
-                        append_file_to_group(groups,
-                                             os.path.join(dirpath, filename))
-        if os.path.isfile(path):
+                        filepath = os.path.join(dirpath, filename)
+                        if os.path.realpath(filepath) not in excludes:
+                            append_file_to_group(groups, filepath)
+
+        if os.path.isfile(path) and os.path.realpath(path) not in excludes:
             append_file_to_group(groups, path)
+
     return groups
 
 
@@ -281,6 +309,7 @@ def get_xunit_content(report, testname, elapsed):
   name="%(testname)s"
   tests="%(test_count)d"
   failures="%(error_count)d"
+  errors="0"
   time="%(time)s"
 >
 """ % data
@@ -290,11 +319,12 @@ def get_xunit_content(report, testname, elapsed):
         if errors:
             # report each cpplint error as a failing testcase
             for error in errors:
+                linenum = str(error['linenum']) if error['linenum'] is not None else 'None'
                 data = {
                     'quoted_name': quoteattr(
-                        '%s [%s] (%s:%d)' % (
+                        '%s [%s] (%s:%s)' % (
                             error['category'], error['confidence'],
-                            filename, error['linenum'])),
+                            filename, linenum)),
                     'testname': testname,
                     'quoted_message': quoteattr(error['message']),
                 }
@@ -314,8 +344,7 @@ def get_xunit_content(report, testname, elapsed):
             }
             xml += """  <testcase
     name=%(quoted_location)s
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files

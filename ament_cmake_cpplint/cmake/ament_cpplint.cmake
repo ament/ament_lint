@@ -26,13 +26,15 @@
 # :type ROOT: string
 # :param TIMEOUT: the test timeout in seconds, default: 120
 # :type TIMEOUT: integer
+# :param EXCLUDE: an optional list of exclude directories or files for cpplint
+# :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_cpplint)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS" ${ARGN})
+  cmake_parse_arguments(ARG "" "EXCLUDE;MAX_LINE_LENGTH;ROOT;TESTNAME;TIMEOUT" "FILTERS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cpplint")
   endif()
@@ -44,6 +46,9 @@ function(ament_cpplint)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_cpplint_BIN}" "--xunit-file" "${result_file}")
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
+  endif()
   if(ARG_FILTERS)
     string(REPLACE ";" "," filters "${ARG_FILTERS}")
     list(APPEND cmd "--filters=${filters}")
@@ -56,7 +61,17 @@ function(ament_cpplint)
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
   if(NOT ARG_TIMEOUT)
-    set(ARG_TIMEOUT 120)
+    if(WIN32)
+      # There are many timeouts when cpplint is executed on Windows,
+      # increasing the timeout seems to fix the problem.
+      set(ARG_TIMEOUT 500)
+    else()
+      set(ARG_TIMEOUT 120)
+    endif()
+  endif()
+  if(NOT ARG_TIMEOUT GREATER 0)
+    message(FATAL_ERROR "ament_add_test() the TIMEOUT argument must be a "
+      "valid number and greater than zero")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cpplint")

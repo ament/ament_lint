@@ -32,7 +32,7 @@ def main(argv=sys.argv[1:]):
     extensions = ['c', 'cc', 'cpp', 'cxx', 'c++']
 
     parser = argparse.ArgumentParser(
-        description='Perform static code analysis using pclint.',
+        description='Perform static code analysis using PC-lint.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         'paths',
@@ -293,7 +293,7 @@ def get_files(paths, extensions):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                if 'AMENT_IGNORE' in filenames:
+                if 'AMENT_IGNORE' in dirnames + filenames:
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
@@ -323,6 +323,7 @@ def get_xunit_content(report, testname, elapsed):
 <testsuite
   name="%(testname)s"
   tests="%(test_count)d"
+  errors="0"
   failures="%(error_count)d"
   time="%(time)s"
 >
@@ -358,8 +359,7 @@ def get_xunit_content(report, testname, elapsed):
             }
             xml += """  <testcase
     name=%(quoted_location)s
-    classname="%(testname)s"
-    status="No problems found"/>
+    classname="%(testname)s"/>
 """ % data
 
     # output list of checked files
