@@ -131,7 +131,7 @@ def main(argv=sys.argv[1:]):
         print('No problems found')
         rc = 0
     else:
-        print('%d errors' % error_count)
+        print('%d errors' % error_count, file=sys.stderr)
         rc = 1
 
     # generate xunit file
@@ -187,7 +187,8 @@ def generate_pep257_report(paths, excludes, ignore, select, convention, add_igno
     report = []
 
     files_dict = {}
-    for filename, checked_codes, ignore_decorators in files_to_check:
+    # Unpack 3 values for pydocstyle <= 6.1.1 and 4 values for pydocstyle >= 6.2.0
+    for filename, checked_codes, ignore_decorators, *_ in files_to_check:
         if _filename_in_excludes(filename, excludes):
             continue
         files_dict[filename] = {
@@ -211,21 +212,21 @@ def generate_pep257_report(paths, excludes, ignore, select, convention, add_igno
                 print(
                     '%s:%d %s: %s' %
                     (pep257_error.filename, pep257_error.line, pep257_error.definition,
-                     pep257_error.message))
+                     pep257_error.message), file=sys.stderr)
             elif isinstance(pep257_error, SyntaxError):
                 errors.append({
                     'category': str(type(pep257_error)),
                     'linenumber': '-',
                     'message': 'invalid syntax in file',
                 })
-                print('%s: invalid syntax' % filename)
+                print('%s: invalid syntax' % filename, file=sys.stderr)
             else:
                 errors.append({
                     'category': 'unknown',
                     'linenumber': '-',
                     'message': str(pep257_error),
                 })
-                print('%s: %s' % (filename, pep257_error))
+                print('%s: %s' % (filename, pep257_error), file=sys.stderr)
         report.append((filename, errors))
     return report
 
@@ -250,14 +251,13 @@ def get_xunit_content(report, testname, elapsed):
 """ % data
 
     for (filename, errors) in report:
-
         if errors:
             # report each error as a failing testcase
             for error in errors:
                 data = {
                     'quoted_location': quoteattr(
-                        '%s (%s:%d)' % (
-                            error['category'], filename, error['linenumber'])),
+                        '%s (%s:%s)' % (
+                            error['category'], filename, str(error['linenumber']))),
                     'testname': testname,
                     'quoted_message': quoteattr(error['message']),
                 }

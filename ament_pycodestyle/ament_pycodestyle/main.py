@@ -192,6 +192,9 @@ class CustomReport(pycodestyle.StandardReport):
     def error(self, line_number, offset, text, check):
         code = super(CustomReport, self).error(
             line_number, offset, text, check)
+        if code is None:
+            # Config says to ignore this error
+            return
         line = self.lines[line_number - 1] \
             if line_number <= len(self.lines) else ''
         self.errors.append({

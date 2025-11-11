@@ -5,7 +5,7 @@ package_name = 'ament_uncrustify'
 
 setup(
     name=package_name,
-    version='0.13.1',
+    version='0.20.2',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -14,19 +14,20 @@ setup(
     ],
     install_requires=['setuptools'],
     package_data={'': [
-        'configuration/ament_code_style.cfg',
+        'configuration/ament_code_style_0_72.cfg',
+        'configuration/ament_code_style_0_78.cfg',
+        'py.typed'
     ]},
     zip_safe=False,
     author='Dirk Thomas',
     author_email='dthomas@osrfoundation.org',
-    maintainer='Michael Jeronimo, Michel Hidalgo',
-    maintainer_email='michael.jeronimo@openrobotics.org, michel@ekumenlabs.com',
+    maintainer='Michael Jeronimo',
+    maintainer_email='michael.jeronimo@openrobotics.org',
     url='https://github.com/ament/ament_lint',
     download_url='https://github.com/ament/ament_lint/releases',
     keywords=['ROS'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
@@ -35,7 +36,11 @@ setup(
 The ability to check code against style conventions using uncrustify
 and generate xUnit test result files.""",
     license='Apache License, Version 2.0',
-    tests_require=['pytest'],
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
     entry_points={
         'console_scripts': [
             'ament_uncrustify = ament_uncrustify.main:main',

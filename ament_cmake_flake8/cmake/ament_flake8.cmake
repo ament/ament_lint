@@ -31,13 +31,15 @@
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_flake8
 # :type MAX_LINE_LENGTH: integer
+# :param EXCLUDE: an optional list of exclude directories or files for flake8
+# :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_flake8)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME;CONFIG_FILE" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "EXCLUDE;MAX_LINE_LENGTH;TESTNAME;CONFIG_FILE" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "flake8")
   endif()
@@ -57,6 +59,10 @@ function(ament_flake8)
   if(ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
   endif()
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
+  endif()
+
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_flake8")

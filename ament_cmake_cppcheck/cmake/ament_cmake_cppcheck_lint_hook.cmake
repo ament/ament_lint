@@ -46,6 +46,10 @@ if(_source_files)
     list(APPEND _all_exclude ${ament_cmake_cppcheck_ADDITIONAL_EXCLUDE})
   endif()
 
+  if(DEFINED AMENT_LINT_AUTO_FILE_EXCLUDE)
+    list(APPEND _all_exclude ${AMENT_LINT_AUTO_FILE_EXCLUDE})
+  endif()
+
   # BUILDSYSTEM_TARGETS only supported in CMake >= 3.7
   if(NOT CMAKE_VERSION VERSION_LESS "3.7.0")
     get_directory_property(_build_targets DIRECTORY ${PROJECT_SOURCE_DIR} BUILDSYSTEM_TARGETS)

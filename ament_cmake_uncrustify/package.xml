@@ -2,20 +2,21 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_cmake_uncrustify</name>
-  <version>0.13.1</version>
+  <version>0.20.2</version>
   <description>
     The CMake API for ament_uncrustify to check code against styleconventions
     using uncrustify.
   </description>
 
-  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
-  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+  <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
 
   <license>Apache License 2.0</license>
 
   <author email="audrow@openrobotics.org">Audrow Nash</author>
+  <author email="brandon@openrobotics.org">Brandon Ong</author>
   <author>Claire Wang</author>
   <author>Dirk Thomas</author>
+  <author email="michel@ekumenlabs.com">Michel Hidalgo</author>
 
   <buildtool_depend>ament_cmake_core</buildtool_depend>
   <buildtool_depend>ament_cmake_test</buildtool_depend>

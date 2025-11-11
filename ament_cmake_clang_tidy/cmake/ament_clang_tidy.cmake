@@ -35,7 +35,7 @@
 # @public
 #
 function(ament_clang_tidy)
-  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE;TIMEOUT" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME;CONFIG_FILE;TIMEOUT;HEADER_FILTER;JOBS" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "clang_tidy")
   endif()
@@ -53,6 +53,18 @@ function(ament_clang_tidy)
     list(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
   elseif(DEFINED ament_cmake_clang_tidy_CONFIG_FILE)
     list(APPEND cmd "--config" "${ament_cmake_clang_tidy_CONFIG_FILE}")
+  endif()
+
+  if(ARG_HEADER_FILTER)
+    list(APPEND cmd "--header-filter" "${ARG_HEADER_FILTER}")
+  elseif(DEFINED ament_cmake_clang_tidy_HEADER_FILTER)
+    list(APPEND cmd "--header-filter" "${ament_cmake_clang_tidy_HEADER_FILTER}")
+  endif()
+
+  if(ARG_JOBS)
+    list(APPEND cmd "--jobs" "${ARG_JOBS}")
+  elseif(DEFINED ament_cmake_clang_tidy_JOBS)
+    list(APPEND cmd "--jobs" "${ament_cmake_clang_tidy_JOBS}")
   endif()
 
   if(NOT ARG_TIMEOUT)

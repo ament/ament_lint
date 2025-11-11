@@ -2,7 +2,7 @@ ament_pep257
 ============
 
 Performs a static analysis to check compliance with Python docstring conventions
-of Python source files using `pep257 <http://pep257.readthedocs.org/>`_.
+of Python source files using `pydocstyle <http://pydocstyle.readthedocs.org/>`_ (formerly pep257).
 Files with the following extensions are being considered: ``.py``.
 
 
