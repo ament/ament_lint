@@ -24,9 +24,8 @@ from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import yaml
-
 from ament_lint.filesystem_helpers import find_executable
+import yaml
 
 
 def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
