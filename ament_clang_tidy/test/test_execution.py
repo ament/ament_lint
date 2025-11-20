@@ -20,7 +20,7 @@ from ament_lint.test_helpers import TempFileWriter
 
 
 def test_clang_tidy_execution():
-    '''Test that clang tidy can be executed on a simple C++ file, via ament_clang_tidy.'''
+    """Test that clang tidy can be executed on a simple C++ file, via ament_clang_tidy."""
     with TempFileWriter('int main() { return 0; }', 'test.cpp') as temp_file_path:
         temp_dir = Path(temp_file_path).parent
 
