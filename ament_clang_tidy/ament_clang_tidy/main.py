@@ -266,6 +266,8 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
         with open(args.xunit_file, 'w') as f:
             f.write(xml)
 
+    return 0 if all(len(v) == 0 for v in report.values()) else 1
+
 
 def get_compilation_db_files(paths):
     files = []
