@@ -15,8 +15,9 @@
 from ament_clang_format.main import main
 from ament_lint.test_helpers import TempFileWriter
 
+
 def test_clang_format_execution():
-    """Test that clang format can be executed on a simple C++ file, via ament_clang_format."""
-    with TempFileWriter("int main() { return 0; }", "test.cpp") as temp_file_path:
+    '''Test that clang format can be executed on a simple C++ file, via ament_clang_format.'''
+    with TempFileWriter('int main() { return 0; }', 'test.cpp') as temp_file_path:
         rc = main(argv=['ament_clang_format', temp_file_path])
         assert rc == 0, 'Clang format found issues'

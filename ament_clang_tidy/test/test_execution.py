@@ -18,20 +18,23 @@ from pathlib import Path
 from ament_clang_tidy.main import main
 from ament_lint.test_helpers import TempFileWriter
 
+
 def test_clang_tidy_execution():
-    """Test that clang tidy can be executed on a simple C++ file, via ament_clang_tidy."""
-    with TempFileWriter("int main() { return 0; }", "test.cpp") as temp_file_path:
+    '''Test that clang tidy can be executed on a simple C++ file, via ament_clang_tidy.'''
+    with TempFileWriter('int main() { return 0; }', 'test.cpp') as temp_file_path:
         temp_dir = Path(temp_file_path).parent
-        
+
         # Create compile_commands.json
         compile_commands = [
             {
-                "directory": str(temp_dir),
-                "command": "c++ -c test.cpp",
-                "file": str(temp_file_path)
+                'directory': str(temp_dir),
+                'command': 'c++ -c test.cpp',
+                'file': str(temp_file_path),
             }
         ]
         compile_commands_json = json.dumps(compile_commands)
-        with TempFileWriter(compile_commands_json, "compile_commands.json") as compile_commands_path:
+        with TempFileWriter(
+            compile_commands_json, 'compile_commands.json'
+        ) as compile_commands_path:
             rc = main(argv=['ament_clang_tidy', str(compile_commands_path)])
             assert rc == 0, 'Clang tidy found issues'
