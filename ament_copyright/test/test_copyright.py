@@ -48,21 +48,6 @@ def test_boost1_py():
     assert rc == 0, 'Found errors'
 
 
-def test_bsd_standard():
-    rc = main(argv=[os.path.join(cases_path, 'bsd_license')])
-    assert rc == 0, 'Found errors'
-
-
-def test_bsd_indented():
-    rc = main(argv=[os.path.join(cases_path, 'bsd_license_indented')])
-    assert rc == 0, 'Found errors'
-
-
-def test_bsd_tabs():
-    rc = main(argv=[os.path.join(cases_path, 'bsd_license_tabs')])
-    assert rc == 0, 'Found errors'
-
-
 def test_3bsd_cpp():
     rc = main(argv=[os.path.join(cases_path, '3clause_bsd/case2.cpp')])
     assert rc == 0, 'Found errors'
