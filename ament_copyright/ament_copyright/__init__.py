@@ -40,7 +40,7 @@ def get_copyright_names():
     if sys.version_info >= (3, 12):
         copyright_groups = entry_points.select(group=COPYRIGHT_GROUP)
     else:
-        copyright_groups = entry_points.get(COPYRIGHT_GROUP)
+        copyright_groups = entry_points.get(COPYRIGHT_GROUP, [])
     for entry_point in copyright_groups:
         assert entry_point.name != UNKNOWN_IDENTIFIER, \
             "Invalid entry point name '%s'" % entry_point.name
@@ -53,9 +53,9 @@ def get_licenses():
     licenses = {}
     entry_points = metadata.entry_points()
     if sys.version_info >= (3, 12):
-        license_groups = entry_points.select(group=COPYRIGHT_GROUP)
+        license_groups = entry_points.select(group=LICENSE_GROUP)
     else:
-        license_groups = entry_points.get(COPYRIGHT_GROUP)
+        license_groups = entry_points.get(LICENSE_GROUP, [])
     for entry_point in license_groups:
         assert entry_point.name != UNKNOWN_IDENTIFIER, \
             "Invalid entry point name '%s'" % entry_point.name
