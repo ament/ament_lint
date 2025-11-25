@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 from importlib import metadata
 
 
@@ -36,7 +37,10 @@ UNKNOWN_IDENTIFIER = '<unknown>'
 def get_copyright_names():
     names = {}
     entry_points = metadata.entry_points()
-    copyright_groups = entry_points.select(group=COPYRIGHT_GROUP)
+    if sys.version_info >= (3, 12):
+        copyright_groups = entry_points.select(group=COPYRIGHT_GROUP)
+    else:
+        copyright_groups = entry_points.get(COPYRIGHT_GROUP)
     for entry_point in copyright_groups:
         assert entry_point.name != UNKNOWN_IDENTIFIER, \
             "Invalid entry point name '%s'" % entry_point.name
@@ -48,7 +52,10 @@ def get_copyright_names():
 def get_licenses():
     licenses = {}
     entry_points = metadata.entry_points()
-    license_groups = entry_points.select(group=LICENSE_GROUP)
+    if sys.version_info >= (3, 12):
+        license_groups = entry_points.select(group=COPYRIGHT_GROUP)
+    else:
+        license_groups = entry_points.get(COPYRIGHT_GROUP)
     for entry_point in license_groups:
         assert entry_point.name != UNKNOWN_IDENTIFIER, \
             "Invalid entry point name '%s'" % entry_point.name
