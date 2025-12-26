@@ -12,7 +12,6 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
     ],
-    install_requires=['setuptools'],
     package_data={'': [
         'configuration/ament_code_style_0_72.cfg',
         'configuration/ament_code_style_0_78.cfg',

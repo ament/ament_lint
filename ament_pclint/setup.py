@@ -12,7 +12,6 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
     ],
-    install_requires=['setuptools'],
     package_data={'': [
         'config/gcc/co-g++.h',
         'config/gcc/co-g++.lnt',

@@ -12,7 +12,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
     ],
-    install_requires=['setuptools', 'pyyaml'],
+    install_requires=['pyyaml'],
     package_data={'': [
         'configuration/.clang-tidy',
         'py.typed'

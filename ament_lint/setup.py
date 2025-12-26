@@ -13,7 +13,6 @@ setup(
             ['resource/' + package_name]),
     ],
     package_data={'': ['py.typed']},
-    install_requires=['setuptools'],
     zip_safe=True,
     author='Dirk Thomas',
     author_email='dthomas@osrfoundation.org',
