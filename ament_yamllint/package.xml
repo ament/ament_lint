@@ -2,18 +2,18 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_yamllint</name>
-  <version>0.11.4</version>
+  <version>0.20.3</version>
   <description>
     The ability to check YAML against style conventions using YAMLlint
     and generate xUnit test result files.
   </description>
 
-  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
-  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+  <maintainer email="logans@cottsay.net">Scott K Logan</maintainer>
+  <maintainer email="ahcorde@gmail.com">Alejandro Hernández Cordero</maintainer>
 
   <license>Apache License 2.0</license>
 
-  <author email="logans@cottsay.net">Scott K Logan</author>
+  <author email="frozenreboot@gmail.com">Woojin Jung</author>
 
   <exec_depend>python3-yaml</exec_depend>
   <exec_depend>yamllint</exec_depend>
