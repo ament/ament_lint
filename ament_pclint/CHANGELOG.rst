@@ -2,8 +2,8 @@
 Changelog for package ament_pclint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.17.4 (2026-01-21)
+-------------------
 * fix setuptools deprecation (backport `#551 <https://github.com/ament/ament_lint/issues/551>`_) (`#559 <https://github.com/ament/ament_lint/issues/559>`_)
   * fix setuptools deprecation (`#551 <https://github.com/ament/ament_lint/issues/551>`_)
   (cherry picked from commit 6c532cfefefcb1af20bdb84d5d4d246571713830)
