@@ -34,7 +34,7 @@ setup(
     long_description="""\
 The ability to check YAML against style conventions using YAMLlint
 and generate xUnit test result files.""",
-    license='Apache License, Version 2.0',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',

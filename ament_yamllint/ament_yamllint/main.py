@@ -137,7 +137,7 @@ def get_files(paths, extensions, excludes=None):
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
-                IGNORE_MARKERS = {'AMENT_IGNORE', 'COLCON_IGNORE'}
+                IGNORE_MARKERS = {'AMENT_IGNORE'}
                 if any(m in dirnames + filenames for m in IGNORE_MARKERS):
                     dirnames[:] = []
                     continue
