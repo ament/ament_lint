@@ -24,6 +24,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 @pytest.mark.linter
 @pytest.mark.xmllint
-def test_xmllint():
+def test_xmllint() -> None:
     rc = main(argv=[])
     assert rc == 0, 'Found errors'

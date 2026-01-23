@@ -20,15 +20,21 @@ import shutil
 import subprocess
 import sys
 import time
+from typing import Any
+from typing import Literal
+from typing_extensions import TypeAlias
 from xml.etree import ElementTree
 from xml.sax import make_parser
 from xml.sax import SAXParseException
+from xml.sax.xmlreader import AttributesImpl
 from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
+ReturnCode: TypeAlias = Literal[0, 1, "Could not find 'xmllint' executable"]
 
-def main(argv=sys.argv[1:]):
+
+def main(argv: list[str] = sys.argv[1:]) -> ReturnCode:
     default_extensions = ['xml']
 
     parser = argparse.ArgumentParser(
@@ -72,16 +78,16 @@ def main(argv=sys.argv[1:]):
     if not xmllint_bin:
         return "Could not find 'xmllint' executable"
 
-    report = []
+    report: list[tuple[str, Any]] = []
 
     # invoke xmllint on all files
     for filename in files:
         # parse file to extract desired validation information
-        parser = make_parser()
+        xml_parser = make_parser()
         handler = CustomHandler()
-        parser.setContentHandler(handler)
+        xml_parser.setContentHandler(handler)
         try:
-            parser.parse(filename)
+            xml_parser.parse(filename)
         except SAXParseException:
             pass
 
@@ -131,7 +137,7 @@ def main(argv=sys.argv[1:]):
     error_count = sum(1 if r[1] else 0 for r in report)
     if not error_count:
         print('No problems found')
-        rc = 0
+        rc: ReturnCode = 0
     else:
         print('%d files are invalid' % error_count, file=sys.stderr)
         rc = 1
@@ -158,8 +164,9 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def get_files(paths, extensions, excludes=[]):
-    files = []
+def get_files(paths: list[str], extensions: list[str],
+              excludes: list[str] = []) -> list[str]:
+    files: list[str] = []
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
@@ -187,23 +194,23 @@ def get_files(paths, extensions, excludes=[]):
 
 class CustomHandler(ContentHandler):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.xml_model_attributes = []
-        self.root_attributes = {}
+        self.xml_model_attributes: list[dict[str, str]] = []
+        self.root_attributes: dict[str, str] = {}
         self._first_node = False
 
-    def processingInstruction(self, target, data):
+    def processingInstruction(self, target: str, data: str) -> None:
         if target != 'xml-model':
             return
 
         root = ElementTree.fromstring('<data ' + data + '/>')
         self.xml_model_attributes.append(root.attrib)
 
-    def startDocument(self):
+    def startDocument(self) -> None:
         self._first_node = True
 
-    def startElement(self, name, attrs):
+    def startElement(self, name: str, attrs: AttributesImpl) -> None:
         if not self._first_node:
             return
         self._first_node = False
@@ -211,7 +218,7 @@ class CustomHandler(ContentHandler):
             self.root_attributes[attr_name] = attrs.getValue(attr_name)
 
 
-def get_xunit_content(report, testname, elapsed):
+def get_xunit_content(report: list[tuple[str, Any]], testname: str, elapsed: float) -> str:
     test_count = len(report)
     error_count = len([r for r in report if r[1]])
     data = {

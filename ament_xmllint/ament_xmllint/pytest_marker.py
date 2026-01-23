@@ -13,7 +13,9 @@
 # limitations under the License.
 
 
-def pytest_configure(config):
+from _pytest.config import Config
+
+def pytest_configure(config: Config) -> None:
     config.addinivalue_line(
         'markers',
         'xmllint: marks tests checking XML files being well formed and valid')
