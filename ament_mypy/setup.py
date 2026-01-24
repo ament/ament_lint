@@ -45,5 +45,8 @@ The ability to check code for user specified static typing with mypy.""",
         'pytest11': [
             'ament_mypy = ament_mypy.pytest_marker',
         ],
+        'ament_lint': [
+            'ament_mypy = ament_mypy.main:main',
+        ],
     },
 )

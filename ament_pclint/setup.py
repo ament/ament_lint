@@ -61,5 +61,8 @@ and generate xUnit test result files.""",
         'console_scripts': [
             'ament_pclint = ament_pclint.main:main',
         ],
+        'ament_lint': [
+            'ament_pclint = ament_pclint.main:main',
+        ],
     },
 )

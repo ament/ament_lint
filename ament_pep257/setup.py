@@ -46,5 +46,8 @@ and generate xUnit test result files.""",
         'pytest11': [
             'ament_pep257 = ament_pep257.pytest_marker',
         ],
+        'ament_lint': [
+            'ament_pep257 = ament_pep257.main:main',
+        ],
     },
 )
