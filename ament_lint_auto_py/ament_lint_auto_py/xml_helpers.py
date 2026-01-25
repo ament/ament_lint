@@ -79,7 +79,10 @@ def find_package_xml(start: Path) -> Path | None:
 def package_has_ament_lint_auto_py(pkg_xml: Path) -> bool:
     tree = ET.parse(pkg_xml)
     root = tree.getroot()
-    for tag in DEPEND_TAGS:
+
+    # Adds name so this package can self lint
+    OPT_IN_TAGS = (*DEPEND_TAGS, 'name')
+    for tag in OPT_IN_TAGS:
         for dep in root.findall(tag):
             if dep.text and dep.text.strip() == 'ament_lint_auto_py':
                 return True

@@ -15,9 +15,6 @@
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>python3-pytest</exec_depend>
 
-  <!-- TODO: this works but seems sus -->
-  <test_depend>ament_lint_auto_py</test_depend>
-
   <test_depend>ament_lint_common_py</test_depend>
   <test_depend>ament_mypy</test_depend>
 
