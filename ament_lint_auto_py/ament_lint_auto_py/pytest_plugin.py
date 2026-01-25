@@ -12,139 +12,109 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections.abc import Callable
 from importlib.metadata import entry_points
 from importlib.metadata import EntryPoint
-import os
 from pathlib import Path
-import sys
-from typing import Final
-import xml.etree.ElementTree as ET
+from typing import Literal
 
-
-from ament_index_python.packages import get_package_share_directory
-import pytest
+from ament_lint_auto_py.xml_helpers import find_package_xml
+from ament_lint_auto_py.xml_helpers import get_depends_recursive
+from ament_lint_auto_py.xml_helpers import package_has_ament_lint_auto_py
 from pytest import Config
-from pytest import Metafunc
-
-
-DEPEND_TAGS: Final = (
-    'depend',
-    'build_depend',
-    'test_depend',
-    'exec_depend',
-)
-
-PACKAGE_XML: Final = 'package.xml'
-
-
-def should_expand_package(name: str) -> bool:
-    return name.startswith('ament_lint')
-
-
-def get_package_xml_for_package(pkg_name: str) -> Path:
-    return Path(get_package_share_directory(pkg_name)) / PACKAGE_XML
-
-
-def get_depends_recursive(
-    pkg_xml: Path,
-    seen: set[str] | None = None,
-) -> set[str]:
-    seen = seen or set()
-
-    tree = ET.parse(pkg_xml)
-    root = tree.getroot()
-
-    deps: set[str] = set()
-
-    for tag in DEPEND_TAGS:
-        for dep in root.findall(tag):
-            if not dep.text:
-                continue
-
-            name = dep.text.strip()
-            if name in seen:
-                continue
-
-            seen.add(name)
-            deps.add(name)
-
-            if should_expand_package(name):
-                dep_xml = get_package_xml_for_package(name)
-                deps |= get_depends_recursive(dep_xml, seen)
-
-    return deps
-
-
-def find_package_xml(start: Path) -> Path | None:
-    for parent in [start, *start.parents]:
-        pkg_xml = parent / PACKAGE_XML
-        if pkg_xml.is_file():
-            return pkg_xml
-    return None
+from pytest import Item
+from pytest import Parser
+from pytest import Session
 
 
 def pytest_configure(config: Config) -> None:
-    config.addinivalue_line('markers',
-                            'ament_lint_auto_py: marks tests as running all linter checks')
+    config.addinivalue_line(
+        'markers', 'ament_lint_auto_py: marks tests as running all linter checks'
+    )
 
 
-def pytest_generate_tests(metafunc: Metafunc) -> None:
-    if 'ament_lint_ep' in metafunc.fixturenames:
-        AMENT_LINT_AUTO_EXCLUDE = os.environ.get('AMENT_LINT_AUTO_EXCLUDE', '')
-        EXCLUDED_LINTERS = {name.strip() for name in AMENT_LINT_AUTO_EXCLUDE.split(';') if name}
+class AmentLintItem(Item):
+    def __init__(
+        self,
+        *,
+        entry_point: EntryPoint,
+        file_excludes: list[str],
+        **kwargs,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.entry_point = entry_point
+        self.file_excludes = file_excludes
 
-        test_file = Path(metafunc.definition.path)
-        pkg_xml = find_package_xml(test_file)
+    def runtest(self) -> None:
+        runner = self.entry_point.load()
 
-        if pkg_xml is None:
-            print('No package.xml found. Is this a ROS package?')
-            return
+        args: list[str] = []
+        if self.file_excludes:
+            args.append('--exclude')
+            args.extend(self.file_excludes)
 
-        effective_depends = get_depends_recursive(pkg_xml)
-        linters = entry_points(group='ament_lint')
+        rc = runner(args)()
+        if rc != 0:
+            raise AssertionError(
+                f'Linter[{runner.NAME}] failed with exit code {rc}'
+            )
 
-        filtered_linters: list[EntryPoint] = []
-        ids: list[int] = []
-
-        for ep in linters:
-            runner = ep.load()
-            name = runner.NAME
-            file_types = runner.FILE_TYPES
-
-            if name not in effective_depends:
-                print(f'Skipping {name} because it was not found in the package.xml')
-                continue
-
-            if name in EXCLUDED_LINTERS:
-                print(f'Skipping {name} because it is in '
-                      f'AMENT_LINT_AUTO_EXCLUDE:={AMENT_LINT_AUTO_EXCLUDE}.')
-                continue
-
-            paths: list[Path] = []
-            for ext in file_types:
-                paths.extend(Path('.').rglob(f'{ext}'))
-
-            if not paths:
-                print(f'Skipping {name} because no files of type {file_types} exist.')
-                continue
-
-            filtered_linters.append(ep)
-            ids.append(name)
-
-        metafunc.parametrize('ament_lint_ep', filtered_linters, ids=ids)
+    def reportinfo(self) -> tuple[Path, Literal[0], str]:
+        return self.path, 0, f'ament_lint: {self.name}'
 
 
-@pytest.fixture
-def run_entry_point(ament_lint_ep: EntryPoint) -> Callable[[], int]:
-    runner = ament_lint_ep.load()
+def pytest_collection_modifyitems(session: Session, config: Config, items: list[Item]) -> None:
+    excluded = set(config.getini('ament_lint_auto_exclude'))
+    file_excludes = config.getini('ament_lint_auto_file_exclude')
 
-    AMENT_LINT_AUTO_FILE_EXCLUDE = os.environ.get('AMENT_LINT_AUTO_FILE_EXCLUDE', '')
-    EXCLUDED_FILE_GLOBS = {name.strip() for
-                           name in AMENT_LINT_AUTO_FILE_EXCLUDE.split(';') if name}
-    if EXCLUDED_FILE_GLOBS:
-        args = ['--exclude']
-        sys.argv.extend(EXCLUDED_FILE_GLOBS)
-        return runner(args)
+    pkg_xml = find_package_xml(config.rootpath)
+    if pkg_xml is None:
+        return  # Not in a ROS package
 
-    return runner([])
+    if not package_has_ament_lint_auto_py(pkg_xml):
+        return  # Package does not opt-in
+
+    effective_depends = get_depends_recursive(pkg_xml)
+    linters = entry_points(group='ament_lint')
+
+    for ep in linters:
+        runner = ep.load()
+
+        if runner.NAME not in effective_depends:
+            continue  # skipping linter if not declared in depends of a package.xmk
+
+        if runner.NAME in excluded:
+            continue  # skipping linter if declared in ament_lint_auto_exclude
+
+        # skip linters if no matching files exist
+        found_file = False
+        for pattern in runner.FILE_TYPES:
+            if any(Path('.').rglob(pattern)):
+                found_file = True
+                break
+        if not found_file:
+            continue
+
+        items.append(
+            AmentLintItem.from_parent(
+                parent=session,
+                name=runner.NAME,
+                entry_point=ep,
+                file_excludes=file_excludes,
+                path=config.rootpath,
+            )
+        )
+
+
+def pytest_addoption(parser: Parser):
+    parser.addini(
+        'ament_lint_auto_exclude',
+        'Linters to exclude from ament_lint_auto_py',
+        type='linelist',
+        default=[],
+    )
+    parser.addini(
+        'ament_lint_auto_file_exclude',
+        'File globs to exclude from ament linters',
+        type='linelist',
+        default=[],
+    )

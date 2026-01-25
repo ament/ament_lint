@@ -2,21 +2,15 @@ ament_lint_auto_py
 ===============
 
 The package simplifies using multiple linters as part of pytest tests.
-It reduces the amount of Python code to a bare minimum.
 
-``test_ament_lint_auto.py`:
+To have `ament_lint_auto_py` collect and run the linters include it in the `package.xml`
 
-.. code:: python
+``package.xml``:
 
-  import pytest
+.. code:: xml
 
+    <test_depend>ament_lint_auto_py</test_depend>
 
-  @pytest.mark.ament_lint_auto_py
-  @pytest.mark.linter
-  def test_ament_lint_auto(run_entry_point) -> None:
-      """Run all installed linter dynamically."""
-      rc = run_entry_point()
-      assert rc == 0, f'Linter[{run_entry_point.NAME}] failed with exit code {rc}'
 
 The set of linters to be used is then only specified in the package manifest as
 test dependencies.
@@ -32,7 +26,7 @@ test dependencies.
     <test_depend>ament_cppcheck</test_depend>
     <test_depend>ament_pycodestyle</test_depend>
 
-Since recursive dependencies are also being used a single test dependency is
+Since recursive dependencies are also being used a for packages starting with `ament_lint_*` a single test dependency is
 sufficient to test with a set of common linters.
 
 ``package.xml``:
@@ -48,30 +42,37 @@ sufficient to test with a set of common linters.
 How to exclude linter modules with ament_lint_auto_py?
 ---------------------------------------------------
 
-Linter modules can be excluded via the environment variable `AMENT_LINT_AUTO_EXCLUDE`.
+Linter modules can be excluded via the pytest configurable variables `ament_lint_auto_exclude` in pytest config files like `pytest.ini` or `pyproject.toml`.
 
 As an example to exclude the `copyright` linter:
 
-.. code:: bash
-    export AMENT_LINT_EXCLUDE="ament_copyright;"
+.. code::
+    [pytest]
+
+    ament_lint_auto_exclude = ament_copyright
 
 
 How to exclude files with ament_lint_auto_py?
 ------------------------------------------
 
-Linter hooks shall conform to the ament_lint_auto convention of excluding files
-specified in the environment list variable `AMENT_LINT_AUTO_FILE_EXCLUDE`.
+Linter hooks shall conform to the ament_lint_auto_py convention of excluding files
+specified in the environment list variable `ament_lint_auto_file_exclude`.
 
-.. code:: bash
-    export AMENT_LINT_EXCLUDE="/path/to/ignored_file"
+.. code::
+    [pytest]
+
+    ament_lint_auto_file_exclude = /path/to/ignored_file
 
 For a more specific example, this excludes all python files matching a pattern using globbing.
 Multiple expressions can be combined on multiple lines.
 
-.. code:: bash
-  .. code:: bash
-    export AMENT_LINT_EXCLUDE="src/*.py;test/*.cpp"
 
+.. code::
+    [pytest]
+
+    ament_lint_auto_file_exclude = 
+        src/*
+        test/*.cpp
 
 How to register 3rd party linters with ament_lint_auto_py?
 ---------------------------------------------------------

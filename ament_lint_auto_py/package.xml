@@ -5,7 +5,7 @@
   <version>0.20.3</version>
   <description>The auto-magic functions for ease to use of the ament linters in Python.</description>
 
-  <!-- TODO: -->
+  <!-- TODO: Maintainership?-->
   <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
 
   <license>Apache License 2.0</license>
@@ -14,6 +14,9 @@
 
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>python3-pytest</exec_depend>
+
+  <!-- TODO: this works but seems sus -->
+  <test_depend>ament_lint_auto_py</test_depend>
 
   <test_depend>ament_lint_common_py</test_depend>
   <test_depend>ament_mypy</test_depend>
