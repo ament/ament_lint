@@ -45,7 +45,7 @@ sufficient to test with a set of common linters.
     <test_depend>ament_lint_common_py</test_depend>
 
 
-How to exclude linter modules with ament_lint_auto?
+How to exclude linter modules with ament_lint_auto_py?
 ---------------------------------------------------
 
 Linter modules can be excluded via the environment variable `AMENT_LINT_AUTO_EXCLUDE`.
@@ -56,7 +56,7 @@ As an example to exclude the `copyright` linter:
     export AMENT_LINT_EXCLUDE="ament_copyright;"
 
 
-How to exclude files with ament_lint_auto?
+How to exclude files with ament_lint_auto_py?
 ------------------------------------------
 
 Linter hooks shall conform to the ament_lint_auto convention of excluding files
@@ -71,3 +71,36 @@ Multiple expressions can be combined on multiple lines.
 .. code:: bash
   .. code:: bash
     export AMENT_LINT_EXCLUDE="src/*.py;test/*.cpp"
+
+
+How to register 3rd party linters with ament_lint_auto_py?
+---------------------------------------------------------
+
+To register a third party linter implement class like the following.
+
+.. code:: python
+
+  class CustomRunner:
+
+      NAME = 'ament_custom'
+      FILE_TYPES = ('*.py')
+
+      def __init__(self, args: list[str]) -> None:
+          self.args = args
+
+      def __call__(self) -> Literal[0, 1]:
+          return main(self.args)
+
+  def main():
+    # Custom linting
+    pass
+
+Then in a `setup.py` register an entry point for the `CustomRunner`.
+
+.. code:: python
+
+  entry_points={
+      'ament_lint': [
+          'ament_lint_cmake = ament_lint_cmake.main:LintCMakeRunner'
+      ]
+  },
