@@ -12,6 +12,7 @@
 
   <author email="audrow@openrobotics.org">Audrow Nash</author>
 
+  <exec_depend>ament_index_python</exec_depend>
   <exec_depend>python3-pytest</exec_depend>
 
   <test_depend>ament_lint_common_py</test_depend>
