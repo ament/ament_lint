@@ -1,7 +1,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-package_name = 'ament_lint_cmake'
+package_name = 'ament_lint_auto_py'
 
 setup(
     name=package_name,
@@ -12,10 +12,12 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
     ],
-    package_data={'': ['py.typed']},
-    zip_safe=True,
-    author='Dirk Thomas',
-    author_email='dthomas@osrfoundation.org',
+    package_data={'': [
+        'py.typed'
+    ]},
+    zip_safe=False,
+    author='Ted Kern',
+    author_email='ted.kern@canonical.com',
     maintainer='Michael Jeronimo',
     maintainer_email='michael.jeronimo@openrobotics.org',
     url='https://github.com/ament/ament_lint',
@@ -26,10 +28,8 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    description='Check CMake code style using cmakelint.',
-    long_description="""\
-The ability to lint CMake code using cmakelint and generate xUnit test
-result files.""",
+    description='Run ament linters',
+    long_description='The auto-magic functions for ease to use of the ament linters in Python.',
     license='Apache License, Version 2.0',
     extras_require={
         'test': [
@@ -37,11 +37,8 @@ result files.""",
         ],
     },
     entry_points={
-        'console_scripts': [
-            'ament_lint_cmake = ament_lint_cmake.main:main',
+        'pytest11': [
+            'ament_lint_auto_py = ament_lint_auto_py.pytest_plugin',
         ],
-        'ament_lint': [
-            'ament_lint_cmake = ament_lint_cmake.main:LintCMakeRunner'
-        ]
     },
 )

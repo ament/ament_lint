@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import sys
 import time
+from typing import Literal
 from xml.etree import ElementTree
 from xml.sax import make_parser
 from xml.sax import SAXParseException
@@ -28,7 +29,17 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 
-def main(argv=sys.argv[1:]):
+class XmlLintRunner:
+
+    NAME = 'ament_xmllint'
+    FILE_TYPES = ('*.xml')
+
+    @staticmethod
+    def __call__() -> Literal[0, 1]:
+        return main()
+
+
+def main(argv=sys.argv[1:]) -> Literal[0, 1]:
     default_extensions = ['xml']
 
     parser = argparse.ArgumentParser(
@@ -70,7 +81,8 @@ def main(argv=sys.argv[1:]):
 
     xmllint_bin = shutil.which('xmllint')
     if not xmllint_bin:
-        return "Could not find 'xmllint' executable"
+        print("Could not find 'xmllint' executable", file=sys.stderr)
+        return 1
 
     report = []
 

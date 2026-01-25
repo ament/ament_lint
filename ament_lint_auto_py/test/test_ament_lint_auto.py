@@ -1,4 +1,4 @@
-# Copyright 2019 Canonical, Ltd.
+# Copyright 2026 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ament_flake8.main import main_with_errors
-
 import pytest
 
 
-@pytest.mark.flake8
+# TODO: AMENT_LINT_AUTO_EXCLUDE suppor
+@pytest.mark.ament_lint_auto_py
 @pytest.mark.linter
-def test_flake8():
-    rc, errors = main_with_errors(argv=[])
-    assert rc == 0, \
-        'Found %d code style errors / warnings:\n' % len(errors) + \
-        '\n'.join(errors)
+def test_ament_lint_auto(run_entry_point) -> None:
+    """Run all installed linter dynamically."""
+    rc = run_entry_point()
+    assert rc == 0, f'Linter[{run_entry_point.NAME}] failed with exit code {rc}'

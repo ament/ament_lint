@@ -62,7 +62,7 @@ and generate xUnit test result files.""",
             'ament_pclint = ament_pclint.main:main',
         ],
         'ament_lint': [
-            'ament_pclint = ament_pclint.main:main',
+            'ament_pclint = ament_pclint.main:PCLintRunner',
         ],
     },
 )

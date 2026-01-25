@@ -18,6 +18,7 @@ import argparse
 import os
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -30,6 +31,16 @@ def is_valid_file(filename):
 
 
 cmakelint.IsValidFile = is_valid_file
+
+
+class LintCMakeRunner:
+
+    NAME = 'ament_lint_cmake'
+    FILE_TYPES = ('CMakeLists.txt', '*.cmake')
+
+    @staticmethod
+    def __call__() -> Literal[0, 1]:
+        return main()
 
 
 def main(argv=sys.argv[1:]):

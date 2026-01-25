@@ -45,7 +45,7 @@ and generate xUnit test result files.""",
             'ament_clang_format = ament_clang_format.main:main',
         ],
         'ament_lint': [
-            'ament_clang_format = ament_clang_format.main:main',
+            'ament_clang_format = ament_clang_format.main:ClangFormatRunner',
         ],
     },
 )

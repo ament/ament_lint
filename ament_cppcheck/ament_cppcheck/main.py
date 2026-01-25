@@ -22,6 +22,7 @@ from shutil import which
 import subprocess
 import sys
 import time
+from typing import Literal
 from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
@@ -49,6 +50,25 @@ def get_cppcheck_version(cppcheck_bin):
         raise RuntimeError("unexpected cppcheck version name '{}'".format(output))
 
     return tokens[1]
+
+
+class CPPCheckRunner:
+
+    NAME = 'ament_cppcheck'
+    FILE_TYPES = (
+        '*.c',
+        '*.cc',
+        '*.cpp',
+        '*.cxx',
+        '*.h',
+        '*.hh',
+        '*.hpp',
+        '*.hxx',
+    )
+
+    @staticmethod
+    def __call__() -> Literal[0, 1]:
+        return main()
 
 
 def main(argv=sys.argv[1:]):

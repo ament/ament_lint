@@ -19,6 +19,7 @@ import logging
 import os
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -53,6 +54,16 @@ _ament_ignore = [
     'D212',
     'D404',
 ]
+
+
+class Pep257Runner:
+
+    NAME = 'ament_pep257'
+    FILE_TYPES = ('*.py')
+
+    @staticmethod
+    def __call__() -> Literal[0, 1]:
+        return main()
 
 
 def main(argv=sys.argv[1:]):

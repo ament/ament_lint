@@ -45,7 +45,7 @@ and generate xUnit test result files.""",
             'ament_uncrustify = ament_uncrustify.main:main',
         ],
         'ament_lint': [
-            'ament_uncrustify = ament_uncrustify.main:main',
+            'ament_uncrustify = ament_uncrustify.main:UncrustifyRunner',
         ],
     },
 )

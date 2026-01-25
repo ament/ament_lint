@@ -41,7 +41,7 @@ result files.""",
             'ament_pyflakes = ament_pyflakes.main:main',
         ],
         'ament_lint': [
-            'ament_pyflakes = ament_pyflakes.main:main',
+            'ament_pyflakes = ament_pyflakes.main:PyflakesRunner',
         ],
     },
 )

@@ -16,8 +16,8 @@
 
 import argparse
 import os
-import re
 import sys
+import re
 import textwrap
 import time
 from typing import List, Match, Optional, Tuple
@@ -25,6 +25,16 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 import mypy.api
+
+
+class MypyRunner:
+
+    NAME = 'ament_mypy'
+    FILE_TYPES = ('*.py', '*.pyi')
+
+    @staticmethod
+    def __call__() -> int:
+        return main()
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:

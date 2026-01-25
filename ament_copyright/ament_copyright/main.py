@@ -18,6 +18,7 @@ import os
 import re
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -34,6 +35,18 @@ from ament_copyright.parser import parse_file
 from ament_copyright.parser import scan_past_coding_and_shebang_lines
 from ament_copyright.parser import scan_past_empty_lines
 from ament_copyright.parser import search_copyright_information
+
+
+class CopyrightRunner:
+
+    NAME = 'ament_copyright'
+    FILE_TYPES = (
+        '*',
+    )
+
+    @staticmethod
+    def __call__() -> Literal[0, 1]:
+        return main()
 
 
 def main(argv=sys.argv[1:]):

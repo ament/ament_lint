@@ -45,7 +45,7 @@ and generate xUnit test result files.""",
             'ament_clang_tidy = ament_clang_tidy.main:main',
         ],
         'ament_lint': [
-            'ament_clang_tidy = ament_clang_tidy.main:main',
+            'ament_clang_tidy = ament_clang_tidy.main:ClangTidyRunner',
         ],
     },
 )

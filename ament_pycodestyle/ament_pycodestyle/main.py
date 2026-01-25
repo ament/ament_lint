@@ -17,10 +17,21 @@
 import argparse
 import os
 import sys
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 import pycodestyle
+
+
+class PycodestyleRunner:
+
+    NAME = 'ament_pycodestyle'
+    FILE_TYPES = ('*.py')
+
+    @staticmethod
+    def __call__() -> Literal[0, 1]:
+        return main()
 
 
 def main(argv=sys.argv[1:]):
