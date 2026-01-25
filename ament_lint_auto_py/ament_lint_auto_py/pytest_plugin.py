@@ -15,6 +15,7 @@
 from collections.abc import Callable
 from importlib.metadata import entry_points
 from importlib.metadata import EntryPoint
+import os
 from pathlib import Path
 import sys
 
@@ -29,6 +30,9 @@ def pytest_configure(config: Config) -> None:
 
 
 def pytest_generate_tests(metafunc: Metafunc) -> None:
+    AMENT_LINT_AUTO_EXCLUDE = os.environ.get('AMENT_LINT_AUTO_EXCLUDE', '')
+    EXCLUDED_LINTERS = {name.strip() for name in AMENT_LINT_AUTO_EXCLUDE.split(';') if name}
+
     if 'ament_lint_ep' in metafunc.fixturenames:
         linters = entry_points(group='ament_lint')
 
@@ -39,6 +43,11 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
             func = ep.load()
             name = func.NAME
             file_types = func.FILE_TYPES
+
+            if name in EXCLUDED_LINTERS:
+                print(f'Skipping {name} because it is in '
+                      f'AMENT_LINT_AUTO_EXCLUDE:={AMENT_LINT_AUTO_EXCLUDE}.')
+                continue
 
             paths: list[Path] = []
             for ext in file_types:
@@ -57,5 +66,13 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
 @pytest.fixture
 def run_entry_point(ament_lint_ep: EntryPoint) -> Callable[[], int]:
     func = ament_lint_ep.load()
-    sys.argv = [func.NAME]
-    return func()
+
+    AMENT_LINT_AUTO_FILE_EXCLUDE = os.environ.get('AMENT_LINT_AUTO_FILE_EXCLUDE', '')
+    EXCLUDED_FILE_GLOBS = {name.strip() for
+                           name in AMENT_LINT_AUTO_FILE_EXCLUDE.split(';') if name}
+    if EXCLUDED_FILE_GLOBS:
+        args = ['--exclude']
+        sys.argv.extend(EXCLUDED_FILE_GLOBS)
+        return func(args)
+
+    return func([])

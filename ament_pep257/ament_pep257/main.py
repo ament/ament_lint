@@ -61,9 +61,11 @@ class Pep257Runner:
     NAME = 'ament_pep257'
     FILE_TYPES = ('*.py')
 
-    @staticmethod
-    def __call__() -> Literal[0, 1]:
-        return main()
+    def __init__(self, args: list[str]) -> None:
+        self.args = args
+
+    def __call__(self) -> Literal[0, 1]:
+        return main(self.args)
 
 
 def main(argv=sys.argv[1:]):

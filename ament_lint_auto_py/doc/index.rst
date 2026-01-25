@@ -1,11 +1,10 @@
 ament_lint_auto_py
 ===============
 
-.. TODO
 The package simplifies using multiple linters as part of pytest tests.
 It reduces the amount of Python code to a bare minimum.
 
-``test_ament_lint_auto`:
+``test_ament_lint_auto.py`:
 
 .. code:: python
 
@@ -45,60 +44,30 @@ sufficient to test with a set of common linters.
     <!-- this recursively depends on a set of common linters -->
     <test_depend>ament_lint_common_py</test_depend>
 
-.. TODO
+
 How to exclude linter modules with ament_lint_auto?
 ---------------------------------------------------
 
-Linter modules can be excluded via the CMake list variable `AMENT_LINT_AUTO_EXCLUDE`.
+Linter modules can be excluded via the environment variable `AMENT_LINT_AUTO_EXCLUDE`.
 
 As an example to exclude the `copyright` linter:
 
-``CMakeLists.txt``:
-
-.. code:: cmake
-
-    # this must happen before the invocation of ament_package()
-    if(BUILD_TESTING)
-      find_package(ament_lint_auto REQUIRED)
-      list(APPEND AMENT_LINT_AUTO_EXCLUDE ament_cmake_copyright)
-      ament_lint_auto_find_test_dependencies()
-    endif()
+.. code:: bash
+    export AMENT_LINT_EXCLUDE="ament_copyright;"
 
 
 How to exclude files with ament_lint_auto?
 ------------------------------------------
 
 Linter hooks shall conform to the ament_lint_auto convention of excluding files
-specified in the CMake list variable `AMENT_LINT_AUTO_FILE_EXCLUDE`.
-As such, the CMake snippet from above can be modified to exclude files across
-all linters with one addition.
+specified in the environment list variable `AMENT_LINT_AUTO_FILE_EXCLUDE`.
 
-``CMakeLists.txt``:
-
-.. code:: cmake
-
-    # this must happen before the invocation of ament_package()
-    if(BUILD_TESTING)
-      find_package(ament_lint_auto REQUIRED)
-      set(AMENT_LINT_AUTO_FILE_EXCLUDE /path/to/ignored_file ...)
-      ament_lint_auto_find_test_dependencies()
-    endif()
+.. code:: bash
+    export AMENT_LINT_EXCLUDE="/path/to/ignored_file"
 
 For a more specific example, this excludes all python files matching a pattern using globbing.
 Multiple expressions can be combined on multiple lines.
-It might be a good idea to issue a warning to developers that linting is disabled
-if you plan to enable it at some point.
 
-.. code:: cmake
-
-      file(GLOB_RECURSE AMENT_LINT_AUTO_FILE_EXCLUDE
-        # Exclude all the python files in src directory
-        src/*.py
-        # Exclude all the c++ implementation files in test directory
-        test/*.cpp
-      )
-      message(AUTHOR_WARNING
-          "Ament lint auto tests are disabled on the following: "
-          ${AMENT_LINT_AUTO_FILE_EXCLUDE}
-      )
-
+.. code:: bash
+  .. code:: bash
+    export AMENT_LINT_EXCLUDE="src/*.py;test/*.cpp"

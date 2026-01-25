@@ -19,4 +19,4 @@ A mechanism for running the following set of common linters:
 
 * `ament_xmllint <https://github.com/ament/ament_lint/blob/master/ament_xmllint/doc/index.rst>`_ : an xml linter
 
-The `ament_lint_auto <https://github.com/ament/ament_lint/blob/master/ament_lint_auto/doc/index.rst>`_ documentation provides information on using ament_lint_common.
+The `ament_lint_auto_py <https://github.com/ament/ament_lint/blob/master/ament_lint_auto_py/doc/index.rst>`_ documentation provides information on using ament_lint_common_py.
