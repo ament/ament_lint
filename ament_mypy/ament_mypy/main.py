@@ -16,8 +16,8 @@
 
 import argparse
 import os
-import sys
 import re
+import sys
 import textwrap
 import time
 from typing import List, Match, Optional, Tuple
