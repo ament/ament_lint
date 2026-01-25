@@ -11,7 +11,7 @@ A mechanism for running the following set of common linters:
 
 * `ament_flake8 <https://github.com/ament/ament_lint/blob/master/ament_flake8/doc/index.rst>`_ : a style checker for Python files
 
-* `ament_lint <https://github.com/ament/ament_lint/blob/master/ament_lint/doc/index.rst>`_ : a cmake linter
+* `ament_cmake_lint <https://github.com/ament/ament_lint/blob/master/ament_cmake_lint/doc/index.rst>`_ : a cmake linter
 
 * `ament_pep257 <https://github.com/ament/ament_lint/blob/master/ament_pep257/doc/index.rst>`_ : a style checker for Python docstrings
 

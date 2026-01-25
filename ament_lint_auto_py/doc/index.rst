@@ -2,18 +2,22 @@ ament_lint_auto_py
 ===============
 
 .. TODO
-The package simplifies using multiple linters as part of the CMake tests.
-It reduces the amount of CMake code to a bare minimum.
+The package simplifies using multiple linters as part of pytest tests.
+It reduces the amount of Python code to a bare minimum.
 
-``CMakeLists.txt``:
+``test_ament_lint_auto`:
 
-.. code:: cmake
+.. code:: python
 
-    # this must happen before the invocation of ament_package()
-    if(BUILD_TESTING)
-      find_package(ament_lint_auto REQUIRED)
-      ament_lint_auto_find_test_dependencies()
-    endif()
+  import pytest
+
+
+  @pytest.mark.ament_lint_auto_py
+  @pytest.mark.linter
+  def test_ament_lint_auto(run_entry_point) -> None:
+      """Run all installed linter dynamically."""
+      rc = run_entry_point()
+      assert rc == 0, f'Linter[{run_entry_point.NAME}] failed with exit code {rc}'
 
 The set of linters to be used is then only specified in the package manifest as
 test dependencies.
@@ -22,12 +26,12 @@ test dependencies.
 
 .. code:: xml
 
-    <test_depend>ament_lint_auto</test_depend>
+    <test_depend>ament_lint_auto_py</test_depend>
 
     <!-- add test dependencies on any linter, e.g. -->
-    <test_depend>ament_cmake_clang_format</test_depend>
-    <test_depend>ament_cmake_cppcheck</test_depend>
-    <test_depend>ament_cmake_pycodestyle</test_depend>
+    <test_depend>ament_clang_format</test_depend>
+    <test_depend>ament_cppcheck</test_depend>
+    <test_depend>ament_pycodestyle</test_depend>
 
 Since recursive dependencies are also being used a single test dependency is
 sufficient to test with a set of common linters.
@@ -36,16 +40,12 @@ sufficient to test with a set of common linters.
 
 .. code:: xml
 
-    <test_depend>ament_lint_auto</test_depend>
+    <test_depend>ament_lint_auto_py</test_depend>
 
     <!-- this recursively depends on a set of common linters -->
-    <test_depend>ament_lint_common</test_depend>
+    <test_depend>ament_lint_common_py</test_depend>
 
-The documentation of the package `ament_cmake_test
-<https://github.com/ament/ament_cmake>`_ provides more information on testing
-in CMake ament packages.
-
-
+.. TODO
 How to exclude linter modules with ament_lint_auto?
 ---------------------------------------------------
 

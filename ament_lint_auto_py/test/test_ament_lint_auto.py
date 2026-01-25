@@ -15,7 +15,6 @@
 import pytest
 
 
-# TODO: AMENT_LINT_AUTO_EXCLUDE suppor
 @pytest.mark.ament_lint_auto_py
 @pytest.mark.linter
 def test_ament_lint_auto(run_entry_point) -> None:
