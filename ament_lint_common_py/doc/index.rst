@@ -1,6 +1,8 @@
 ament_lint_common_py
 =================
 
+The pytest variant of ament_lint_common. The dependencies match to keep parity between them.
+
 A mechanism for running the following set of common linters:
 
 * `ament_copyright <https://github.com/ament/ament_lint/blob/master/ament_copyright/doc/index.rst>`_ : a copyright linter which checks that copyright statements and license headers are present and correct
