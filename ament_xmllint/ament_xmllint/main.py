@@ -15,11 +15,14 @@
 # limitations under the License.
 
 import argparse
+import hashlib
 import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
+import urllib.request
 from xml.etree import ElementTree
 from xml.sax import make_parser
 from xml.sax import SAXParseException
@@ -74,45 +77,46 @@ def main(argv=sys.argv[1:]):
 
     report = []
 
-    # invoke xmllint on all files
-    for filename in files:
-        # parse file to extract desired validation information
-        parser = make_parser()
-        handler = CustomHandler()
-        parser.setContentHandler(handler)
-        try:
-            parser.parse(filename)
-        except SAXParseException:
-            pass
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # invoke xmllint on all files
+        for filename in files:
+            # parse file to extract desired validation information
+            parser = make_parser()
+            handler = CustomHandler()
+            parser.setContentHandler(handler)
+            try:
+                parser.parse(filename)
+            except SAXParseException:
+                pass
 
-        cmd = [xmllint_bin, '--noout', filename]
-        # choose validation options based on handler information
-        for attributes in handler.xml_model_attributes:
-            schematypens = attributes.get('schematypens')
-            href = attributes.get('href')
-            if schematypens is None or href is None:
-                continue
-            # check for XML schema
-            if schematypens == 'http://www.w3.org/2001/XMLSchema':
-                cmd += ['--schema', href]
-            # check for RelaxNG
-            elif schematypens == 'http://relaxng.org/ns/structure/1.0':
-                cmd += ['--relaxng', href]
-            # check for Schematron
-            elif schematypens == 'http://purl.oclc.org/dsdl/schematron':
-                cmd += ['--schematron', href]
-        if 'xsi:noNamespaceSchemaLocation' in handler.root_attributes:
-            cmd += [
-                '--schema',
-                handler.root_attributes['xsi:noNamespaceSchemaLocation']]
+            cmd = [xmllint_bin, '--noout', filename]
+            # choose validation options based on handler information
+            for attributes in handler.xml_model_attributes:
+                schematypens = attributes.get('schematypens')
+                href = attributes.get('href')
+                if schematypens is None or href is None:
+                    continue
+                # check for XML schema
+                if schematypens == 'http://www.w3.org/2001/XMLSchema':
+                    cmd += ['--schema', get_local_schema_path(href, temp_dir)]
+                # check for RelaxNG
+                elif schematypens == 'http://relaxng.org/ns/structure/1.0':
+                    cmd += ['--relaxng', get_local_schema_path(href, temp_dir)]
+                # check for Schematron
+                elif schematypens == 'http://purl.oclc.org/dsdl/schematron':
+                    cmd += ['--schematron', get_local_schema_path(href, temp_dir)]
+            if 'xsi:noNamespaceSchemaLocation' in handler.root_attributes:
+                schema_path = get_local_schema_path(
+                    handler.root_attributes['xsi:noNamespaceSchemaLocation'], temp_dir)
+                cmd += ['--schema', schema_path]
 
-        try:
-            subprocess.check_output(
-                cmd, cwd=os.path.dirname(filename), stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            errors = e.output.decode()
-        else:
-            errors = None
+            try:
+                subprocess.check_output(
+                    cmd, cwd=os.path.dirname(filename), stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError as e:
+                errors = e.output.decode()
+            else:
+                errors = None
 
         filename = os.path.relpath(filename, start=os.getcwd())
         report.append((filename, errors))
@@ -156,6 +160,29 @@ def main(argv=sys.argv[1:]):
             f.write(xml)
 
     return rc
+
+
+def get_local_schema_path(path, temp_dir):
+    if not path.startswith(('http://', 'https://')):
+        return path
+
+    # Use a hash of the URL to create a unique filename in the temp directory
+    url_hash = hashlib.sha256(path.encode('utf-8')).hexdigest()
+    # Attempt to keep the original extension if possible
+    _, ext = os.path.splitext(path)
+    if ext not in ['.xsd', '.rng', '.sch']:
+        ext = ''
+    local_path = os.path.join(temp_dir, url_hash + ext)
+
+    if not os.path.exists(local_path):
+        try:
+            with urllib.request.urlopen(path) as response, open(local_path, 'wb') as out_file:
+                out_file.write(response.read())
+        except Exception as e:
+            print(f"Warning: failed to download schema from '{path}': {e}", file=sys.stderr)
+            # Fall back to original path if download fails, xmllint will likely fail anyway
+            return path
+    return local_path
 
 
 def get_files(paths, extensions, excludes=[]):
