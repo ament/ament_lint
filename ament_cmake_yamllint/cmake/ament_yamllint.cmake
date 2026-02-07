@@ -23,7 +23,7 @@
 # @public
 #
 function(ament_yamllint)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "yamllint")
   endif()
@@ -57,7 +57,7 @@ function(ament_yamllint)
   set_tests_properties(
     "${ARG_TESTNAME}"
     PROPERTIES
-    LABELS "yamllint;linter"
+    LABELS "linter;yamllint"
   )
   if(NOT yamllint_BIN)
     set_tests_properties(
