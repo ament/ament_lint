@@ -53,7 +53,7 @@ As an example to exclude the `copyright` linter:
 
 
 How to exclude files with ament_lint_auto_py?
-------------------------------------------
+---------------------------------------------
 
 Linter hooks shall conform to the ament_lint_auto_py convention of excluding files
 specified in the environment list variable `ament_lint_auto_file_exclude`.
