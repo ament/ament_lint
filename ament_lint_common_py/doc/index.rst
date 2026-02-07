@@ -1,5 +1,5 @@
 ament_lint_common_py
-=================
+====================
 
 The pytest variant of ament_lint_common. The dependencies match to keep parity between them.
 
