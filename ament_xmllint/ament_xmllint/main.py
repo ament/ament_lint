@@ -32,7 +32,7 @@ from xml.sax.saxutils import quoteattr
 class XmlLintRunner:
 
     NAME = 'ament_xmllint'
-    FILE_TYPES = ('*.xml')
+    FILE_TYPES = ('*.xml',)
 
     def __init__(self, args: list[str]) -> None:
         self.args = args
