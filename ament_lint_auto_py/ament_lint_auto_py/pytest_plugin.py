@@ -88,7 +88,7 @@ def pytest_collection_modifyitems(session: Session, config: Config, items: list[
         # skip linters if no matching files exist
         found_file = False
         for pattern in runner.FILE_TYPES:
-            if any(Path('.').rglob(pattern)):
+            if any(config.rootpath.rglob(pattern)):
                 found_file = True
                 break
         if not found_file:
