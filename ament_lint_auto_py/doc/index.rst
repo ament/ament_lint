@@ -1,5 +1,5 @@
 ament_lint_auto_py
-===============
+==================
 
 The package simplifies using multiple linters as part of pytest tests.
 
