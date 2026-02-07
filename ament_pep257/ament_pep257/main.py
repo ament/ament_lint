@@ -59,7 +59,7 @@ _ament_ignore = [
 class Pep257Runner:
 
     NAME = 'ament_pep257'
-    FILE_TYPES = ('*.py')
+    FILE_TYPES = ('*.py',)
 
     def __init__(self, args: list[str]) -> None:
         self.args = args
