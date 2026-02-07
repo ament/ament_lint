@@ -30,7 +30,7 @@ from pyflakes.reporter import Reporter
 class PyflakesRunner:
 
     NAME = 'ament_pyflakes'
-    FILE_TYPES = ('*.py')
+    FILE_TYPES = ('*.py',)
 
     def __init__(self, args: list[str]) -> None:
         self.args = args
