@@ -84,7 +84,7 @@ To register a third party linter implement class like the following.
   class CustomRunner:
 
       NAME = 'ament_custom'
-      FILE_TYPES = ('*.py')
+      FILE_TYPES = ('*.py',)
 
       def __init__(self, args: list[str]) -> None:
           self.args = args
