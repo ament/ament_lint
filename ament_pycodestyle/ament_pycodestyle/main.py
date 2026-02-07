@@ -27,7 +27,7 @@ import pycodestyle
 class PycodestyleRunner:
 
     NAME = 'ament_pycodestyle'
-    FILE_TYPES = ('*.py')
+    FILE_TYPES = ('*.py',)
 
     def __init__(self, args: list[str]) -> None:
         self.args = args
