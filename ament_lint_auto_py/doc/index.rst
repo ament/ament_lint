@@ -40,7 +40,7 @@ sufficient to test with a set of common linters.
 
 
 How to exclude linter modules with ament_lint_auto_py?
----------------------------------------------------
+------------------------------------------------------
 
 Linter modules can be excluded via the pytest configurable variables `ament_lint_auto_exclude` in pytest config files like `pytest.ini` or `pyproject.toml`.
 
