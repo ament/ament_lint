@@ -80,7 +80,7 @@ def pytest_collection_modifyitems(session: Session, config: Config, items: list[
         runner = ep.load()
 
         if runner.NAME not in effective_depends:
-            continue  # skipping linter if not declared in depends of a package.xmk
+            continue  # skipping linter if not declared in depends of a package.xml
 
         if runner.NAME in excluded:
             continue  # skipping linter if declared in ament_lint_auto_exclude
