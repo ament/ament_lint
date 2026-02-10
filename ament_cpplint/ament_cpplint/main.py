@@ -181,6 +181,8 @@ def main(argv=sys.argv[1:]):
 
             ProcessFile(filename, _cpplint_state.verbose_level)
             report.append((filename, errors))
+            if errors or not args.quiet:
+                print('')
 
     # output summary
     for category in sorted(_cpplint_state.errors_by_category.keys()):
