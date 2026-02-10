@@ -16,7 +16,6 @@
 
 import argparse
 import glob
-import logging
 import os
 import re
 import sys
@@ -28,13 +27,6 @@ from ament_cpplint import cpplint
 from ament_cpplint.cpplint import _cpplint_state
 from ament_cpplint.cpplint import ParseArguments
 from ament_cpplint.cpplint import ProcessFile
-
-
-def setup_logging(quiet):
-    logging.basicConfig(
-            format='%(levelname)s: %(message)s', stream=sys.stdout,
-            level=logging.INFO if quiet else logging.DEBUG
-    )
 
 
 # use custom header guard with two underscore between the name parts
@@ -110,8 +102,6 @@ def main(argv=sys.argv[1:]):
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
-    setup_logging(quiet=args.quiet)
-    LOGGER = logging.getLogger()
     if args.xunit_file:
         start_time = time.time()
 
@@ -145,7 +135,7 @@ def main(argv=sys.argv[1:]):
         argv.append('--quiet')
     groups = get_file_groups(args.paths, extensions + headers, args.exclude)
     if not groups:
-        LOGGER.info('No files found')
+        print('No files found', file=sys.stderr)
         return 1
 
     # hook into error reporting
@@ -163,9 +153,13 @@ def main(argv=sys.argv[1:]):
         if root:
             root_arg = '--root=%s' % root
             arguments.append(root_arg)
-            LOGGER.debug("Using '%s' argument", root_arg)
+            if not args.quiet:
+                print("Using '%s' argument" % root_arg)
         else:
-            LOGGER.debug("Not using '--root'")
+            if not args.quiet:
+                print("Not using '--root'")
+        if not args.quiet:
+            print('')
 
         arguments += files
         filenames = ParseArguments(arguments)
@@ -187,15 +181,20 @@ def main(argv=sys.argv[1:]):
 
             ProcessFile(filename, _cpplint_state.verbose_level)
             report.append((filename, errors))
+            if errors or not args.quiet:
+                print('')
 
     # output summary
     for category in sorted(_cpplint_state.errors_by_category.keys()):
         count = _cpplint_state.errors_by_category[category]
-        LOGGER.info('Category %s errors found: %d', category, count)
+        print("Category '%s' errors found: %d" % (category, count),
+              file=sys.stderr)
     if _cpplint_state.error_count:
-        LOGGER.info('Total errors found: %d', _cpplint_state.error_count)
+        print('Total errors found: %d' % _cpplint_state.error_count,
+              file=sys.stderr)
     else:
-        LOGGER.debug('No problems found')
+        if not args.quiet:
+            print('No problems found')
 
     # generate xunit file
     if args.xunit_file:
