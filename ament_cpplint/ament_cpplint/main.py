@@ -158,6 +158,8 @@ def main(argv=sys.argv[1:]):
         else:
             if not args.quiet:
                 print("Not using '--root'")
+        if not args.quiet:
+            print('')
 
         arguments += files
         filenames = ParseArguments(arguments)
