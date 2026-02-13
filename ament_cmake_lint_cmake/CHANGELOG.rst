@@ -2,6 +2,9 @@
 Changelog for package ament_cmake_lint_cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.12.14 (2025-07-18)
 --------------------
 
