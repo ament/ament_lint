@@ -25,9 +25,14 @@
 # @public
 #
 function(ament_mypy)
-  cmake_parse_arguments(ARG "" "CONFIG_FILE;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "CONFIG_FILE;TESTNAME;AMENT_STRICT" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "mypy")
+  endif()
+
+  # Error if both CONFIG_FILE and AMENT_STRICT are provided
+  if(ARG_CONFIG_FILE AND ARG_AMENT_STRICT)
+    message(FATAL_ERROR "ament_mypy(): Cannot specify both CONFIG_FILE and AMENT_STRICT at the same time")
   endif()
 
   find_program(ament_mypy_BIN NAMES "ament_mypy")
@@ -40,6 +45,11 @@ function(ament_mypy)
   if(ARG_CONFIG_FILE)
     list(APPEND cmd "--config" "${ARG_CONFIG_FILE}")
   endif()
+
+  if(ARG_AMENT_STRICT)
+    list(APPEND cmd "--ament-strict")
+  endif()
+
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_mypy")
