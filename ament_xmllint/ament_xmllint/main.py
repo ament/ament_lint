@@ -22,6 +22,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from typing import Literal
 import urllib.request
 from xml.etree import ElementTree
 from xml.sax import make_parser
@@ -31,7 +32,7 @@ from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 
-def main(argv=sys.argv[1:]):
+def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     default_extensions = ['xml']
 
     parser = argparse.ArgumentParser(

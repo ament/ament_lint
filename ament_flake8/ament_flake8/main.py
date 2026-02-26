@@ -18,6 +18,7 @@ import argparse
 import os
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -27,12 +28,12 @@ from flake8.main import application as flake8_app
 from flake8.main import options as flake8_options
 
 
-def main(argv=sys.argv[1:]):
+def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     rc, _ = main_with_errors(argv=argv)
     return rc
 
 
-def main_with_errors(argv=sys.argv[1:]):
+def main_with_errors(argv: list[str] = sys.argv[1:]) -> tuple[Literal[0, 1], list[str]]:
     config_file = os.path.join(
         os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
 

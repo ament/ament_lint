@@ -14,6 +14,7 @@ setup(
     ],
     package_data={'': [
         'configuration/ament_mypy.ini',
+        'configuration/ament_mypy_strict.toml'
         'py.typed'
     ]},
     zip_safe=False,

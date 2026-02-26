@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pytest import Config
 
-def pytest_configure(config):
+
+def pytest_configure(config: Config) -> None:
     config.addinivalue_line(
         'markers', 'flake8: marks tests checking for flake8 compliance')

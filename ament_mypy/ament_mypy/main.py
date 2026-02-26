@@ -33,13 +33,32 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
         description='Check code using mypy',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument(
+
+    config_group = parser.add_mutually_exclusive_group()
+    config_group.add_argument(
         '--config',
         metavar='path',
         dest='config_file',
-        default=os.path.join(os.path.dirname(__file__), 'configuration', 'ament_mypy.ini'),
-        help='The config file'
+        default=os.path.join(
+            os.path.dirname(__file__),
+            'configuration',
+            'ament_mypy.ini',
+        ),
+        help='The config file',
     )
+
+    config_group.add_argument(
+        '--ament-strict',
+        action='store_const',
+        dest='config_file',
+        const=os.path.join(
+            os.path.dirname(__file__),
+            'configuration',
+            'ament_mypy_strict.toml',
+        ),
+        help='Use strict ament mypy configuration',
+    )
+
     parser.add_argument(
         'paths',
         nargs='*',
@@ -137,7 +156,7 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
 def _generate_mypy_report(paths: List[str],
                           config_file: Optional[str] = None,
                           cache_dir: str = os.devnull) -> Tuple[str, str, int]:
-    mypy_argv = []
+    mypy_argv: list[str] = []
     mypy_argv.append('--cache-dir')
     mypy_argv.append(str(cache_dir))
     if cache_dir == os.devnull:
