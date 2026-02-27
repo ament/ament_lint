@@ -1,4 +1,8 @@
 [tool.mypy]
-
 strict = true
 pretty = true
+
+# Done until rhel has types-setuptools
+[[tool.mypy.overrides]]
+module = "setup"
+ignore_errors = true
