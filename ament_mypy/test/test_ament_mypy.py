@@ -2,11 +2,10 @@ import os
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+from _pytest.tmpdir import TempPathFactory
 import ament_mypy.main
-
 import pytest
-from pytest import TempPathFactory
-from pytest_mock import MockerFixture
+from pytest_mock.plugin import MockerFixture
 from pytest_mock.plugin import MockType
 
 
