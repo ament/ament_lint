@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytest import Config
+
+from _pytest.config import Config
 
 
 def pytest_configure(config: Config) -> None:
