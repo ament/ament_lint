@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
+from unittest.mock import MagicMock
 import xml.etree.ElementTree as ET
 
 from _pytest.tmpdir import TempPathFactory
 import ament_mypy.main
 import pytest
 from pytest_mock.plugin import MockerFixture
-from pytest_mock.plugin import MockType
 
 
 @pytest.fixture()
@@ -57,7 +57,7 @@ def ignore_dir(tmp_path_factory: TempPathFactory) -> Path:
 
 
 @pytest.fixture()
-def mock_mypy_succ(mocker: MockerFixture) -> MockType:
+def mock_mypy_succ(mocker: MockerFixture) -> MagicMock:
     return mocker.patch('ament_mypy.main.mypy.api.run', return_value=('', '', 0))
 
 
@@ -73,18 +73,18 @@ def sample_errors(use_dir: Path) -> list[str]:
 
 
 @pytest.fixture()
-def mock_mypy_generate_fail(mocker: MockerFixture, sample_errors: list[str]) -> MockType:
+def mock_mypy_generate_fail(mocker: MockerFixture, sample_errors: list[str]) -> MagicMock:
     mock_fail = mocker.patch('ament_mypy.main._generate_mypy_report')
     mock_fail.return_value = ('\n'.join(sample_errors), '', 1)
     return mock_fail
 
 
 @pytest.fixture()
-def mock_generate_report(mocker: MockerFixture) -> MockType:
+def mock_generate_report(mocker: MockerFixture) -> MagicMock:
     return mocker.patch('ament_mypy.main._generate_mypy_report')
 
 
-def test__generate_mypy_report(mock_mypy_succ: MockType) -> None:
+def test__generate_mypy_report(mock_mypy_succ: MagicMock) -> None:
     # Test if correctly returns mypy output
     files = ['a.py', 'b.py']
     assert ament_mypy.main._generate_mypy_report(files) == mock_mypy_succ.return_value
@@ -119,7 +119,7 @@ def test__generate_mypy_report(mock_mypy_succ: MockType) -> None:
     assert '--no-incremental' not in args[0]
 
 
-def test_main_success(mock_generate_report: MockType, use_dir: Path) -> None:
+def test_main_success(mock_generate_report: MagicMock, use_dir: Path) -> None:
     mock_generate_report.return_value = ('', '', 0)
 
     # Test that a successful lint returns 0
@@ -142,7 +142,7 @@ def test_main_success(mock_generate_report: MockType, use_dir: Path) -> None:
     assert str(use_dir / '03.txt') not in args[0]
 
 
-def test_main_exclude(mock_generate_report: MockType, use_dir: Path) -> None:
+def test_main_exclude(mock_generate_report: MagicMock, use_dir: Path) -> None:
     mock_generate_report.return_value = ('', '', 0)
     # Test that excluding a file that was passed as an arg works
     assert ament_mypy.main.main([str(use_dir / '01.py'),
@@ -165,14 +165,14 @@ def test_main_exclude(mock_generate_report: MockType, use_dir: Path) -> None:
     mock_generate_report.assert_not_called()
 
 
-def test_ignore(mock_generate_report: MockType, use_dir: Path, ignore_dir: Path) -> None:
+def test_ignore(mock_generate_report: MagicMock, use_dir: Path, ignore_dir: Path) -> None:
     mock_generate_report.return_value = ('', '', 0)
 
     # Test if returns no error if at least one valid dir is presented
     assert ament_mypy.main.main([str(use_dir), str(ignore_dir)]) == 0
 
 
-def test_fail(mocker: MockerFixture, mock_mypy_generate_fail: MockType, use_dir: Path) -> None:
+def test_fail(mocker: MockerFixture, mock_mypy_generate_fail: MagicMock, use_dir: Path) -> None:
     # Test if an error message from mypy causes a non-zero return
     assert ament_mypy.main.main([str(use_dir / '01.py')])
 
@@ -198,7 +198,7 @@ def test_main_error(mocker: MockerFixture, use_dir: Path) -> None:
     assert ament_mypy.main.main([str(use_dir)]) == 15
 
 
-def test_main_config_file(mock_generate_report: MockType, mocker: MockerFixture,
+def test_main_config_file(mock_generate_report: MagicMock, mocker: MockerFixture,
                           use_dir: Path) -> None:
     # Test that a valid config file is passed on to mypy
     conf_file = use_dir / 'mypy.ini'
@@ -220,7 +220,7 @@ def test_main_config_file(mock_generate_report: MockType, mocker: MockerFixture,
                                  str(use_dir / 'aeiou.ini')]) == 1
 
 
-def test_main_xunit(mock_mypy_generate_fail: MockType, mocker: MockerFixture,
+def test_main_xunit(mock_mypy_generate_fail: MagicMock, mocker: MockerFixture,
                     use_dir: Path) -> None:
     mock_xunit = mocker.patch('ament_mypy.main._get_xunit_content')
     mock_xunit.return_value = "<?xml version='1.0' encoding='UTF-8'?></xml>\n"
