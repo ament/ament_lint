@@ -43,5 +43,8 @@ generate xUnit test result files.""",
         'console_scripts': [
             'ament_pycodestyle = ament_pycodestyle.main:main',
         ],
+        'ament_lint': [
+            'ament_pycodestyle = ament_pycodestyle.main:PycodestyleRunner',
+        ],
     },
 )

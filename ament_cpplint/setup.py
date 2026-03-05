@@ -40,5 +40,8 @@ cpplint and generate xUnit test result files.""",
         'console_scripts': [
             'ament_cpplint = ament_cpplint.main:main',
         ],
+        'ament_lint': [
+            'ament_cpplint = ament_cpplint.main:CPPLintRunner',
+        ],
     },
 )

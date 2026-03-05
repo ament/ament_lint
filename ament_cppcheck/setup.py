@@ -40,5 +40,8 @@ and generate xUnit test result files.""",
         'console_scripts': [
             'ament_cppcheck = ament_cppcheck.main:main',
         ],
+        'ament_lint': [
+            'ament_cppcheck = ament_cppcheck.main:CPPCheckRunner',
+        ],
     },
 )

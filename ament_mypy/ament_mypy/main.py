@@ -27,6 +27,18 @@ from xml.sax.saxutils import quoteattr
 import mypy.api
 
 
+class MypyRunner:
+
+    NAME = 'ament_mypy'
+    FILE_TYPES = ('*.py', '*.pyi')
+
+    def __init__(self, args: list[str]) -> None:
+        self.args = args
+
+    def __call__(self) -> int:
+        return main(self.args)
+
+
 def main(argv: List[str] = sys.argv[1:]) -> int:
     """Command line tool for static type analysis with mypy."""
     parser = argparse.ArgumentParser(

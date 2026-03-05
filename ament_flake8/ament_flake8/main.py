@@ -18,6 +18,7 @@ import argparse
 import os
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -25,6 +26,18 @@ import flake8
 from flake8.api.legacy import StyleGuide
 from flake8.main import application as flake8_app
 from flake8.main import options as flake8_options
+
+
+class Flake8Runner:
+
+    NAME = 'ament_flake8'
+    FILE_TYPES = ('*.py', )
+
+    def __init__(self, args: list[str]) -> None:
+        self.args = args
+
+    def __call__(self) -> Literal[0, 1]:
+        return main(self.args)
 
 
 def main(argv=sys.argv[1:]):

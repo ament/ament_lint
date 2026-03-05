@@ -18,12 +18,26 @@ import argparse
 import os
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 from pyflakes.api import checkPath
 from pyflakes.messages import Message
 from pyflakes.reporter import Reporter
+
+
+class PyflakesRunner:
+
+    NAME = 'ament_pyflakes'
+    FILE_TYPES = ('*.py',)
+
+    def __init__(self, args: list[str]) -> None:
+        self.args = args
+        self.args = args
+
+    def __call__(self) -> Literal[0, 1]:
+        return main(self.args)
 
 
 def main(argv=sys.argv[1:]):

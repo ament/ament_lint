@@ -21,6 +21,7 @@ import os
 import re
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -67,6 +68,27 @@ def custom_get_header_guard_cpp_variable(filename):
 
 
 cpplint.GetHeaderGuardCPPVariable = custom_get_header_guard_cpp_variable
+
+
+class CPPLintRunner:
+
+    NAME = 'ament_cpplint'
+    FILE_TYPES = (
+        '*.c',
+        '*.cc',
+        '*.cpp',
+        '*.cxx',
+        '*.h',
+        '*.hh',
+        '*.hpp',
+        '*.hxx',
+    )
+
+    def __init__(self, args: list[str]) -> None:
+        self.args = args
+
+    def __call__(self) -> Literal[0, 1]:
+        return main(self.args)
 
 
 def main(argv=sys.argv[1:]):

@@ -27,8 +27,31 @@ import subprocess
 import sys
 import tempfile
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
+
+
+class UncrustifyRunner:
+
+    NAME = 'ament_uncrustify'
+    FILE_TYPES = (
+        '*.c',
+        '*.cc',
+        '*.cpp',
+        '*.cxx',
+        '*.h',
+        '*.hh',
+        '*.hpp',
+        '*.hxx',
+    )
+
+    def __init__(self, args: list[str]) -> None:
+        self.args = args
+        self.args = args
+
+    def __call__(self) -> Literal[0, 1]:
+        return main(self.args)
 
 
 def main(argv=sys.argv[1:]):

@@ -43,5 +43,8 @@ and generate xUnit test result files.""",
         'pytest11': [
             'ament_xmllint = ament_xmllint.pytest_marker',
         ],
+        'ament_lint': [
+            'ament_xmllint = ament_xmllint.main:XmlLintRunner',
+        ],
     },
 )
