@@ -16,7 +16,7 @@
 # Add a test to statically check Python types using mypy.
 #
 # :option AMENT_STRICT: Wether to run in strict mode. Excluse with CONFIG_FILE
-# :type AMENT_STRICT: bool 
+# :type AMENT_STRICT: bool
 # :param CONFIG_FILE: the name of the config file to use, if any
 # :type CONFIG_FILE: string
 # :param TESTNAME: the name of the test, default: "mypy"
