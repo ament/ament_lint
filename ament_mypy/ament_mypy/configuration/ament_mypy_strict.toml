@@ -3,6 +3,8 @@ strict = true
 pretty = true
 
 # Done until rhel has types-setuptools
+warn_unused_configs = false
+
 [[tool.mypy.overrides]]
 module = "setup"
-ignore_errors = true
+ignore_missing_imports = true
