@@ -19,6 +19,7 @@ import os
 import subprocess
 import sys
 import time
+from typing import Literal
 from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
@@ -26,7 +27,7 @@ from xml.sax.saxutils import quoteattr
 import yaml
 
 
-def main(argv=sys.argv[1:]):
+def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     config_file = os.path.join(
         os.path.dirname(__file__), 'configuration', '.clang-format')
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']

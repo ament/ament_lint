@@ -21,6 +21,7 @@ import os
 import re
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -69,7 +70,7 @@ def custom_get_header_guard_cpp_variable(filename):
 cpplint.GetHeaderGuardCPPVariable = custom_get_header_guard_cpp_variable
 
 
-def main(argv=sys.argv[1:]):
+def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     extensions = ['c', 'cc', 'cpp', 'cxx']
     headers = ['h', 'hh', 'hpp', 'hxx']
 

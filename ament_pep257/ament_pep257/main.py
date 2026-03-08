@@ -19,6 +19,7 @@ import logging
 import os
 import sys
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
@@ -55,7 +56,7 @@ _ament_ignore = [
 ]
 
 
-def main(argv=sys.argv[1:]):
+def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     parser = argparse.ArgumentParser(
         description='Check docstrings against the style conventions in PEP 257.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)

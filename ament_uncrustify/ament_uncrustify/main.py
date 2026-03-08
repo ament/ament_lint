@@ -27,11 +27,12 @@ import subprocess
 import sys
 import tempfile
 import time
+from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 
-def main(argv=sys.argv[1:]):
+def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     uncrustify_bin = find_executable('uncrustify')
     if not uncrustify_bin:
         print("Could not find 'uncrustify' executable", file=sys.stderr)

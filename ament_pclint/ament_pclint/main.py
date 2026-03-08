@@ -23,12 +23,13 @@ from shutil import which
 import subprocess
 import sys
 import time
+from typing import Literal
 from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
 
-def main(argv=sys.argv[1:]):
+def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     extensions = ['c', 'cc', 'cpp', 'cxx', 'c++']
 
     parser = argparse.ArgumentParser(
