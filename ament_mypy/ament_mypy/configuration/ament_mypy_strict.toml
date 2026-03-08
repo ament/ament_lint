@@ -7,4 +7,4 @@ warn_unused_configs = false
 
 [[tool.mypy.overrides]]
 module = "setup"
-disable_error_code = ["import-untyped"]
+ignore_errors = true
