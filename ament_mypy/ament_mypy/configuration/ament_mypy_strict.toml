@@ -2,6 +2,10 @@
 strict = true
 pretty = true
 
+# Done since rhel is currently 1 major and 9 minor version behind
+# We can reconsider in rhel10 when the difference is 4 minor versions.
+warn_unused_ignores = false
+
 # Done until rhel has types-setuptools
 warn_unused_configs = false
 
