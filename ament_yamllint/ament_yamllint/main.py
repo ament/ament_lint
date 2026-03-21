@@ -96,12 +96,16 @@ def main(argv=sys.argv[1:]):
             yamllint_config['rules']['line-length'] = {}
         yamllint_config['rules']['line-length']['max'] = args.linelength
 
-    with tempfile.NamedTemporaryFile(
-        mode='w', suffix='.yaml', prefix='yamllint_', delete=True
-    ) as temp_config:
+    temp_config = tempfile.NamedTemporaryFile(
+        mode='w', suffix='.yaml', prefix='yamllint_', delete=False
+    )
+    try:
         yaml.dump(yamllint_config, temp_config)
-        temp_config.flush()
+        temp_config.close()
         report = invoke_yamllint(files, config_file=temp_config.name)
+    finally:
+        if os.path.exists(temp_config.name):
+            os.remove(temp_config.name)
 
     # generate xunit file
     if args.xunit_file:
