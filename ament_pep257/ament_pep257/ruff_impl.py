@@ -21,8 +21,25 @@ import sys
 from ament_pep257.main import _filename_in_excludes
 
 
-def generate_ruff_report(paths: str, excludes: str, ignore: str, select: str, convention: str,
-                         add_ignore: str, add_select: str):
+def generate_ruff_report(paths: list[str], excludes: list[str], ignore: str, select: str,
+                         convention: str, add_ignore: str, add_select: str):
+
+    # If files don't exist fail fast
+    report = []
+    existing_paths = []
+    for path in paths:
+        if not os.path.exists(path):
+            report.append((path, [{
+                'category': 'unknown',
+                'linenumber': '-',
+                'message': 'file does not exist'
+            }]))
+        else:
+            existing_paths.append(path)
+
+    if not existing_paths:
+        return report
+
     cmd = ['ruff', 'check', '--output-format', 'json']
 
     if ignore:
@@ -43,7 +60,7 @@ def generate_ruff_report(paths: str, excludes: str, ignore: str, select: str, co
         cmd += ['--exclude', e]
 
     # paths
-    cmd += paths
+    cmd += existing_paths
 
     result = subprocess.run(
         cmd,
@@ -53,11 +70,10 @@ def generate_ruff_report(paths: str, excludes: str, ignore: str, select: str, co
 
     data = json.loads(result.stdout)
 
-    report = []
     files_dict = {}
 
     for item in data:
-        filename = os.path.abspath(item['filename'])
+        filename = os.path.relpath(item['filename'])
 
         if _filename_in_excludes(filename, excludes):
             continue
@@ -86,5 +102,21 @@ def generate_ruff_report(paths: str, excludes: str, ignore: str, select: str, co
             )
 
         report.append((filename, errors))
+
+    # If no violations count as a pass
+    reported_files = {filename for filename, _ in report}
+
+    for path in existing_paths:
+        if os.path.isdir(path):
+            for root, _, files in os.walk(path):
+                for f in files:
+                    if f.endswith('.py'):
+                        rel = os.path.relpath(os.path.join(root, f))
+                        if rel not in reported_files and not _filename_in_excludes(rel, excludes):
+                            report.append((rel, []))
+        else:
+            rel = os.path.relpath(path)
+            if rel not in reported_files and not _filename_in_excludes(rel, excludes):
+                report.append((rel, []))
 
     return report

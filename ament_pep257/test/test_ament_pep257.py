@@ -32,3 +32,19 @@ def test_valid_file():
         report = main([str(py_file)])
 
         assert report == 0
+
+
+def test_valid_with_violations():
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = pathlib.Path(temp_dir)
+        py_file = temp_dir / 'foobar.py'
+
+        py_file.write_text(
+            'def foo():\n'
+            '    """bad docstring"""\n'
+            '    pass\n'
+        )
+
+        report = main([str(py_file)])
+
+        assert report == 1
