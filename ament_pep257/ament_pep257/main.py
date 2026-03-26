@@ -14,32 +14,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import argparse
-import logging
+from importlib.util import find_spec
 import os
+import shutil
 import sys
 import time
 from typing import Literal
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
-import pydocstyle
-from pydocstyle import check
+ruff_installed = False
+pydocstyle_installed = False
 
-try:  # as of version 1.1.0
-    from pydocstyle.config import ConfigurationParser
-    from pydocstyle.violations import Error
-    from pydocstyle.utils import log
-except ImportError:  # try version 1.0.0
-    from pydocstyle import ConfigurationParser
-    from pydocstyle import Error
-    from pydocstyle import log
+if shutil.which('ruff'):
+    ruff_installed = True
+else:
+    ruff_installed = False
 
-log.setLevel(logging.INFO)
-
-
-_conventions = set(pydocstyle.conventions.keys())
-_conventions.add('ament')
+if find_spec('pydocstyle'):
+    pydocstyle_installed = True
+    import pydocstyle
+    _conventions = set(pydocstyle.conventions.keys())
+    _conventions.add('ament')
+else:
+    pydocstyle_installed = False
+    _conventions = {'pep257', 'numpy', 'google', 'ament'}
 
 _ament_ignore = [
     'D100',
@@ -123,8 +124,18 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
         args.ignore = ','.join(_ament_ignore)
 
     excludes = [os.path.abspath(e) for e in args.excludes]
-    report = generate_pep257_report(args.paths, excludes, args.ignore, args.select,
-                                    args.convention, args.add_ignore, args.add_select)
+
+    if ruff_installed:
+        from ament_pep257.ruff_impl import generate_ruff_report
+        report = generate_ruff_report(args.paths, excludes, args.ignore, args.select,
+                                      args.convention, args.add_ignore, args.add_select)
+    elif pydocstyle_installed:
+        from ament_pep257.pydocstyle_impl import generate_pep257_report
+        report = generate_pep257_report(args.paths, excludes, args.ignore, args.select,
+                                        args.convention, args.add_ignore, args.add_select)
+    else:
+        print('Neither ruff or pydocstyle installed')
+        return 1
     error_count = sum(len(r[1]) for r in report)
 
     # print summary
@@ -160,76 +171,6 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
 def _filename_in_excludes(filename, excludes):
     absname = os.path.abspath(filename)
     return any(os.path.commonpath([absname, e]) == e for e in excludes)
-
-
-def generate_pep257_report(paths, excludes, ignore, select, convention, add_ignore, add_select):
-    conf = ConfigurationParser()
-    sys_argv = sys.argv
-    sys.argv = [
-        'main',
-        '--match', r'.*\.py',
-        '--match-dir', r'[^\._].*',
-    ]
-    if ignore:
-        sys.argv += ['--ignore', ignore]
-    elif select:
-        sys.argv += ['--select', select]
-    else:
-        sys.argv += ['--convention', convention]
-    if add_ignore:
-        sys.argv += ['--add-ignore', add_ignore]
-    if add_select:
-        sys.argv += ['--add-select', add_select]
-    sys.argv += paths
-    conf.parse()
-    sys.argv = sys_argv
-    files_to_check = conf.get_files_to_check()
-
-    report = []
-
-    files_dict = {}
-    # Unpack 3 values for pydocstyle <= 6.1.1 and 4 values for pydocstyle >= 6.2.0
-    for filename, checked_codes, ignore_decorators, *_ in files_to_check:
-        if _filename_in_excludes(filename, excludes):
-            continue
-        files_dict[filename] = {
-            'select': checked_codes,
-            'ignore_decorators': ignore_decorators,
-        }
-
-    for filename in sorted(files_dict.keys()):
-        print('checking', filename)
-        errors = []
-        pep257_errors = check(
-            [filename],
-            **files_dict[filename])
-        for pep257_error in pep257_errors:
-            if isinstance(pep257_error, Error):
-                errors.append({
-                    'category': pep257_error.code,
-                    'linenumber': pep257_error.line,
-                    'message': pep257_error.message,
-                })
-                print(
-                    '%s:%d %s: %s' %
-                    (pep257_error.filename, pep257_error.line, pep257_error.definition,
-                     pep257_error.message), file=sys.stderr)
-            elif isinstance(pep257_error, SyntaxError):
-                errors.append({
-                    'category': str(type(pep257_error)),
-                    'linenumber': '-',
-                    'message': 'invalid syntax in file',
-                })
-                print('%s: invalid syntax' % filename, file=sys.stderr)
-            else:
-                errors.append({
-                    'category': 'unknown',
-                    'linenumber': '-',
-                    'message': str(pep257_error),
-                })
-                print('%s: %s' % (filename, pep257_error), file=sys.stderr)
-        report.append((filename, errors))
-    return report
 
 
 def get_xunit_content(report, testname, elapsed):

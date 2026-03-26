@@ -20,6 +20,9 @@
   <author email="michel@ekumenlabs.com">Michel Hidalgo</author>
 
   <exec_depend>ament_lint</exec_depend>
+
+  <!-- change on rosdistro to pydocstyle_impl -->
+  <!-- ruff on rhel 10 and pydocstyle elsewhere -->
   <exec_depend>pydocstyle</exec_depend>
 
   <test_depend>ament_flake8</test_depend>

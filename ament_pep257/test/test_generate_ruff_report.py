@@ -16,16 +16,16 @@ import pathlib
 import tempfile
 
 from ament_pep257.main import _ament_ignore
-from ament_pep257.main import pydocstyle_installed
+from ament_pep257.main import ruff_installed
 import pytest
 
 
-@pytest.mark.skipif(not pydocstyle_installed, reason='pydocstyle not installed')
+@pytest.mark.skipif(not ruff_installed, reason='ruff not installed')
 def test_invalid_file():
-    from ament_pep257.pydocstyle_impl import generate_pep257_report
+    from ament_pep257.ruff_impl import generate_ruff_report
     ignore = ','.join(_ament_ignore)
 
-    report = generate_pep257_report(['non_existent_file.py'], [], ignore, [], 'ament', [], [])
+    report = generate_ruff_report(['non_existent_file.py'], [], ignore, [], 'ament', [], [])
     assert len(report) == 1
     filename, errors = report[0]
     assert filename == 'non_existent_file.py'
@@ -35,9 +35,9 @@ def test_invalid_file():
     assert error['category'] == 'unknown'
 
 
-@pytest.mark.skipif(not pydocstyle_installed, reason='pydocstyle not installed')
+@pytest.mark.skipif(not ruff_installed, reason='ruff not installed')
 def test_valid_file():
-    from ament_pep257.pydocstyle_impl import generate_pep257_report
+    from ament_pep257.ruff_impl import generate_ruff_report
     ignore = ','.join(_ament_ignore)
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -45,7 +45,7 @@ def test_valid_file():
         py_file = temp_dir / 'foobar.py'
         py_file.write_text('a = 1+2\n')
 
-        report = generate_pep257_report([str(temp_dir)], [], ignore, [], 'ament', [], [])
+        report = generate_ruff_report([str(temp_dir)], [], ignore, [], 'ament', [], [])
 
         assert len(report) == 1
         filename, errors = report[0]
