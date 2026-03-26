@@ -14,27 +14,53 @@
 
 import pathlib
 import tempfile
+import typing
 
-from ament_pep257.main import main
+from _pytest.fixtures import FixtureRequest
+from _pytest.monkeypatch import MonkeyPatch
+import pytest
 
 
-def test_invalid_file():
-    report = main(['non_existent_file.py'])
+class MainFunc(typing.Protocol):
+
+    def __call__(self, argv: list[str] = ...) -> typing.Literal[0, 1]: ...
+
+
+@pytest.fixture(params=['ruff', 'pydocstyle'])
+def backend(request: FixtureRequest, monkeypatch: MonkeyPatch) -> MainFunc:
+    import ament_pep257.main as m
+
+    if request.param == 'ruff':
+        if not m.ruff_installed:
+            pytest.skip('ruff not installed')
+        monkeypatch.setattr(m, 'ruff_installed', True)
+        monkeypatch.setattr(m, 'pydocstyle_installed', False)
+
+    elif request.param == 'pydocstyle':
+        if not m.pydocstyle_installed:
+            pytest.skip('pydocstyle not installed')
+        monkeypatch.setattr(m, 'ruff_installed', False)
+        monkeypatch.setattr(m, 'pydocstyle_installed', True)
+
+    return m.main
+
+
+def test_invalid_file(backend: MainFunc) -> None:
+    report = backend(['non_existent_file.py'])
     assert report == 1
 
 
-def test_valid_file():
+def test_valid_file(backend: MainFunc) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir = pathlib.Path(temp_dir)
         py_file = temp_dir / 'foobar.py'
         py_file.write_text('a = 1+2\n')
 
-        report = main([str(py_file)])
-
+        report = backend([str(py_file)])
         assert report == 0
 
 
-def test_valid_with_violations():
+def test_valid_with_violations(backend: MainFunc) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir = pathlib.Path(temp_dir)
         py_file = temp_dir / 'foobar.py'
@@ -45,6 +71,5 @@ def test_valid_with_violations():
             '    pass\n'
         )
 
-        report = main([str(py_file)])
-
+        report = backend([str(py_file)])
         assert report == 1
