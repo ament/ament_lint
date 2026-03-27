@@ -18,7 +18,12 @@ import typing
 
 from _pytest.fixtures import FixtureRequest
 from _pytest.monkeypatch import MonkeyPatch
+import ament_pep257.main as m
 import pytest
+
+
+if not m.ruff_installed or not m.pydocstyle_installed:
+    pytest.fail('Neither ruff or pydocstyle installed')
 
 
 class MainFunc(typing.Protocol):
@@ -28,8 +33,6 @@ class MainFunc(typing.Protocol):
 
 @pytest.fixture(params=['ruff', 'pydocstyle'])
 def backend(request: FixtureRequest, monkeypatch: MonkeyPatch) -> MainFunc:
-    import ament_pep257.main as m
-
     if request.param == 'ruff':
         if not m.ruff_installed:
             pytest.skip('ruff not installed')
@@ -60,6 +63,17 @@ def test_valid_file(backend: MainFunc) -> None:
         assert report == 0
 
 
+def test_valid_and_invalid_file(backend: MainFunc) -> None:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = pathlib.Path(temp_dir)
+        py_file = temp_dir / 'foobar.py'
+        py_file2 = temp_dir / 'barfoo.py'
+        py_file.write_text('a = 1+2\n')
+
+        report = backend([str(py_file), str(py_file2)])
+        assert report == 1
+
+
 def test_valid_with_violations(backend: MainFunc) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir = pathlib.Path(temp_dir)
@@ -72,4 +86,30 @@ def test_valid_with_violations(backend: MainFunc) -> None:
         )
 
         report = backend([str(py_file)])
+        assert report == 1
+
+
+def test_ignore_codes(backend: MainFunc) -> None:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = pathlib.Path(temp_dir)
+        py_file = temp_dir / 'foobar.py'
+
+        # This normally triggers D100 (missing docstring in module)
+        py_file.write_text('')
+
+        report = backend([str(py_file), '--ignore', 'D100'])
+        assert report == 0
+
+
+def test_directory_with_multiple_files(backend: MainFunc) -> None:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = pathlib.Path(temp_dir)
+        files = {
+            'good.py': 'a = 1\n',
+            'bad.py': 'def f():\n    """foo"""\n    pass\n',
+        }
+        for name, content in files.items():
+            (temp_dir / name).write_text(content)
+
+        report = backend([str(temp_dir)])
         assert report == 1
