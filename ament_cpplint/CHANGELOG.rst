@@ -2,6 +2,11 @@
 Changelog for package ament_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.17.5 (2026-04-08)
+-------------------
+* Enable a quiet mode for cpplint (backport `#532 <https://github.com/ament/ament_lint/issues/532>`_) (`#571 <https://github.com/ament/ament_lint/issues/571>`_)
+* Contributors: mergify[bot]
+
 0.17.4 (2026-01-21)
 -------------------
 
