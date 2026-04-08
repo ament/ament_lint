@@ -2,6 +2,12 @@
 Changelog for package ament_cmake_cpplint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.19.3 (2026-04-08)
+-------------------
+* Fix cmake deprecation (`#539 <https://github.com/ament/ament_lint/issues/539>`_) (`#540 <https://github.com/ament/ament_lint/issues/540>`_)
+* cpplint: update link to upstream cpplint repo (`#538 <https://github.com/ament/ament_lint/issues/538>`_) (`#541 <https://github.com/ament/ament_lint/issues/541>`_)
+* Contributors: mergify[bot]
+
 0.19.2 (2025-04-17)
 -------------------
 

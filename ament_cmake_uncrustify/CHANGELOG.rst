@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_uncrustify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.19.3 (2026-04-08)
+-------------------
+* Fix cmake deprecation (`#539 <https://github.com/ament/ament_lint/issues/539>`_) (`#540 <https://github.com/ament/ament_lint/issues/540>`_)
+* Contributors: mergify[bot]
+
 0.19.2 (2025-04-17)
 -------------------
 

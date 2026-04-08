@@ -2,6 +2,11 @@
 Changelog for package ament_copyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.19.3 (2026-04-08)
+-------------------
+* Remove `importlib_metadata` (`#564 <https://github.com/ament/ament_lint/issues/564>`_) (`#565 <https://github.com/ament/ament_lint/issues/565>`_)
+* Contributors: mergify[bot]
+
 0.19.2 (2025-04-17)
 -------------------
 
