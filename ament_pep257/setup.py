@@ -41,7 +41,7 @@ and generate xUnit test result files.""",
     },
     entry_points={
         'console_scripts': [
-            'ament_pep257 = ament_pep257.main:main',
+            'ament_pep257 = ament_pep257.main:main_with_catch',
         ],
         'pytest11': [
             'ament_pep257 = ament_pep257.pytest_marker',
