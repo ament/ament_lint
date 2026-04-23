@@ -39,12 +39,12 @@ _ament_ignore = [
 ]
 
 
-def main_with_catch(*args, **kwargs) -> Literal[0, 1, 188]:
+def main_with_catch(*args, **kwargs) -> Literal[0, 1]:
     try:
         return main(*args, **kwargs)
     except SkipTest as e:
         print(str(e), file=sys.stderr)
-        return 188
+        return 1
 
 
 def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
