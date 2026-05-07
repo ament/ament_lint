@@ -17,9 +17,12 @@ import tempfile
 
 from ament_pep257.main import _ament_ignore
 from ament_pep257.main import generate_pep257_report
+import pytest
 
 
 def test_invalid_file():
+    pytest.importorskip('pydocstyle')
+
     ignore = ','.join(_ament_ignore)
 
     report = generate_pep257_report(['non_existent_file.py'], [], ignore, [], 'ament', [], [])
@@ -33,6 +36,8 @@ def test_invalid_file():
 
 
 def test_valid_file():
+    pytest.importorskip('pydocstyle')
+
     ignore = ','.join(_ament_ignore)
 
     with tempfile.TemporaryDirectory() as temp_dir:

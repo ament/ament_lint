@@ -20,26 +20,9 @@ import os
 import sys
 import time
 from typing import Literal
+from unittest import SkipTest
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
-
-import pydocstyle
-from pydocstyle import check
-
-try:  # as of version 1.1.0
-    from pydocstyle.config import ConfigurationParser
-    from pydocstyle.violations import Error
-    from pydocstyle.utils import log
-except ImportError:  # try version 1.0.0
-    from pydocstyle import ConfigurationParser
-    from pydocstyle import Error
-    from pydocstyle import log
-
-log.setLevel(logging.INFO)
-
-
-_conventions = set(pydocstyle.conventions.keys())
-_conventions.add('ament')
 
 _ament_ignore = [
     'D100',
@@ -56,7 +39,24 @@ _ament_ignore = [
 ]
 
 
+def main_with_catch(*args, **kwargs) -> Literal[0, 1]:
+    try:
+        return main(*args, **kwargs)
+    except SkipTest as e:
+        print(str(e), file=sys.stderr)
+        return 1
+
+
 def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
+    conventions = set()
+    try:
+        import pydocstyle
+    except ImportError:
+        pydocstyle = None
+    else:
+        conventions.update(pydocstyle.conventions.keys())
+    conventions.add('ament')
+
     parser = argparse.ArgumentParser(
         description='Check docstrings against the style conventions in PEP 257.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -74,10 +74,10 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     )
     err_code_group.add_argument(
         '--convention',
-        choices=_conventions,
+        choices=conventions,
         default='ament',
         help=(
-            f'Choose a preset list of error codes. Valid options are {_conventions}.'
+            f'Choose a preset list of error codes. Valid options are {conventions}.'
             f'The "ament" convention is defined as --ignore {_ament_ignore}.'
         ),
     )
@@ -122,6 +122,18 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     if not (args.ignore or args.select) and args.convention == 'ament':
         args.ignore = ','.join(_ament_ignore)
 
+    if pydocstyle is None:
+        if args.xunit_file:
+            report = [(input_path, []) for input_path in args.paths]
+            write_xunit_file(
+                args.xunit_file, report, time.time() - start_time,
+                skip='absence of pydocstyle module',
+            )
+            return 0
+        raise SkipTest(
+            'The pydocstyle package is not installed. '
+            'Please install pydocstyle to use ament_pep257.')
+
     excludes = [os.path.abspath(e) for e in args.excludes]
     report = generate_pep257_report(args.paths, excludes, args.ignore, args.select,
                                     args.convention, args.add_ignore, args.add_select)
@@ -137,22 +149,7 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
 
     # generate xunit file
     if args.xunit_file:
-        folder_name = os.path.basename(os.path.dirname(args.xunit_file))
-        file_name = os.path.basename(args.xunit_file)
-        suffix = '.xml'
-        if file_name.endswith(suffix):
-            file_name = file_name[0:-len(suffix)]
-            suffix = '.xunit'
-            if file_name.endswith(suffix):
-                file_name = file_name[0:-len(suffix)]
-        testname = '%s.%s' % (folder_name, file_name)
-
-        xml = get_xunit_content(report, testname, time.time() - start_time)
-        path = os.path.dirname(os.path.abspath(args.xunit_file))
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(args.xunit_file, 'w') as f:
-            f.write(xml)
+        write_xunit_file(args.xunit_file, report, time.time() - start_time)
 
     return rc
 
@@ -163,6 +160,19 @@ def _filename_in_excludes(filename, excludes):
 
 
 def generate_pep257_report(paths, excludes, ignore, select, convention, add_ignore, add_select):
+    from pydocstyle import check
+
+    try:  # as of version 1.1.0
+        from pydocstyle.config import ConfigurationParser
+        from pydocstyle.violations import Error
+        from pydocstyle.utils import log
+    except ImportError:  # try version 1.0.0
+        from pydocstyle import ConfigurationParser
+        from pydocstyle import Error
+        from pydocstyle import log
+
+    log.setLevel(logging.INFO)
+
     conf = ConfigurationParser()
     sys_argv = sys.argv
     sys.argv = [
@@ -232,7 +242,7 @@ def generate_pep257_report(paths, excludes, ignore, select, convention, add_igno
     return report
 
 
-def get_xunit_content(report, testname, elapsed):
+def get_xunit_content(report, testname, elapsed, skip=None):
     test_count = sum(max(len(r[1]), 1) for r in report)
     error_count = sum(len(r[1]) for r in report)
     data = {
@@ -240,6 +250,7 @@ def get_xunit_content(report, testname, elapsed):
         'test_count': test_count,
         'error_count': error_count,
         'time': '%.3f' % round(elapsed, 3),
+        'skip': test_count if skip else 0,
     }
     xml = """<?xml version="1.0" encoding="UTF-8"?>
 <testsuite
@@ -248,11 +259,29 @@ def get_xunit_content(report, testname, elapsed):
   errors="0"
   failures="%(error_count)d"
   time="%(time)s"
+  skipped="%(skip)d"
 >
 """ % data
 
     for (filename, errors) in report:
-        if errors:
+        if skip:
+            data = {
+                'quoted_location': quoteattr(filename),
+                'testname': testname,
+                'quoted_message': quoteattr(''),
+                'skip': skip,
+            }
+            xml += """  <testcase
+    name=%(quoted_location)s
+    classname="%(testname)s"
+  >
+    <skipped type="skip" message=%(quoted_message)s>
+      ![CDATA[Test Skipped due to %(skip)s]]
+    </skipped>
+  </testcase>
+""" % data
+
+        elif errors:
             # report each error as a failing testcase
             for error in errors:
                 data = {
@@ -282,15 +311,41 @@ def get_xunit_content(report, testname, elapsed):
 """ % data
 
     # output list of checked files
-    data = {
-        'escaped_files': escape(''.join(['\n* %s' % r[0] for r in report])),
-    }
-    xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
+    if skip:
+        data = {
+            'skip': skip,
+        }
+        xml += """  <system-err>Tests Skipped due to %(skip)s</system-err>
+""" % data
+    else:
+        data = {
+            'escaped_files': escape(''.join(['\n* %s' % r[0] for r in report])),
+        }
+        xml += """  <system-out>Checked files:%(escaped_files)s</system-out>
 """ % data
 
     xml += '</testsuite>\n'
     return xml
 
 
+def write_xunit_file(xunit_file, report, duration, skip=None):
+    folder_name = os.path.basename(os.path.dirname(xunit_file))
+    file_name = os.path.basename(xunit_file)
+    suffix = '.xml'
+    if file_name.endswith(suffix):
+        file_name = file_name[0:-len(suffix)]
+        suffix = '.xunit'
+        if file_name.endswith(suffix):
+            file_name = file_name[0:-len(suffix)]
+    testname = '%s.%s' % (folder_name, file_name)
+
+    xml = get_xunit_content(report, testname, duration, skip)
+    path = os.path.dirname(os.path.abspath(xunit_file))
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open(xunit_file, 'w') as f:
+        f.write(xml)
+
+
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(main_with_catch())

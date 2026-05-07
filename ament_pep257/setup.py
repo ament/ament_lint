@@ -5,7 +5,7 @@ package_name = 'ament_pep257'
 
 setup(
     name=package_name,
-    version='0.20.4',
+    version='0.21.0',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -41,7 +41,7 @@ and generate xUnit test result files.""",
     },
     entry_points={
         'console_scripts': [
-            'ament_pep257 = ament_pep257.main:main',
+            'ament_pep257 = ament_pep257.main:main_with_catch',
         ],
         'pytest11': [
             'ament_pep257 = ament_pep257.pytest_marker',

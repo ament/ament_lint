@@ -2,6 +2,14 @@
 Changelog for package ament_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.21.0 (2026-05-05)
+-------------------
+
+0.20.5 (2026-04-23)
+-------------------
+* Skip pydocstyle tests if it can't be imported (`#579 <https://github.com/ament/ament_lint/issues/579>`_)
+* Contributors: Scott K Logan
+
 0.20.4 (2026-04-08)
 -------------------
 * [ament_mypy] Fix config for ament_cmake packages and type entrypoints (`#574 <https://github.com/ament/ament_lint/issues/574>`_)
