@@ -2,6 +2,9 @@
 Changelog for package ament_pep257
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.20.6 (2026-05-15)
+-------------------
+
 0.20.5 (2026-04-23)
 -------------------
 * Skip pydocstyle tests if it can't be imported (`#579 <https://github.com/ament/ament_lint/issues/579>`_)
