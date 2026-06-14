@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_cmake_yamllint</name>
-  <version>0.20.3</version>
+  <version>0.21.1</version>
   <description>
     The CMake API for ament_yamllint to check YAML file using yamllint.
   </description>
