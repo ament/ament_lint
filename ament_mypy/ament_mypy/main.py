@@ -26,6 +26,7 @@ from xml.sax.saxutils import quoteattr
 
 import mypy.api
 
+a: str =3
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
     """Command line tool for static type analysis with mypy."""
@@ -260,8 +261,17 @@ def _get_files(paths: List[str]) -> List[str]:
 
 
 def _get_errors(report_string: str) -> List[Match[str]]:
-    return list(re.finditer(r'^(?P<filename>([a-zA-Z]:)?([^:])+):((?P<lineno>\d+):)?((?P<colno>\d+):)?\ (?P<type>error|warning|note):\ (?P<msg>.*)$', report_string, re.MULTILINE))  # noqa: E501
-
+    error_re = re.compile(
+        r'^(?P<filename>(?:[a-zA-Z]:)?[^:\n]+):'
+        r'(?:(?P<lineno>\d+):)?'
+        r'(?:(?P<colno>\d+):)?'
+        r'\s+'
+        r'(?P<type>error|warning|note):'
+        r'\s+'
+        r'(?P<msg>.*(?:\n(?:[ \t].*|\^.*))*)',
+        re.MULTILINE,
+    )
+    return list(error_re.finditer(report_string))
 
 def _dedent_to(text: str, prefix: str) -> str:
     return textwrap.indent(textwrap.dedent(text), prefix)
