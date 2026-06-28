@@ -26,7 +26,6 @@ from xml.sax.saxutils import quoteattr
 
 import mypy.api
 
-a: str =3
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
     """Command line tool for static type analysis with mypy."""
