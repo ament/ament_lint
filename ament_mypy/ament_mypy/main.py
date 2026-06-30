@@ -272,6 +272,7 @@ def _get_errors(report_string: str) -> List[Match[str]]:
     )
     return list(error_re.finditer(report_string))
 
+
 def _dedent_to(text: str, prefix: str) -> str:
     return textwrap.indent(textwrap.dedent(text), prefix)
 
