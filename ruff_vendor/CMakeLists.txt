@@ -15,12 +15,12 @@ ExternalProject_Add(ruff_external
   BUILD_IN_SOURCE TRUE
 
   INSTALL_COMMAND
-    ${CMAKE_COMMAND} -E make_directory
-      ${CMAKE_INSTALL_PREFIX}/bin
-    COMMAND
-      ${CMAKE_COMMAND} -E copy
-      <SOURCE_DIR>/target/release/ruff{CMAKE_EXECUTABLE_SUFFIX}
-      ${CMAKE_INSTALL_PREFIX}/bin/ruff{CMAKE_EXECUTABLE_SUFFIX}
+  ${CMAKE_COMMAND} -E make_directory
+    ${CMAKE_INSTALL_PREFIX}/bin
+  COMMAND
+    ${CMAKE_COMMAND} -E copy
+    <SOURCE_DIR>/target/release/ruff${CMAKE_EXECUTABLE_SUFFIX}
+    ${CMAKE_INSTALL_PREFIX}/bin/ruff${CMAKE_EXECUTABLE_SUFFIX}
 
   LOG_DOWNLOAD ON
   LOG_BUILD ON
