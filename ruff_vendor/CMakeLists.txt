@@ -17,7 +17,7 @@ ExternalProject_Add(ruff_external
   BUILD_COMMAND
     ${CMAKE_COMMAND} -E env
       CARGO_INCREMENTAL=0
-      cargo build --release --verbose -p ruff
+      cargo build --release -p ruff
 
   BUILD_IN_SOURCE TRUE
 
