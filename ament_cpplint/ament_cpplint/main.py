@@ -175,7 +175,7 @@ def main(argv=sys.argv[1:]):
             errors = []
 
             def custom_error(filename, linenum, category, confidence, message):
-                if cpplint._ShouldPrintError(category, confidence, linenum):
+                if cpplint._ShouldPrintError(category, confidence, filename, linenum):
                     errors.append({
                         'linenum': linenum,
                         'category': category,
