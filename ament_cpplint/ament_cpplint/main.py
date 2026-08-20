@@ -123,8 +123,9 @@ def main(argv=sys.argv[1:]):
     argv.append('--extensions=%s' % ','.join(extensions))
     argv.append('--headers=%s' % ','.join(headers))
     filters = [
-        # we do allow C++11
+        # we target C++20, so C++11 and C++17 standard headers are allowed
         '-build/c++11',
+        '-build/c++17',
         # we consider passing non-const references to be ok
         '-runtime/references',
         # we wrap open curly braces for namespaces, classes and functions
