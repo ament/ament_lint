@@ -35,7 +35,7 @@
 # @public
 #
 function(ament_cppcheck)
-  cmake_parse_arguments(ARG "" "LANGUAGE;TESTNAME" "EXCLUDE;LIBRARIES;INCLUDE_DIRS" ${ARGN})
+  cmake_parse_arguments(ARG "" "ENABLE_EXTRA_CHECKS;LANGUAGE;TESTNAME" "EXCLUDE;LIBRARIES;INCLUDE_DIRS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
   endif()
@@ -60,6 +60,10 @@ function(ament_cppcheck)
   endif()
   if(ARG_INCLUDE_DIRS)
     list(APPEND cmd "--include_dirs" "${ARG_INCLUDE_DIRS}")
+  endif()
+  if(ARG_ENABLE_EXTRA_CHECKS)
+    string(TOLOWER ${ARG_ENABLE_EXTRA_CHECKS} ARG_ENABLE_EXTRA_CHECKS)
+    list(APPEND cmd "--enable-extra-checks" "${ARG_ENABLE_EXTRA_CHECKS}")
   endif()
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_cppcheck")
