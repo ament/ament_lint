@@ -20,13 +20,15 @@
 # :param MAX_LINE_LENGTH: override the maximum line length,
 #   the default is defined in ament_lint_cmake
 # :type MAX_LINE_LENGTH: integer
+# :param EXCLUDE: an optional list of exclude files or directories for cmake lint check
+# :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_lint_cmake)
-  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "MAX_LINE_LENGTH;TESTNAME" "EXCLUDE" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "lint_cmake")
   endif()
@@ -40,6 +42,9 @@ function(ament_lint_cmake)
   set(cmd "${ament_lint_cmake_BIN}" "--xunit-file" "${result_file}")
   if(DEFINED ARG_MAX_LINE_LENGTH)
     list(APPEND cmd "--linelength" "${ARG_MAX_LINE_LENGTH}")
+  endif()
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
   endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 

@@ -187,6 +187,11 @@ def get_local_schema_path(path, temp_dir):
 
 
 def get_files(paths, extensions, excludes=[]):
+   excludes = []
+    for exclude_pattern in exclude_patterns:
+        excludes.extend(glob.glob(exclude_pattern))
+    excludes = {os.path.realpath(x) for x in excludes}
+
     files = []
     for path in paths:
         if os.path.isdir(path):
@@ -197,12 +202,12 @@ def get_files(paths, extensions, excludes=[]):
                 # ignore folder starting with . or _
                 dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
                 # ignore excluded folders
-                dirnames[:] = [d for d in dirnames if d not in excludes]
+                dirnames[:] = [d for d in dirnames if os.path.realpath(d) not in excludes]
                 dirnames.sort()
 
                 # select files by extension
                 for filename in sorted(filenames):
-                    if filename in excludes:
+                    if os.path.realpath(os.path.join(dirpath, filename)) in excludes:
                         continue
                     _, ext = os.path.splitext(filename)
                     if ext not in ['.%s' % e for e in extensions]:
