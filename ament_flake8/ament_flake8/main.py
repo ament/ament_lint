@@ -35,7 +35,11 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
 
 def main_with_errors(argv: list[str] = sys.argv[1:]) -> tuple[Literal[0, 1], list[str]]:
     config_file = os.path.join(
-        os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
+        os.getcwd(), 'test', 'configuration', 'ament_flake8.ini')
+
+    if not os.path.isfile(config_file):
+        config_file = os.path.join(
+          os.path.dirname(__file__), 'configuration', 'ament_flake8.ini')
 
     parser = argparse.ArgumentParser(
         description='Check code using flake8.',
