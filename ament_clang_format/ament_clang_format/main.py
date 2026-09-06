@@ -16,6 +16,7 @@
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -247,12 +248,10 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
 
 
 def find_executable(file_names):
-    paths = os.getenv('PATH').split(os.path.pathsep)
     for file_name in file_names:
-        for path in paths:
-            file_path = os.path.join(path, file_name)
-            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-                return file_path
+        file_path = shutil.which(file_name)
+        if file_path:
+            return file_path
     return None
 
 
