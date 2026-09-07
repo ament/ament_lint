@@ -74,7 +74,8 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
 
     xmllint_bin = shutil.which('xmllint')
     if not xmllint_bin:
-        return "Could not find 'xmllint' executable"
+        print("Could not find 'xmllint' executable", file=sys.stderr)
+        return 1
 
     report = []
 
@@ -119,8 +120,8 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
             else:
                 errors = None
 
-        filename = os.path.relpath(filename, start=os.getcwd())
-        report.append((filename, errors))
+            filename = os.path.relpath(filename, start=os.getcwd())
+            report.append((filename, errors))
 
     for (filename, errors) in report:
         if errors is not None:
