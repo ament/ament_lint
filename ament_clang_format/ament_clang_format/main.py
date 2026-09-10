@@ -120,8 +120,20 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
         report[filename] = []
 
     xmls = output.split(b"<?xml version='1.0'?>")[1:]
+    if len(files) > len(xmls):
+        # Skip empty files since clang-format doesn't output anything for them.
+        for index in range(len(files)):
+            if os.stat(files[index]).st_size == 0:
+                xmls.insert(index, None)
+
     changed_files = []
     for filename, xml in zip(files, xmls):
+        if not xml:
+            print("Skipping empty file '%s'" % filename)
+            if not args.reformat:
+                print('')
+            continue
+
         try:
             root = ElementTree.fromstring(xml)
         except ElementTree.ParseError as e:
