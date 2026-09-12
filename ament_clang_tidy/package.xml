@@ -16,6 +16,7 @@
   <author>Claire Wang</author>
   <author email="michel@ekumenlabs.com">Michel Hidalgo</author>
 
+  <exec_depend>ament_lint</exec_depend>
   <exec_depend>clang-tidy</exec_depend>
   <exec_depend>python3-yaml</exec_depend>
 
