@@ -30,7 +30,7 @@ setup(
     long_description="""\
 Providing common API for ament linter packages, e.g. the `linter` marker for
 pytest.""",
-    license='Apache License, Version 2.0',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',

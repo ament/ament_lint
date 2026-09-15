@@ -32,7 +32,7 @@ setup(
     description='Check source files for copyright reference.',
     long_description="""\
 The ability to check sources file for copyright and license information.""",
-    license='Apache License, Version 2.0',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',
