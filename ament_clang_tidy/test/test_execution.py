@@ -15,8 +15,19 @@
 import json
 from pathlib import Path
 
+from ament_clang_tidy.main import is_unittest_source
 from ament_clang_tidy.main import main
 from ament_lint.test_helpers import TempFileWriter
+
+
+def test_is_unittest_source():
+    package = 'ament_clang_tidy'
+    assert is_unittest_source(
+        package, r'C:\workspace\src\ament_clang_tidy\test\test_execution.cpp')
+    assert is_unittest_source(
+        package, '/workspace/src/ament_clang_tidy/test/test_execution.cpp')
+    assert not is_unittest_source(
+        package, r'C:\workspace\src\ament_clang_tidy\src\main.cpp')
 
 
 def test_clang_tidy_execution():
