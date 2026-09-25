@@ -18,12 +18,13 @@ import argparse
 import hashlib
 import os
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
 import time
 from typing import Literal
-import urllib.request
+from urllib import request, error
 from xml.etree import ElementTree
 from xml.sax import make_parser
 from xml.sax import SAXParseException
@@ -178,8 +179,14 @@ def get_local_schema_path(path, temp_dir):
 
     if not os.path.exists(local_path):
         try:
-            with urllib.request.urlopen(path) as response, open(local_path, 'wb') as out_file:
+            with request.urlopen(path, timeout=30) as response, open(local_path, 'wb') as out_file:
                 out_file.write(response.read())
+        except error.URLError as e:
+            if isinstance(e.reason, socket.timeout):
+                print(f"Warning: timeout while downloading schema from '{path}'", file=sys.stderr)
+            else:
+                print(f"Warning: URLError exception when trying to download schema from '{path}': {e}", file=sys.stderr)
+            return path
         except Exception as e:
             print(f"Warning: failed to download schema from '{path}': {e}", file=sys.stderr)
             # Fall back to original path if download fails, xmllint will likely fail anyway
