@@ -33,7 +33,7 @@ setup(
     description='Check Python static typing using mypy.',
     long_description="""\
 The ability to check code for user specified static typing with mypy.""",
-    license='Apache License, Version 2.0',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',
