@@ -16,7 +16,6 @@
 
 import argparse
 from collections import defaultdict
-import copy
 import json
 from multiprocessing.pool import ThreadPool
 import os
@@ -220,34 +219,11 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
     for filename in files:
         report[filename] = []
 
-    error_re = re.compile('(/.*?\\.(?:%s)):(\\d+):(\\d+): (?:warning:|error:)' %
-                          '|'.join(extensions))
-
-    current_file = None
-    new_file = None
-    data = {}
-
     for output in outputs:
         print(output)
-        for line in output.splitlines():
-            # error found
-            match = error_re.search(line)
-            if match:
-                new_file = match.group(1)
-                if current_file is not None:
-                    report[current_file].append(copy.deepcopy(data))
-                    data.clear()
-                current_file = new_file
-                line_num = match.group(2)
-                col_num = match.group(3)
-                error_msg = find_error_message(line)
-                data['line_no'] = line_num
-                data['offset_in_line'] = col_num
-                data['error_msg'] = error_msg
-            else:
-                data['code_correct_rec'] = data.get('code_correct_rec', '') + line + '\n'
-        if current_file is not None:
-            report[current_file].append(copy.deepcopy(data))
+        diagnostics = parse_diagnostics(output, extensions)
+        for filename, errors in diagnostics.items():
+            report[filename].extend(errors)
 
     if args.xunit_file:
         folder_name = os.path.basename(os.path.dirname(args.xunit_file))
@@ -301,8 +277,34 @@ def filter_packages_select(compilation_db_paths, packages):
     return list(filter(package_test, compilation_db_paths))
 
 
-def find_error_message(data):
-    return data[data.rfind(':') + 2:]
+def parse_diagnostics(output, extensions):
+    """Parse clang-tidy diagnostics and their associated context."""
+    diagnostic_re = re.compile(
+        r'^(.*\.(?:%s)):(\d+):(\d+): (?:warning|error): (.*)$' %
+        '|'.join(extensions),
+        re.IGNORECASE)
+
+    report = defaultdict(list)
+    current_file = None
+    current_error = None
+    for line in output.splitlines():
+        match = diagnostic_re.match(line)
+        if match:
+            if current_error is not None:
+                report[current_file].append(current_error)
+            current_file = match.group(1)
+            current_error = {
+                'line_no': match.group(2),
+                'offset_in_line': match.group(3),
+                'error_msg': match.group(4),
+            }
+        elif current_error is not None:
+            current_error['code_correct_rec'] = (
+                current_error.get('code_correct_rec', '') + line + '\n')
+
+    if current_error is not None:
+        report[current_file].append(current_error)
+    return report
 
 
 def get_xunit_content(report, testname, elapsed):
@@ -344,9 +346,9 @@ def get_xunit_content(report, testname, elapsed):
                             filename, int(error['line_no']),
                             int(error['offset_in_line']))])
                 }
-                if 'code_correct_rec' in data:
+                if 'code_correct_rec' in error:
                     data['cdata'] += '\n'
-                    data['cdata'] += data['code_correct_rec']
+                    data['cdata'] += error['code_correct_rec']
                 xml += """  <testcase
     name=%(quoted_location)s
     classname="%(testname)s"
