@@ -2,6 +2,11 @@
 Changelog for package ament_cmake_pyflakes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.21.3 (2026-10-02)
+-------------------
+* Use the SPDX identifier Apache-2.0 in license declarations (`#598 <https://github.com/ament/ament_lint/issues/598>`_)
+* Contributors: Michael Carroll
+
 0.21.2 (2026-09-03)
 -------------------
 
