@@ -268,7 +268,10 @@ def get_files(paths, extensions):
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
-                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames[:] = [
+                    d for d in dirnames
+                    if d[0] not in ['.', '_'] and d not in ['build', 'install']
+                ]
                 dirnames.sort()
 
                 # select files by extension

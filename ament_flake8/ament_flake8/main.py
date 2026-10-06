@@ -84,7 +84,10 @@ def main_with_errors(argv: list[str] = sys.argv[1:]) -> tuple[Literal[0, 1], lis
             args.excludes.append(dirpath)
         else:
             # ignore folder starting with . or _
-            args.excludes.extend(d for d in dirnames if d[0] in ['.', '_'])
+            args.excludes.extend(
+                d for d in dirnames
+                if d[0] in ['.', '_'] and d not in ['build', 'install']
+            )
 
     report = generate_flake8_report(
         args.config_file, args.paths, args.excludes,

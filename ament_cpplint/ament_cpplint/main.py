@@ -235,7 +235,10 @@ def get_file_groups(paths, extensions, exclude_patterns):
                     dirnames[:] = []
                     continue
                 # ignore folder starting with . or _
-                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames[:] = [
+                    d for d in dirnames
+                    if d[0] not in ['.', '_'] and d not in ['build', 'install']
+                ]
                 dirnames.sort()
 
                 # select files by extension

@@ -282,7 +282,10 @@ def get_compilation_db_files(paths):
                 # the compile_commands.json will not be present in relevant build folder.
 
                 # ignore folder starting with . or _
-                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames[:] = [
+                    d for d in dirnames
+                    if d[0] not in ['.', '_'] and d not in ['build', 'install']
+                ]
                 dirnames.sort()
 
                 # select files by extension
