@@ -33,6 +33,12 @@ from ament_lint.filesystem_helpers import find_executable
 import yaml
 
 
+def is_unittest_source(package, file_path):
+    """Return whether a file is located in the package's test directory."""
+    normalized_file_path = file_path.replace('\\', '/')
+    return ('%s/test/' % package) in normalized_file_path
+
+
 def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
@@ -160,9 +166,6 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
                or file_name == 'gmock_main.cc' or file_name == 'gmock-all.cc':
                 return True
             return False
-
-        def is_unittest_source(package, file_path):
-            return ('%s/test/' % package) in file_path
 
         def start_subprocess(full_cmd):
             output = ''
