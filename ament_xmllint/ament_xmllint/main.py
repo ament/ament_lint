@@ -78,6 +78,8 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
         return 1
 
     report = []
+    # schema URLs which could not be downloaded, to avoid retrying them for every file
+    failed_urls = set()
 
     with tempfile.TemporaryDirectory() as temp_dir:
         # invoke xmllint on all files
@@ -100,16 +102,17 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
                     continue
                 # check for XML schema
                 if schematypens == 'http://www.w3.org/2001/XMLSchema':
-                    cmd += ['--schema', get_local_schema_path(href, temp_dir)]
+                    cmd += ['--schema', get_local_schema_path(href, temp_dir, failed_urls)]
                 # check for RelaxNG
                 elif schematypens == 'http://relaxng.org/ns/structure/1.0':
-                    cmd += ['--relaxng', get_local_schema_path(href, temp_dir)]
+                    cmd += ['--relaxng', get_local_schema_path(href, temp_dir, failed_urls)]
                 # check for Schematron
                 elif schematypens == 'http://purl.oclc.org/dsdl/schematron':
-                    cmd += ['--schematron', get_local_schema_path(href, temp_dir)]
+                    cmd += ['--schematron', get_local_schema_path(href, temp_dir, failed_urls)]
             if 'xsi:noNamespaceSchemaLocation' in handler.root_attributes:
                 schema_path = get_local_schema_path(
-                    handler.root_attributes['xsi:noNamespaceSchemaLocation'], temp_dir)
+                    handler.root_attributes['xsi:noNamespaceSchemaLocation'], temp_dir,
+                    failed_urls)
                 cmd += ['--schema', schema_path]
 
             try:
@@ -164,8 +167,8 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     return rc
 
 
-def get_local_schema_path(path, temp_dir):
-    if not path.startswith(('http://', 'https://')):
+def get_local_schema_path(path, temp_dir, failed_urls):
+    if not path.startswith(('http://', 'https://')) or path in failed_urls:
         return path
 
     # Use a hash of the URL to create a unique filename in the temp directory
@@ -178,12 +181,17 @@ def get_local_schema_path(path, temp_dir):
 
     if not os.path.exists(local_path):
         try:
-            with urllib.request.urlopen(path) as response, open(local_path, 'wb') as out_file:
-                out_file.write(response.read())
+            # Read the whole response before creating the local file,
+            # in order to prevent leaving an empty file when the download fails
+            with urllib.request.urlopen(path, timeout=30) as response:
+                data = response.read()
         except Exception as e:
             print(f"Warning: failed to download schema from '{path}': {e}", file=sys.stderr)
             # Fall back to original path if download fails, xmllint will likely fail anyway
+            failed_urls.add(path)
             return path
+        with open(local_path, 'wb') as out_file:
+            out_file.write(data)
     return local_path
 
 
