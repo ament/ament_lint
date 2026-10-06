@@ -14,14 +14,18 @@
 
 """Tests for the ament_xmllint entry point."""
 
+import io
 import shutil
+import urllib.request
 
+from ament_xmllint.main import get_local_schema_path
 from ament_xmllint.main import main
 import pytest
 
 
 VALID_XML = '<root><child/></root>\n'
 INVALID_XML = '<root><child></root>\n'
+SCHEMA_URL = 'http://example.invalid/schema.xsd'
 
 requires_xmllint = pytest.mark.skipif(
     shutil.which('xmllint') is None, reason="requires the 'xmllint' executable")
@@ -54,3 +58,55 @@ def test_missing_xmllint_returns_error_code(tmp_path, monkeypatch):
     monkeypatch.setattr(shutil, 'which', lambda name: None)
 
     assert main(argv=[]) == 1
+
+
+def test_schema_is_downloaded_with_a_timeout(tmp_path, monkeypatch):
+    """Check that a remote schema is fetched with a timeout and stored locally."""
+    timeouts = []
+
+    def urlopen(url, timeout=None):
+        timeouts.append(timeout)
+        return io.BytesIO(b'<schema/>')
+
+    monkeypatch.setattr(urllib.request, 'urlopen', urlopen)
+
+    local_path = get_local_schema_path(SCHEMA_URL, str(tmp_path), set())
+
+    assert local_path != SCHEMA_URL
+    with open(local_path, 'rb') as f:
+        assert f.read() == b'<schema/>'
+    assert len(timeouts) == 1
+    assert timeouts[0] is not None
+
+
+def test_failed_schema_download_is_not_retried(tmp_path, monkeypatch, capsys):
+    """Check that a failed download falls back to the URL and is only attempted once."""
+    calls = []
+
+    def urlopen(url, timeout=None):
+        calls.append(url)
+        raise TimeoutError('timed out')
+
+    monkeypatch.setattr(urllib.request, 'urlopen', urlopen)
+    failed_urls = set()
+
+    assert get_local_schema_path(SCHEMA_URL, str(tmp_path), failed_urls) == SCHEMA_URL
+    assert get_local_schema_path(SCHEMA_URL, str(tmp_path), failed_urls) == SCHEMA_URL
+
+    assert calls == [SCHEMA_URL]
+    assert 'failed to download schema' in capsys.readouterr().err
+
+
+def test_interrupted_schema_download_is_not_cached(tmp_path, monkeypatch):
+    """Check that a download failing while reading the response leaves no file behind."""
+
+    class StalledResponse(io.BytesIO):
+
+        def read(self, *args):
+            raise TimeoutError('timed out')
+
+    monkeypatch.setattr(
+        urllib.request, 'urlopen', lambda url, timeout=None: StalledResponse())
+
+    assert get_local_schema_path(SCHEMA_URL, str(tmp_path), set()) == SCHEMA_URL
+    assert list(tmp_path.iterdir()) == []
