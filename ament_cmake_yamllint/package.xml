@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>ament_cmake_yamllint</name>
+  <version>0.11.3</version>
+  <description>
+    The CMake API for ament_yamllint to check YAML file using yamllint.
+  </description>
+
+  <maintainer email="michael.jeronimo@openrobotics.org">Michael Jeronimo</maintainer>
+  <maintainer email="michel@ekumenlabs.com">Michel Hidalgo</maintainer>
+
+  <license>Apache License 2.0</license>
+
+  <author email="logans@cottsay.net">Scott K Logan</author>
+
+  <buildtool_depend>ament_cmake_core</buildtool_depend>
+  <buildtool_depend>ament_cmake_test</buildtool_depend>
+
+  <buildtool_export_depend>ament_cmake_test</buildtool_export_depend>
+  <buildtool_export_depend>ament_yamllint</buildtool_export_depend>
+
+  <test_depend>ament_cmake_copyright</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+  <test_depend>ament_cmake_xmllint</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
