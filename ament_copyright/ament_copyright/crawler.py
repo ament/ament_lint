@@ -38,7 +38,10 @@ def get_files(paths, extensions, exclude_patterns, skip_package_level_setup_py=T
                     add_files_for_all_filetypes(dirpath, files)
 
                 # ignore folder starting with . or _
-                dirnames[:] = [d for d in dirnames if d[0] not in ['.', '_']]
+                dirnames[:] = [
+                    d for d in dirnames
+                    if d[0] not in ['.', '_'] and d not in ['build', 'install']
+                ]
                 dirnames.sort()
 
                 # select files by extension
