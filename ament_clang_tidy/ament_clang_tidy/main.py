@@ -164,6 +164,9 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
         def is_unittest_source(package, file_path):
             return ('%s/test/' % package) in file_path
 
+        def is_rclcpp_components_generated(file_path):
+            return 'rclcpp_components/node_main_' in file_path
+
         def start_subprocess(full_cmd):
             output = ''
             try:
@@ -191,6 +194,13 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
             # exclude unit test sources from being checked by clang-tidy
             # because gtest macros are problematic
             if is_unittest_source(package_name, item['file']):
+                continue
+
+            # exclude auto-generated rclcpp_components node main wrappers
+            # rclcpp_components_register_node() generates node_main_*.cpp in
+            # the build directory. These files contain "using namespace"
+            # directives that cannot be annotated with NOLINT.
+            if is_rclcpp_components_generated(item['file']):
                 continue
 
             files.append(item['file'])
