@@ -124,8 +124,9 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
     argv.append('--extensions=%s' % ','.join(extensions))
     argv.append('--headers=%s' % ','.join(headers))
     filters = [
-        # we do allow C++11
+        # we target C++20, so C++11 and C++17 standard headers are allowed
         '-build/c++11',
+        '-build/c++17',
         # we consider passing non-const references to be ok
         '-runtime/references',
         # we wrap open curly braces for namespaces, classes and functions
@@ -176,7 +177,7 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
             errors = []
 
             def custom_error(filename, linenum, category, confidence, message):
-                if cpplint._ShouldPrintError(category, confidence, linenum):
+                if cpplint._ShouldPrintError(category, confidence, filename, linenum):
                     errors.append({
                         'linenum': linenum,
                         'category': category,
