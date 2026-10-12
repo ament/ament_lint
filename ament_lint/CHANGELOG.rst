@@ -2,6 +2,11 @@
 Changelog for package ament_lint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.20.7 (2026-10-12)
+-------------------
+* Fix ament_clang tools windows support (`#563 <https://github.com/ament/ament_lint/issues/563>`_)
+* Contributors: tony-p
+
 0.20.6 (2026-05-15)
 -------------------
 

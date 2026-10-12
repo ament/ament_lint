@@ -2,6 +2,11 @@
 Changelog for package ament_lint_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.20.7 (2026-10-12)
+-------------------
+* Fix build-time dependencies of ament_lint_common (`#599 <https://github.com/ament/ament_lint/issues/599>`_)
+* Contributors: Scott K Logan
+
 0.20.6 (2026-05-15)
 -------------------
 
