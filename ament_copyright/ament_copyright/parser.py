@@ -130,6 +130,18 @@ class SourceDescriptor(FileDescriptor):
 
         self.identify_copyright(known_copyrights)
 
+        # SPDX identifiers are exact values: substring matching would mistake
+        # MIT-0 for MIT, or a longer unknown identifier for a supported one.
+        spdx_match = re.search(
+            r'(?m)^[ \t]*SPDX-License-Identifier:[ \t]*([^\s]+)[ \t]*$',
+            remaining_block)
+        if spdx_match:
+            for name, license_ in licenses.items():
+                if license_.spdx == spdx_match.group(1):
+                    self.license_identifier = name
+                    break
+            return
+
         content = '{copyright}' + remaining_block
         self.identify_license(content, 'file_headers', licenses)
 
@@ -201,7 +213,8 @@ def search_copyright_information(content):
     year_range = '%s-%s' % (year, year)
     year_or_year_range = '(?:%s|%s)' % (year, year_range)
     pattern = r'^[^\n\r]?\s*(?:\\copyright\s*)?' \
-              r'copyright(?:\s+\(c\))?\s+(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
+              r'(?:copyright(?:\s+\(c\))?|SPDX-FileCopyrightText:)\s+' \
+              r'(%s(?:,\s*%s)*),?\s+([^\n\r]+)$' % \
         (year_or_year_range, year_or_year_range)
     regex = re.compile(pattern, re.DOTALL | re.MULTILINE | re.IGNORECASE)
 
