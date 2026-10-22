@@ -2,6 +2,9 @@
 Changelog for package ament_lint_auto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.21.4 (2026-10-22)
+-------------------
+
 0.21.3 (2026-10-02)
 -------------------
 * Use the SPDX identifier Apache-2.0 in license declarations (`#598 <https://github.com/ament/ament_lint/issues/598>`_)
