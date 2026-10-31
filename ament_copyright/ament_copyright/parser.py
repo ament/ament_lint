@@ -254,6 +254,8 @@ def get_index_of_next_line(content, index):
 
 
 def is_comment_line(content, index):
+    if index >= len(content):
+        return False
     # skip over optional BOM
     if index == 0 and content[0] == '\ufeff':
         index = 1
