@@ -20,6 +20,9 @@
 
   <buildtool_export_depend>ament_cmake_copyright</buildtool_export_depend>
   <buildtool_export_depend>ament_cmake_core</buildtool_export_depend>
+  <!-- ament_cmake_cppcheck is deprecated and no longer run by ament_lint_auto.
+       It is still exported so that packages which call ament_cppcheck()
+       explicitly keep configuring until it is removed entirely. -->
   <buildtool_export_depend>ament_cmake_cppcheck</buildtool_export_depend>
   <buildtool_export_depend>ament_cmake_cpplint</buildtool_export_depend>
   <buildtool_export_depend>ament_cmake_flake8</buildtool_export_depend>

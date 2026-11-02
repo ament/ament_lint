@@ -25,7 +25,7 @@ test dependencies.
 
     <!-- add test dependencies on any linter, e.g. -->
     <test_depend>ament_cmake_clang_format</test_depend>
-    <test_depend>ament_cmake_cppcheck</test_depend>
+    <test_depend>ament_cmake_cpplint</test_depend>
     <test_depend>ament_cmake_pycodestyle</test_depend>
 
 Since recursive dependencies are also being used a single test dependency is
