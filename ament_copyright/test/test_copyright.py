@@ -16,7 +16,9 @@ from contextlib import redirect_stdout
 import io
 import os
 
+from ament_copyright import UNKNOWN_IDENTIFIER
 from ament_copyright.main import main
+from ament_copyright.parser import SourceDescriptor
 
 
 cases_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'cases')
@@ -26,6 +28,37 @@ f = io.StringIO()
 def test_apache2_standard():
     rc = main(argv=[os.path.join(cases_path, 'apache2_license')])
     assert rc == 0, 'Found errors'
+
+
+def test_apache2_reuse_header(tmp_path):
+    """Accept REUSE copyright and license identifiers in a source header."""
+    source = tmp_path / 'case.py'
+    source.write_text(
+        '# SPDX-FileCopyrightText: 2026 Example Org\n'
+        '# SPDX-License-Identifier: Apache-2.0\n'
+        '\n'
+        'pass\n',
+        encoding='utf-8')
+
+    assert main(argv=[str(source)]) == 0
+
+
+def test_reuse_header_matches_exact_spdx_identifier(tmp_path):
+    """Do not classify MIT-0 as MIT or accept a longer unknown identifier."""
+    source = tmp_path / 'case.py'
+    source.write_text(
+        '# SPDX-FileCopyrightText: 2026 Example Org\n'
+        '# SPDX-License-Identifier: MIT-0\n', encoding='utf-8')
+    descriptor = SourceDescriptor(str(source))
+    descriptor.parse()
+    assert descriptor.license_identifier == 'mit0'
+
+    source.write_text(
+        '# SPDX-FileCopyrightText: 2026 Example Org\n'
+        '# SPDX-License-Identifier: MIT-0-extra\n', encoding='utf-8')
+    descriptor = SourceDescriptor(str(source))
+    descriptor.parse()
+    assert descriptor.license_identifier == UNKNOWN_IDENTIFIER
 
 
 def test_apache2_cpp_multiline():
