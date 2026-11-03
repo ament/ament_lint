@@ -233,9 +233,6 @@ def add_missing_header(file_descriptors, name, license_, verbose):
         skip = False
 
         if file_descriptor.filetype == SOURCE_FILETYPE:
-            # ignore empty files
-            if not file_descriptor.content:
-                skip = True
             # ignore files which already have a header
             if file_descriptor.copyright_identifiers:
                 skip = True
