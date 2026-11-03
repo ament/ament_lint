@@ -15,6 +15,9 @@
 #
 # Add a test to perform static code analysis with cppcheck.
 #
+# Deprecated: this function emits a deprecation warning when called and
+# ament_cmake_cppcheck will be removed in a future release.
+#
 # The include dirs for cppcheck to consider can either be set by the function
 # parameter 'INCLUDE_DIRS` or by a global variable called
 # 'ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS'.
@@ -35,6 +38,9 @@
 # @public
 #
 function(ament_cppcheck)
+  message(DEPRECATION
+    "ament_cppcheck() is deprecated and will be removed in a future release; "
+    "remove the call and the dependency on ament_cmake_cppcheck.")
   cmake_parse_arguments(ARG "" "LANGUAGE;TESTNAME" "EXCLUDE;LIBRARIES;INCLUDE_DIRS" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "cppcheck")
