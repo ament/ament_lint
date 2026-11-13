@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+import glob
 import os
 import sys
 import time
@@ -51,6 +52,13 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--linelength', metavar='N', type=int, default=140,
         help='The maximum line length')
+    parser.add_argument(
+        '--exclude',
+        metavar='filename',
+        nargs='*',
+        default=[],
+        dest='excludes',
+        help='The filenames to exclude.')
     # not using a file handle directly
     # in order to prevent leaving an empty file when something fails early
     parser.add_argument(
@@ -61,7 +69,7 @@ def main(argv=sys.argv[1:]):
     if args.xunit_file:
         start_time = time.time()
 
-    files = get_files(args.paths)
+    files = get_files(args.paths, args.excludes)
     if not files:
         print('No files found', file=sys.stderr)
         return 1
@@ -125,7 +133,12 @@ def main(argv=sys.argv[1:]):
     return rc
 
 
-def get_files(paths):
+def get_files(paths, exclude_patterns):
+    excludes = []
+    for exclude_pattern in exclude_patterns:
+        excludes.extend(glob.glob(exclude_pattern))
+    excludes = {os.path.realpath(x) for x in excludes}
+
     files = []
     for path in paths:
         if os.path.isdir(path):
@@ -145,9 +158,12 @@ def get_files(paths):
                         fname_low.endswith('.cmake') or
                         fname_low.endswith('.cmake.in')
                     ):
-                        files.append(os.path.join(dirpath, filename))
+                        fname = os.path.join(dirpath, filename)
+                        if os.path.realpath(fname) not in excludes:
+                            files.append(fname)
         if os.path.isfile(path):
-            files.append(path)
+            if os.path.realpath(path) not in excludes:
+                files.append(path)
     return [os.path.normpath(f) for f in files]
 
 

@@ -15,5 +15,10 @@
 file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS "*.xml")
 if(_source_files)
   message(STATUS "Added test 'xmllint' to check XML markup files")
-  ament_xmllint()
+
+  if(DEFINED AMENT_LINT_AUTO_FILE_EXCLUDE)
+    ament_xmllint(EXCLUDE ${AMENT_LINT_AUTO_FILE_EXCLUDE})
+  else()
+    ament_xmllint()
+  endif()
 endif()
