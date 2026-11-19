@@ -1,0 +1,68 @@
+line-length = 99
+target-version = "py312"
+
+[lint]
+
+select = [
+#  python3-flake8
+    "E", "F",
+#  python3-flake8-blind-except
+    "BLE",
+#  python3-flake8-builtins
+    "A",
+#  python3-flake8-class-newline
+# Missing CNL100
+#  python3-flake8-comprehensions
+    "C4",
+#  python3-flake8-deprecated
+# Missing D001
+#  python3-flake8-import-order
+# Missing I100, I101, I201, I202
+# (maybe isort?)
+#  python3-flake8-quotes
+    "Q",
+#  python3-pycodestyle (pep257)
+    "D",
+    "W"
+]
+
+
+extend-ignore = [
+# ament_flake8
+#  "B902", (ruffs BLE)
+  "BLE",
+
+#  "C816", (ruffs COM812 doesn't do anything since flake8-commas isn't installed)
+  "COM812",
+
+  "D100", 
+  "D101", 
+  "D102", 
+  "D103", 
+  "D104",
+  "D105",
+  "D106",
+  "D107",
+  "D203",
+  "D212",
+  "D404",
+# "I202" (ruff doesn't support flake8-import-order)
+# ament_pep257 (a complete subset of ament_flake8)
+    # "D100",
+    # "D101",
+    # "D102",
+    # "D103",
+    # "D104",
+    # "D105",
+    # "D106",
+    # "D107",
+    # "D203",
+    # "D212",
+    # "D404",
+]
+
+[lint.flake8-quotes]
+inline-quotes = "single"
+
+[format]
+quote-style = "single"
