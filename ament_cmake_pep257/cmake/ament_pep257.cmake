@@ -17,13 +17,15 @@
 #
 # :param TESTNAME: the name of the test, default: "pep257"
 # :type TESTNAME: string
+# :param EXCLUDE: an optional list of exclude files or directories for cmake pep257 check
+# :type EXCLUDE: list
 # :param ARGN: the files or directories to check
 # :type ARGN: list of strings
 #
 # @public
 #
 function(ament_pep257)
-  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TESTNAME" "EXCLUDE" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "pep257")
   endif()
@@ -35,6 +37,9 @@ function(ament_pep257)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_pep257_BIN}" "--xunit-file" "${result_file}")
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
+  endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pep257")
