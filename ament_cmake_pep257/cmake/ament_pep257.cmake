@@ -23,7 +23,7 @@
 # @public
 #
 function(ament_pep257)
-  cmake_parse_arguments(ARG "" "TESTNAME" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "EXCLUDE;TESTNAME" "" ${ARGN})
   if(NOT ARG_TESTNAME)
     set(ARG_TESTNAME "pep257")
   endif()
@@ -35,6 +35,9 @@ function(ament_pep257)
 
   set(result_file "${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml")
   set(cmd "${ament_pep257_BIN}" "--xunit-file" "${result_file}")
+  if(ARG_EXCLUDE)
+    list(APPEND cmd "--exclude" "${ARG_EXCLUDE}")
+  endif()
   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/ament_pep257")

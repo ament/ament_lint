@@ -15,5 +15,17 @@
 file(GLOB_RECURSE _python_files FOLLOW_SYMLINKS "*.py")
 if(_python_files)
   message(STATUS "Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257")
-  ament_pep257()
+
+  # Get exclude paths for added targets
+  set(_all_exclude "")
+  if(DEFINED ament_cmake_pep257_ADDITIONAL_EXCLUDE)
+    list(APPEND _all_exclude ${ament_cmake_pep257_ADDITIONAL_EXCLUDE})
+  endif()
+
+  if(DEFINED AMENT_LINT_AUTO_FILE_EXCLUDE)
+    list(APPEND _all_exclude ${AMENT_LINT_AUTO_FILE_EXCLUDE})
+  endif()
+
+  message(STATUS "Configured pep257 exclude dirs and/or files: ${_all_exclude}")
+  ament_pep257(EXCLUDE ${_all_exclude})
 endif()
