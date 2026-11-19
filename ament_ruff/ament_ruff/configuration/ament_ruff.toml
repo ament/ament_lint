@@ -1,0 +1,4 @@
+[lint]
+select =["ALL"]
+[format]
+quote_style = "Double"
