@@ -169,19 +169,21 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
 
         def start_subprocess(full_cmd):
             output = ''
+            returncode = 0
             try:
                 output = subprocess.check_output(
                     full_cmd,
                     stderr=subprocess.DEVNULL
                 ).decode()
             except subprocess.CalledProcessError as e:
+                returncode = e.returncode
                 print('The invocation of "%s" failed with error code %d: %s' %
                       (os.path.basename(clang_tidy_bin), e.returncode, e),
                       file=sys.stderr)
                 # Attempt to recover output, if any was found (eg - if
                 # WarningsAsErrors was specified in the config file).
                 output = e.output.decode('utf-8')
-            return output
+            return output, returncode
 
         files = []
         async_outputs = []
@@ -201,20 +203,26 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
             async_outputs.append(pool.apply_async(start_subprocess, (full_cmd,)))
 
         output = ''
-        for async_output in async_outputs:
-            output += async_output.get()
+        failures = {}
+        for filename, async_output in zip(files, async_outputs):
+            command_output, returncode = async_output.get()
+            output += command_output
+            if returncode:
+                failures[filename] = returncode
 
-        return (files, output)
+        return (files, output, failures)
 
     files = []
     outputs = []
+    failed_invocations = {}
     for compilation_db in compilation_dbs:
         package_dir = os.path.dirname(compilation_db)
         package_name = os.path.basename(package_dir)
         print(f"found compilation database for package '{package_name}' at '{compilation_db}'")
-        (source_files, output) = invoke_clang_tidy(compilation_db)
+        (source_files, output, failures) = invoke_clang_tidy(compilation_db)
         files += source_files
         outputs.append(output)
+        failed_invocations.update(failures)
     pool.close()
     pool.join()
 
@@ -222,6 +230,13 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
     report = defaultdict(list)
     for filename in files:
         report[filename] = []
+    for filename, returncode in failed_invocations.items():
+        report[filename].append({
+            'line_no': 0,
+            'offset_in_line': 0,
+            'error_msg': 'The invocation of "%s" failed with error code %d' %
+                         (os.path.basename(clang_tidy_bin), returncode),
+        })
 
     error_re = re.compile('(/.*?\\.(?:%s)):(\\d+):(\\d+): (?:warning:|error:)' %
                           '|'.join(extensions))
