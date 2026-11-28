@@ -2,6 +2,21 @@
 Changelog for package ament_xmllint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.21.4 (2026-10-22)
+-------------------
+* Adding a timeout and graceful handling when schema download fails (`#597 <https://github.com/ament/ament_lint//issues/597>`_)
+  Co-authored-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>
+* Contributors: David Anthony
+
+0.21.3 (2026-10-02)
+-------------------
+* Use the SPDX identifier Apache-2.0 in license declarations (`#598 <https://github.com/ament/ament_lint/issues/598>`_)
+* Report every file checked by ament_xmllint (`#589 <https://github.com/ament/ament_lint/issues/589>`_)
+* Contributors: Michael Carroll
+
+0.21.2 (2026-09-03)
+-------------------
+
 0.21.1 (2026-05-15)
 -------------------
 

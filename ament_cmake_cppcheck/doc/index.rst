@@ -1,6 +1,12 @@
 ament_cppcheck
 ==============
 
+.. note::
+
+   ``ament_cmake_cppcheck`` is deprecated and will be removed in a future
+   release.  It is no longer run automatically by ``ament_lint_auto``, and
+   calling ``ament_cppcheck()`` explicitly emits a deprecation warning.
+
 Performs a static code analysis of C / C++ source files using `CppCheck
 <http://cppcheck.sourceforge.net/>`_.
 Files with the following extensions are being considered:

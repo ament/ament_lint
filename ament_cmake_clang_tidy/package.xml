@@ -2,14 +2,14 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>ament_cmake_clang_tidy</name>
-  <version>0.21.1</version>
+  <version>0.21.4</version>
   <description>
     The CMake API for ament_clang_tidy to lint C / C++ code using clang tidy.
   </description>
 
   <maintainer email="clalancette@gmail.com">Chris Lalancette</maintainer>
 
-  <license>Apache License 2.0</license>
+  <license>Apache-2.0</license>
 
   <author email="audrow@openrobotics.org">Audrow Nash</author>
   <author email="brandon@openrobotics.org">Brandon Ong</author>

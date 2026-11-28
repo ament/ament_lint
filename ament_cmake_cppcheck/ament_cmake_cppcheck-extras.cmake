@@ -18,5 +18,6 @@ find_package(ament_cmake_test QUIET REQUIRED)
 
 include("${ament_cmake_cppcheck_DIR}/ament_cppcheck.cmake")
 
-ament_register_extension("ament_lint_auto" "ament_cmake_cppcheck"
-  "ament_cmake_cppcheck_lint_hook.cmake")
+# ament_cmake_cppcheck is deprecated and is intentionally no longer registered
+# as an ament_lint_auto extension, so packages using ament_lint_auto do not
+# get a cppcheck test.  Explicit calls to ament_cppcheck() still work.

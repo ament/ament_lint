@@ -5,7 +5,7 @@ package_name = 'ament_mypy'
 
 setup(
     name=package_name,
-    version='0.21.1',
+    version='0.21.4',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -33,7 +33,7 @@ setup(
     description='Check Python static typing using mypy.',
     long_description="""\
 The ability to check code for user specified static typing with mypy.""",
-    license='Apache License, Version 2.0',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',

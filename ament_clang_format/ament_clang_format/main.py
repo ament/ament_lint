@@ -24,6 +24,7 @@ from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
+from ament_lint.filesystem_helpers import find_executable
 import yaml
 
 
@@ -119,8 +120,20 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
         report[filename] = []
 
     xmls = output.split(b"<?xml version='1.0'?>")[1:]
+    if len(files) > len(xmls):
+        # Skip empty files since clang-format doesn't output anything for them.
+        for index in range(len(files)):
+            if os.stat(files[index]).st_size == 0:
+                xmls.insert(index, None)
+
     changed_files = []
     for filename, xml in zip(files, xmls):
+        if not xml:
+            print("Skipping empty file '%s'" % filename)
+            if not args.reformat:
+                print('')
+            continue
+
         try:
             root = ElementTree.fromstring(xml)
         except ElementTree.ParseError as e:
@@ -244,16 +257,6 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[0, 1]:
             f.write(xml)
 
     return rc
-
-
-def find_executable(file_names):
-    paths = os.getenv('PATH').split(os.path.pathsep)
-    for file_name in file_names:
-        for path in paths:
-            file_path = os.path.join(path, file_name)
-            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-                return file_path
-    return None
 
 
 def get_files(paths, extensions):

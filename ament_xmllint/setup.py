@@ -5,7 +5,7 @@ package_name = 'ament_xmllint'
 
 setup(
     name=package_name,
-    version='0.21.1',
+    version='0.21.4',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -30,7 +30,7 @@ setup(
     long_description="""\
 The ability to check XML files like the package manifest using xmllint
 and generate xUnit test result files.""",
-    license='Apache License, Version 2.0',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',
