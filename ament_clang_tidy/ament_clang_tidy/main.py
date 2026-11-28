@@ -39,6 +39,35 @@ def is_unittest_source(package, file_path):
     return ('%s/test/' % package) in normalized_file_path
 
 
+def get_source_dir_from_cmake_cache(build_dir):
+    """
+    Return the CMake source directory recorded in a build directory's CMakeCache.txt.
+
+    Returns None if the cache does not exist or does not record a source directory.
+    """
+    cache_path = os.path.join(build_dir, 'CMakeCache.txt')
+    if not os.path.isfile(cache_path):
+        return None
+    with open(cache_path, 'r', encoding='utf-8', errors='replace') as h:
+        for line in h:
+            if line.startswith('CMAKE_HOME_DIRECTORY:'):
+                _, _, value = line.partition('=')
+                value = value.strip()
+                return value or None
+    return None
+
+
+def is_in_directory(file_path, directory):
+    """Return whether file_path is located inside directory (after resolving symlinks)."""
+    file_path = os.path.realpath(file_path)
+    directory = os.path.realpath(directory)
+    try:
+        return os.path.commonpath([file_path, directory]) == directory
+    except ValueError:
+        # e.g. paths on different drives on Windows
+        return False
+
+
 def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
     extensions = ['c', 'cc', 'cpp', 'cxx', 'h', 'hh', 'hpp', 'hxx']
 
@@ -93,12 +122,25 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
         '--packages-select', nargs='*', metavar='PKG_NAME',
         help='Only process a subset of packages')
     parser.add_argument(
+        '--source-dir',
+        metavar='path',
+        default=None,
+        help='Only check translation units located in this directory. By default the source'
+             ' directory of each package is read from the CMakeCache.txt next to its'
+             ' compilation database, so that files generated into the build directory'
+             ' (e.g. by rclcpp_components or rosidl) are not checked')
+    parser.add_argument(
         '--xunit-file',
         help='Generate a xunit compliant XML file')
     args = parser.parse_args(argv)
 
     if args.config_file is not None and not os.path.exists(args.config_file):
         print("Could not find config file '%s'" % args.config_file,
+              file=sys.stderr)
+        return 1
+
+    if args.source_dir is not None and not os.path.isdir(args.source_dir):
+        print("Could not find source directory '%s'" % args.source_dir,
               file=sys.stderr)
         return 1
 
@@ -183,10 +225,23 @@ def main(argv: list[str] = sys.argv[1:]) -> Literal[None, 1]:
                 output = e.output.decode('utf-8')
             return output
 
+        # only check files that are part of the package's sources, not files
+        # generated into the build directory which the user doesn't control
+        source_dir = args.source_dir
+        if source_dir is None:
+            source_dir = get_source_dir_from_cmake_cache(package_dir)
+
         files = []
         async_outputs = []
-        db = json.load(open(compilation_db_path))
+        with open(compilation_db_path, 'r') as h:
+            db = json.load(h)
         for item in db:
+            # exclude files outside of the source directory
+            if source_dir is not None:
+                file_path = os.path.join(item.get('directory', ''), item['file'])
+                if not is_in_directory(file_path, source_dir):
+                    continue
+
             # exclude gtest sources from being checked by clang-tidy
             if is_gtest_source(os.path.basename(item['file'])):
                 continue
